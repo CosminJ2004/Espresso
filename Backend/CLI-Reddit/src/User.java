@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -115,6 +116,7 @@ public class User {
             if (rowsAffected > 0) {
                 this.username = user;
                 this.password = pass;
+                System.out.println("User registered successfully!");
                 return false;
             }
 
@@ -122,6 +124,7 @@ public class User {
             System.err.println("An error occurred: " + e.getMessage());
             return true;
         }
+        System.out.println("Registration failed.");
         return true;
     }
 
