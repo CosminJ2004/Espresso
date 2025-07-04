@@ -16,7 +16,12 @@ public class Service {
     }
 
     public boolean register(Scanner scanner) {
-        return true;
+        System.out.println("Please enter the desired username: ");
+        String username = scanner.next();
+        System.out.println("Please enter the desired password: ");
+        String password = scanner.next();
+        user.register(username, password);
+        return user.isLoggedIn() && user.login(username, password);
     }
 
     public void createPost(Scanner scanner)
