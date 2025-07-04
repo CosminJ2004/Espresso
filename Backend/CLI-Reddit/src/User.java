@@ -109,6 +109,8 @@ public class User {
             int rowsAffected = pstmt.executeUpdate();
 
             if (rowsAffected > 0) {
+                this.username = user;
+                this.password = pass;
                 return false;
             }
 
