@@ -118,7 +118,7 @@ public class User {
             System.err.println("An error occurred: " + e.getMessage());
             return true;
         }
-        return false;
+        return true;
     }
 
     public boolean login(String user, String pass) {
@@ -146,14 +146,16 @@ public class User {
         }
     }
 
-    public void logout() {
+    public boolean logout() {
         if (this.username != null) {
             System.out.println("Goodbye, " + this.username + "!");
             this.username = null;
             this.password = null;
             System.out.println("Logged out successfully.");
+            return false;
         } else {
             System.out.println("No user is currently logged in.");
+            return true;
         }
     }
 
