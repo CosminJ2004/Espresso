@@ -6,14 +6,20 @@ public class Post {
     private static int counter;
     private int id;
     private String author;
+    private String summary;
     private String content;
     private List<Comment> commentList = new ArrayList<>();
     private int votes;
 
-    public Post(String author, String content) {
+    public Post(String author, String summary, String content) {
         this.id = ++counter;
         this.author = author;
+        this.summary =summary;
         this.content = content;
+    }
+
+    public String getSummary() {
+        return summary;
     }
 
     public String getAuthor() {
@@ -45,7 +51,14 @@ public class Post {
     }
 
     public String display() {
-        String result = "[" + id + "] " + content + " (by " + author + ") Votes: " + votes;
+        String result = "[" + id + "] " + summary + " (by " + author + ") Votes: " + votes;
+        if (votes >= 10) {
+            result += " ⭐";
+        }
+        return result;
+    }
+    public String expand(){
+        String result = "[" + id + "] " + summary + content + " (by " + author + ") Votes: " + votes;
         if (votes >= 10) {
             result += " ⭐";
         }

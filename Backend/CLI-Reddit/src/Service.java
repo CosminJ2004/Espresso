@@ -10,29 +10,48 @@ public class Service {
     public boolean register(Scanner scanner) {
         return true;
     }
-
-    public void createPost(Scanner scanner) {
-        System.out.println("Author:");
+    public void createPost(Scanner scanner)
+    {   System.out.println("Enter the author of the post: ");
         String author = scanner.nextLine();
-        System.out.println("Content:");
+        System.out.print("Enter the summary of the post: ");
+        String summary = scanner.nextLine();
+        System.out.print("Enter the content of the post: ");
         String content = scanner.nextLine();
-        Post post = new Post(author, content);
+        Post post = new Post(author, summary, content);
         posts.add(post);
     }
-
-    public void showPost(Scanner scanner) {
-        for (Post post : posts) {
+    public void showPost(Scanner scanner)
+    {
+        for(Post post:posts) {
 
             String msg = post.display();
             System.out.println(msg);
         }
     }
+    public void deletePost(Scanner scanner)
+    {
+        System.out.print("Enter the ID of the post to delete: ");
+        int idToDelete = scanner.nextInt();
+        scanner.nextLine();
 
-    public void deletePost(Scanner scanner) {
+        boolean found = false;
+
+        for (int i = 0; i < posts.size(); i++) {
+            if (posts.get(i).getId() == idToDelete) {
+                posts.remove(i);
+                System.out.println("Post deleted.");
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            System.out.println("Post not found.");
+        }
 
     }
-
-    public void addCommentToPost(Scanner scanner) {
+    public void addCommentToPost(Scanner scanner)
+    {
 
     }
 
@@ -44,9 +63,6 @@ public class Service {
 
     }
 
-    public void addVoteToComment(Scanner scanner) {
-
-    }
 
     public void createLoginMenu(Scanner scanner) {
         boolean isLoggedIn = false;
@@ -73,6 +89,8 @@ public class Service {
             }
         }
     }
+    public void addVoteToComment(Scanner scanner)
+    {}
 
     public void createMainMenu(Scanner scanner) {
         while (true) {
@@ -85,8 +103,12 @@ public class Service {
             scanner.nextLine();
             switch (option) {
                 case 1:
+                      createPost(scanner);
                     break;
                 case 2:
+                    showPost(scanner);
+                    System.out.println("Alege postarea pe care vrei sa o vizualizezi");
+                    //expand
                     createPostMenu(scanner);
                     break;
                 case 3:
