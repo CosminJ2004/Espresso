@@ -180,7 +180,8 @@ public class Service {
                             String textComment=scanner.nextLine();
                             //casting and adding them to the list of comments of posts
                             CommentPost commentPost = new CommentPost(user, textComment, post);
-                            commentPosts.add(commentPost);
+                            commentPosts.add(commentPost);//adding also in a list
+                            post.addComment(commentPost);//adding comments to a post object
                         }
 
                     }
@@ -189,29 +190,30 @@ public class Service {
                     System.out.println("Choose the comment id you want to comment on: ");
                     int idComment=scanner.nextInt();
                     scanner.nextLine();
-                    for(Comment comment:commentPosts) {
+                    for(CommentPost comment:commentPosts) {
                         if(comment.getId()==idComment)
                         {
                             System.out.println("Write your comment: ");
                             String textComment=scanner.nextLine();
                             //adding comments of comments after casting them
                             CommentCom commentCom = new CommentCom(user, textComment,comment);
-                            commentComs.add(commentCom);
+                            comment.addReply(commentCom);//adding repluies to the comment object
+                            commentComs.add(commentCom);//still adding to a list
+                            //TO DO erase this logic
                         }
 
 
                     }
                     break;
                 case 4:
-                    for(CommentPost comment:commentPosts)
-                    {
-                        CommentPost commentPost = comment;
-                        comment.showComment();
-                    }
-                    for(CommentCom comment:commentComs)
-                    {
-                        CommentCom commentCom= comment;
-                        comment.showComment();
+                    System.out.println("Choose the post id you want to see comments of: ");
+                    int idPost2=scanner.nextInt();
+                    scanner.nextLine();
+                    for(Post post:posts) {
+                        if(post.getId()==idPost2)
+                        {
+                            post.showAllComments();
+                        }
                     }
                     break;
                 case 5:

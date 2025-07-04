@@ -8,7 +8,7 @@ public class Post {
     private String author;
     private String summary;
     private String content;
-    private List<Comment> commentList = new ArrayList<>();
+    private List<CommentPost> commentList = new ArrayList<>();
     private int votes;
 
     public Post(String author, String summary, String content) {
@@ -42,12 +42,21 @@ public class Post {
         return votes;
     }
 
-    public void addComment(Comment comment) {
+    public void addComment(CommentPost comment) {
         commentList.add(comment);
     }
 
-    public List<Comment> getComments() {
+    public List<CommentPost> getComments() {
         return commentList;
+    }
+
+    public void showAllComments()
+    {
+        for(CommentPost commentPost: commentList)
+        {
+            commentPost.showComment();//TO DO adding indentation logic with levels
+            commentPost.showReplies();//same as reddit
+        }
     }
 
     public String display() {
