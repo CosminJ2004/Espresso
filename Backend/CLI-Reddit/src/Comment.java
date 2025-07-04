@@ -1,6 +1,6 @@
 public abstract class Comment {
-    private User user;
-    private String textComment;
+    protected User user;
+    protected String textComment;
 
     public Comment(User user, String textComment)
     {
