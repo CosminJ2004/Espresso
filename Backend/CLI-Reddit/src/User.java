@@ -9,7 +9,15 @@ public class User {
 
     public User() {}
     
+    private boolean isLoggedIn() {
+        return this.username != null && !this.username.isEmpty();
+    }
+    
     public boolean deleteUser() {
+        if (!isLoggedIn()) {
+            System.out.println("You must be logged in to delete your account.");
+            return true;
+        }
         try (Connection conn = DB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("DELETE FROM Users WHERE username = ?")) {
             
@@ -17,6 +25,8 @@ public class User {
             int rowsAffected = pstmt.executeUpdate();
             
             if (rowsAffected > 0) {
+                this.username = null;
+                this.password = null;
                 System.out.println("User deleted successfully!");
                 return false;
             } else {
@@ -35,6 +45,11 @@ public class User {
     }
     
     public boolean setUsername(String newUsername) {
+        if (!isLoggedIn()) {
+            System.out.println("You must be logged in to change your username.");
+            return true;
+        }
+        
         try (Connection conn = DB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("UPDATE Users SET username = ? WHERE username = ?")) {
             
@@ -59,6 +74,11 @@ public class User {
     }
     
     public boolean setPassword(String newPassword) {
+        if (!isLoggedIn()) {
+            System.out.println("You must be logged in to change your password.");
+            return true;
+        }
+        
         try (Connection conn = DB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("UPDATE Users SET password = ? WHERE username = ?")) {
             
@@ -80,8 +100,6 @@ public class User {
     }
 
     public boolean register(String user, String pass) {
-        this.username = user;
-        this.password = pass;
 
         try (Connection conn = DB.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Users (username, password) VALUES (?, ?)")) {
