@@ -1,10 +1,10 @@
 import java.util.*;
-import java.sql.*;
+/*import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 import java.util.Comparator;
-import java.time.LocalDate;
+import java.time.LocalDate;*/
 
 public class Main {
     public static void main(String[] args) {
@@ -85,8 +85,6 @@ public class Main {
                 }
             } catch (NoSuchElementException e) {
                 System.out.println("Error: Please enter a valid integer option.");
-//                scanner.nextLine(); // Curăță inputul invalid
-
             }
         }
     }
