@@ -10,7 +10,7 @@ public class User {
 
     public User() {}
     
-    private boolean isLoggedIn() {
+    public boolean isLoggedIn() {
         return this.username != null && !this.username.isEmpty();
     }
     

@@ -11,6 +11,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         Service service = new Service();
 
+
         service.createLoginMenu(scanner);
         service.createMainMenu(scanner);
     }

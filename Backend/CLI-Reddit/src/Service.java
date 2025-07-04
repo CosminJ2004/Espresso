@@ -2,12 +2,18 @@ import java.util.*;
 public class Service {
 
     List<Post> posts = new ArrayList<>();
+    List<CommentPost> commentPosts=new ArrayList<>();
+    List<CommentCom> commentComs=new ArrayList<>();
+    User user=new User();
 
     public boolean login(Scanner scanner) {
-        return true;
+
+        user.login("cosmin", "1234");
+        return user.isLoggedIn();
     }
 
     public boolean register(Scanner scanner) {
+        user.register("cosmin","123456");
         return true;
     }
 
@@ -72,6 +78,9 @@ public class Service {
     public void addCommentToPost(Scanner scanner)
     {
 
+//        CommentPost commentPost=new CommentPost(user, )
+
+
     }
 
     public void addCommentToComment(Scanner scanner) {
@@ -81,6 +90,7 @@ public class Service {
     public void addVoteToPost(Scanner scanner) {
 
     }
+
 
 
     public void createLoginMenu(Scanner scanner) {
@@ -124,6 +134,7 @@ public class Service {
             switch (option) {
                 case 1:
                       createPost(scanner);
+
                     break;
                 case 2:
                     showPost(scanner);
@@ -159,10 +170,49 @@ public class Service {
                     deletePost( scanner);
                     break;
                 case 2:
+                    System.out.println("Choose the post id you want to comment on: ");
+                    int idPost=scanner.nextInt();
+                    scanner.nextLine();
+                    for(Post post:posts) {
+                        if(post.getId()==idPost)
+                        {
+                            System.out.println("Write your comment: ");
+                            String textComment=scanner.nextLine();
+                            //casting and adding them to the list of comments of posts
+                            CommentPost commentPost = new CommentPost(user, textComment, post);
+                            commentPosts.add(commentPost);
+                        }
+
+                    }
                     break;
                 case 3:
+                    System.out.println("Choose the comment id you want to comment on: ");
+                    int idComment=scanner.nextInt();
+                    scanner.nextLine();
+                    for(Comment comment:commentPosts) {
+                        if(comment.getId()==idComment)
+                        {
+                            System.out.println("Write your comment: ");
+                            String textComment=scanner.nextLine();
+                            //adding comments of comments after casting them
+                            CommentCom commentCom = new CommentCom(user, textComment,comment);
+                            commentComs.add(commentCom);
+                        }
+
+
+                    }
                     break;
                 case 4:
+                    for(CommentPost comment:commentPosts)
+                    {
+                        CommentPost commentPost = comment;
+                        comment.showComment();
+                    }
+                    for(CommentCom comment:commentComs)
+                    {
+                        CommentCom commentCom= comment;
+                        comment.showComment();
+                    }
                     break;
                 case 5:
                     break;
