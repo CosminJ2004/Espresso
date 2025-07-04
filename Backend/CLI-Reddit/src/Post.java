@@ -51,14 +51,14 @@ public class Post {
     }
 
     public String display() {
-        String result = "[" + id + "] " + summary + " (by " + author + ") Votes: " + votes;
+        String result = "[" + id + "] " + summary  + " (by " + author + ") Votes: " + votes;
         if (votes >= 10) {
             result += " ⭐";
         }
         return result;
     }
     public String expand(){
-        String result = "[" + id + "] " + summary + content + " (by " + author + ") Votes: " + votes;
+        String result = "[" + id + "] " + summary +" " +content + " (by " + author + ") Votes: " + votes;
         if (votes >= 10) {
             result += " ⭐";
         }
