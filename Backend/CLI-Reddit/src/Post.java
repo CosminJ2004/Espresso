@@ -56,6 +56,7 @@ public class Post {
         {
             commentPost.showComment();//TO DO adding indentation logic with levels
             commentPost.showReplies();//same as reddit
+            //need to see a comment id also to have better debugging
         }
     }
 
