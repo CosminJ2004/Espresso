@@ -14,7 +14,7 @@ public class User {
         return this.username != null && !this.username.isEmpty();
     }
     
-    private boolean isNotLoggedIn() {
+    public boolean isNotLoggedIn() {
         return !isLoggedIn();
     }
     
