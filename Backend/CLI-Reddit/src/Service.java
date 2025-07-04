@@ -87,9 +87,9 @@ public class Service {
         boolean isLoggedIn = false;
         while (!isLoggedIn) {
             System.out.println("Choose your action:");
-            System.out.println("1. Login.");
-            System.out.println("2. Register.");
-            System.out.println("3. Exit.");
+            System.out.println("1. Login");
+            System.out.println("2. Register");
+            System.out.println("3. Exit");
 
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -114,9 +114,10 @@ public class Service {
     public void createMainMenu(Scanner scanner) {
         while (true) {
             System.out.println("Choose your action:");
-            System.out.println("1. Write a post.");
-            System.out.println("2. Show posts.");
-            System.out.println("3. Exit");
+            System.out.println("1. Write a post");
+            System.out.println("2. Show posts");
+            System.out.println("3. Log out");
+            System.out.println("4. Exit");
 
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -131,6 +132,8 @@ public class Service {
                     createPostMenu(scanner);
                     break;
                 case 3:
+                    return;
+                case 4:
                     return;
                 default:
                     System.out.println("Invalid option, try again.");
