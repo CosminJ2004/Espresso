@@ -2,18 +2,20 @@ import java.util.*;
 public class Service {
 
     List<Post> posts = new ArrayList<>();
-    List<CommentPost> commentPosts=new ArrayList<>();
-    List<CommentCom> commentComs=new ArrayList<>();
-    User user=new User();
+    List<CommentPost> commentPosts = new ArrayList<>();
+    List<CommentCom> commentComs = new ArrayList<>();
+    User user = new User();
 
     public boolean login(Scanner scanner) {
-
-        user.login("cosmin", "1234");
+        System.out.println("Please enter your username: ");
+        String username = scanner.next();
+        System.out.println("Please enter your password: ");
+        String password = scanner.next();
+        user.login(username, password);
         return user.isLoggedIn();
     }
 
     public boolean register(Scanner scanner) {
-        user.register("cosmin","123456");
         return true;
     }
 
