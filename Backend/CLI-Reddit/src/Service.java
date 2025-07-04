@@ -101,8 +101,7 @@ public class Service {
 
 
     public void createLoginMenu(Scanner scanner) {
-        boolean isLoggedIn = false;
-        while (!isLoggedIn) {
+        while (user.isNotLoggedIn()) {
             System.out.println("Choose your action:");
             System.out.println("1. Login");
             System.out.println("2. Register");
@@ -112,10 +111,10 @@ public class Service {
             scanner.nextLine();
             switch (option) {
                 case 1:
-                    isLoggedIn = login(scanner);
+                    login(scanner);
                     break;
                 case 2:
-                    isLoggedIn = register(scanner);
+                    register(scanner);
                     break;
                 case 3:
                     return;
@@ -129,7 +128,7 @@ public class Service {
     {}
 
     public void createMainMenu(Scanner scanner) {
-        while (true) {
+        while (user.isLoggedIn()) {
             System.out.println("Choose your action:");
             System.out.println("1. Write a post");
             System.out.println("2. Show posts");
@@ -141,7 +140,6 @@ public class Service {
             switch (option) {
                 case 1:
                       createPost(scanner);
-
                     break;
                 case 2:
                     showPost(scanner);
@@ -150,7 +148,8 @@ public class Service {
                     createPostMenu(scanner);
                     break;
                 case 3:
-                    return;
+                    user.logout();
+                    break;
                 case 4:
                     return;
                 default:
