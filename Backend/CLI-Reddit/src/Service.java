@@ -2,21 +2,22 @@ import java.util.*;
 public class Service {
 
     List <Post> posts=new ArrayList<>();
-    public void login(Scanner scanner)
+    public boolean login(Scanner scanner)
     {
-
+        return true;
     }
-    public void register(Scanner scanner)
+    public boolean register(Scanner scanner)
     {
-
+        return true;
     }
     public void createPost(Scanner scanner)
     {
-        String author=scanner.nextLine();
-        String content=scanner.nextLine();
-        Post post=new Post(author, content);
+        System.out.println("Author:");
+        String author = scanner.nextLine();
+        System.out.println("Content:");
+        String content = scanner.nextLine();
+        Post post = new Post(author, content);
         posts.add(post);
-
     }
     public void showPost(Scanner scanner)
     {
