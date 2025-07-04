@@ -13,8 +13,12 @@ public class User {
         return this.username != null && !this.username.isEmpty();
     }
     
+    private boolean isNotLoggedIn() {
+        return !isLoggedIn();
+    }
+    
     public boolean deleteUser() {
-        if (!isLoggedIn()) {
+        if (isNotLoggedIn()) {
             System.out.println("You must be logged in to delete your account.");
             return true;
         }
@@ -45,7 +49,7 @@ public class User {
     }
     
     public boolean setUsername(String newUsername) {
-        if (!isLoggedIn()) {
+        if (isNotLoggedIn()) {
             System.out.println("You must be logged in to change your username.");
             return true;
         }
@@ -74,7 +78,7 @@ public class User {
     }
     
     public boolean setPassword(String newPassword) {
-        if (!isLoggedIn()) {
+        if (isNotLoggedIn()) {
             System.out.println("You must be logged in to change your password.");
             return true;
         }
@@ -118,7 +122,7 @@ public class User {
             System.err.println("An error occurred: " + e.getMessage());
             return true;
         }
-        return false;
+        return true;
     }
 
     public boolean login(String user, String pass) {
@@ -146,14 +150,16 @@ public class User {
         }
     }
 
-    public void logout() {
+    public boolean logout() {
         if (this.username != null) {
             System.out.println("Goodbye, " + this.username + "!");
             this.username = null;
             this.password = null;
             System.out.println("Logged out successfully.");
+            return false;
         } else {
             System.out.println("No user is currently logged in.");
+            return true;
         }
     }
 
