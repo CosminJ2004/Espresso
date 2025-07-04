@@ -11,8 +11,25 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         Service service = new Service();
 
+        while (true) {
+            if (service.user.isNotLoggedIn()) {
+                service.createLoginMenu(scanner);
 
-        service.createLoginMenu(scanner);
-        service.createMainMenu(scanner);
+                if (service.user.isNotLoggedIn()) {
+                    break;
+                }
+            } else {
+                service.createMainMenu(scanner);
+
+                if (service.user.isNotLoggedIn()) {
+                    continue;
+                } else {
+                    break;
+                }
+            }
+        }
+        
+        scanner.close();
+        System.out.println("Goodbye!");
     }
 }
