@@ -8,28 +8,12 @@ import java.time.LocalDate;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
         Service service = new Service();
+        Menu menu = new Menu(service);
 
         while (true) {
-            if (service.user.isNotLoggedIn()) {
-                service.createLoginMenu(scanner);
-
-                if (service.user.isNotLoggedIn()) {
-                    break;
-                }
-            } else {
-                service.createMainMenu(scanner);
-
-                if (service.user.isNotLoggedIn()) {
-                    continue;
-                } else {
-                    break;
-                }
-            }
+            menu.createLoginMenu();
+            menu.createMainMenu();
         }
-        
-        scanner.close();
-        System.out.println("Goodbye!");
     }
 }

@@ -5,6 +5,8 @@ public class Service {
     List<CommentPost> commentPosts = new ArrayList<>();
     List<CommentCom> commentComs = new ArrayList<>();
     User user = new User();
+    private int currentPostID;
+    private Post currentPost;
 
     public boolean login(Scanner scanner) {
         System.out.println("Please enter your username: ");
@@ -24,66 +26,49 @@ public class Service {
         return user.isLoggedIn() && user.login(username, password);
     }
 
-    public void createPost(Scanner scanner)
-    {   System.out.println("Enter the author of the post: ");
-        String author = scanner.nextLine();
+    public void createPost(Scanner scanner) {
         System.out.print("Enter the summary of the post: ");
         String summary = scanner.nextLine();
         System.out.print("Enter the content of the post: ");
         String content = scanner.nextLine();
-        Post post = new Post(author, summary, content);
+        Post post = new Post(user.getUsername(), summary, content);
         posts.add(post);
     }
-    public void showPost(Scanner scanner)
-    {
-        for(Post post:posts) {
 
+    public void showPosts(Scanner scanner) {
+        for (Post post : posts) {
             String msg = post.display();
             System.out.println(msg);
         }
     }
-    public void expandPost(Scanner scanner){
-        System.out.println("Enter the ID of the post to expand: ");
-        int idToExpand = scanner.nextInt();
-        boolean found = false;
 
+    public Post getPostById(int postID) {
         for (int i = 0; i < posts.size(); i++) {
-            if (posts.get(i).getId() == idToExpand) {
-                String msg = posts.get(i).expand();
-                System.out.println(msg);
-                found = true;
-                break;
+            if (posts.get(i).getId() == postID) {
+                return posts.get(i);
             }
         }
 
-        if (!found) {
-            System.out.println("Post not found.");
-        }
+        System.out.println("Post not found.");
+        return null;
     }
-    public void deletePost(Scanner scanner)
-    {
-        System.out.print("Enter the ID of the post to delete: ");
-        int idToDelete = scanner.nextInt();
-        scanner.nextLine();
 
-        boolean found = false;
-
-        for (int i = 0; i < posts.size(); i++) {
-            if (posts.get(i).getId() == idToDelete) {
-                posts.remove(i);
-                System.out.println("Post deleted.");
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            System.out.println("Post not found.");
-        }
-
+    public void openPost(Scanner scanner) {
+        System.out.println("Choose the Post Id you wish to open:");
+        currentPostID = scanner.nextInt(); scanner.nextLine();
+        currentPost = getPostById(currentPostID);
+        expandPost();
     }
-    public void addCommentToPost(Scanner scanner)
-    {
+
+    public void expandPost() {
+        System.out.println(currentPost.expand());
+    }
+
+    public void deletePost(Scanner scanner) {
+        posts.remove(currentPost);
+    }
+
+    public void addCommentToPost(Scanner scanner) {
 
 //        CommentPost commentPost=new CommentPost(user, )
 
@@ -95,141 +80,18 @@ public class Service {
     }
 
     public void addVoteToPost(Scanner scanner) {
-
+        currentPost.upvote();
     }
 
 
-
-    public void createLoginMenu(Scanner scanner) {
-        while (user.isNotLoggedIn()) {
-            System.out.println("Choose your action:");
-            System.out.println("1. Login");
-            System.out.println("2. Register");
-            System.out.println("3. Exit");
-
-            int option = scanner.nextInt();
-            scanner.nextLine();
-            switch (option) {
-                case 1:
-                    login(scanner);
-                    break;
-                case 2:
-                    register(scanner);
-                    break;
-                case 3:
-                    return;
-                default:
-                    System.out.println("Invalid option, try again.");
-                    break;
-            }
-        }
-    }
-    public void addVoteToComment(Scanner scanner)
-    {}
-
-    public void createMainMenu(Scanner scanner) {
-        while (user.isLoggedIn()) {
-            System.out.println("Choose your action:");
-            System.out.println("1. Write a post");
-            System.out.println("2. Show posts");
-            System.out.println("3. Log out");
-            System.out.println("4. Exit");
-
-            int option = scanner.nextInt();
-            scanner.nextLine();
-            switch (option) {
-                case 1:
-                      createPost(scanner);
-                    break;
-                case 2:
-                    showPost(scanner);
-                    System.out.println("Alege ID ul postarii pe care vrei sa o vizualizezi");
-                    expandPost(scanner);
-                    createPostMenu(scanner);
-                    break;
-                case 3:
-                    user.logout();
-                    break;
-                case 4:
-                    return;
-                default:
-                    System.out.println("Invalid option, try again.");
-                    break;
-            }
-        }
+    public void addVoteToComment(Scanner scanner) {
     }
 
-    public void createPostMenu(Scanner scanner) {
-        while (true) {
-            System.out.println("Choose your action:");
-            System.out.println("1. Delete a post");
-            System.out.println("2. Add a comment to post");
-            System.out.println("3. Add a comment to a comment");
-            System.out.println("4. Vote a post");
-            System.out.println("5. Vote a comment");
-            System.out.println("6. Return");
+    public boolean isUserLoggedIn() {
+        return user.isLoggedIn();
+    }
 
-            int option = scanner.nextInt();
-            scanner.nextLine();
-            switch (option) {
-                case 1:
-                    deletePost( scanner);
-                    break;
-                case 2:
-                    System.out.println("Choose the post id you want to comment on: ");
-                    int idPost=scanner.nextInt();
-                    scanner.nextLine();
-                    for(Post post:posts) {
-                        if(post.getId()==idPost)
-                        {
-                            System.out.println("Write your comment: ");
-                            String textComment=scanner.nextLine();
-                            //casting and adding them to the list of comments of posts
-                            CommentPost commentPost = new CommentPost(user, textComment, post);
-                            commentPosts.add(commentPost);//adding also in a list
-                            post.addComment(commentPost);//adding comments to a post object
-                        }
-
-                    }
-                    break;
-                case 3:
-                    System.out.println("Choose the comment id you want to comment on: ");
-                    int idComment=scanner.nextInt();
-                    scanner.nextLine();
-                    for(CommentPost comment:commentPosts) {
-                        if(comment.getId()==idComment)
-                        {
-                            System.out.println("Write your comment: ");
-                            String textComment=scanner.nextLine();
-                            //adding comments of comments after casting them
-                            CommentCom commentCom = new CommentCom(user, textComment,comment);
-                            comment.addReply(commentCom);//adding repluies to the comment object
-                            commentComs.add(commentCom);//still adding to a list
-                            //TO DO erase this logic
-                        }
-
-
-                    }
-                    break;
-                case 4:
-                    System.out.println("Choose the post id you want to see comments of: ");
-                    int idPost2=scanner.nextInt();
-                    scanner.nextLine();
-                    for(Post post:posts) {
-                        if(post.getId()==idPost2)
-                        {
-                            post.showAllComments();
-                        }
-                    }
-                    break;
-                case 5:
-                    break;
-                case 6:
-                    return;
-                default:
-                    System.out.println("Invalid option, try again.");
-                    break;
-            }
-        }
+    public void userLogout() {
+        user.logout();
     }
 }

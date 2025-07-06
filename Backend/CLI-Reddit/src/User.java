@@ -153,16 +153,14 @@ public class User {
         }
     }
 
-    public boolean logout() {
+    public void logout() {
         if (this.username != null) {
             System.out.println("Goodbye, " + this.username + "!");
             this.username = null;
             this.password = null;
             System.out.println("Logged out successfully.");
-            return false;
         } else {
             System.out.println("No user is currently logged in.");
-            return true;
         }
     }
 
