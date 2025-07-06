@@ -20,10 +20,10 @@ public class Menu {
             scanner.nextLine();
             switch (option) {
                 case 1:
-                    service.login(scanner);
+                    service.login();
                     break;
                 case 2:
-                    service.register(scanner);
+                    service.register();
                     break;
                 case 3:
                     System.out.println("Goodbye!");
@@ -35,8 +35,10 @@ public class Menu {
         }
     }
 
-    public void createPostMenu(Scanner scanner) {
+    public void createPostMenu() {
         while (true) {
+            service.expandPost();
+
             System.out.println("Choose your action for this post:");
             System.out.println("1. Delete the post");
             System.out.println("2. Add a comment");
@@ -48,27 +50,14 @@ public class Menu {
             int option = scanner.nextInt();
             scanner.nextLine();
             switch (option) {
-                case 1:
-                    service.deletePost(scanner);
-                    return;
-                /*case 2:
-                    System.out.println("Choose the post id you want to comment on: ");
-                    int idPost=scanner.nextInt();
-                    scanner.nextLine();
-                    for(Post post:posts) {
-                        if(post.getId()==idPost)
-                        {
-                            System.out.println("Write your comment: ");
-                            String textComment=scanner.nextLine();
-                            //casting and adding them to the list of comments of posts
-                            CommentPost commentPost = new CommentPost(user, textComment, post);
-                            commentPosts.add(commentPost);//adding also in a list
-                            post.addComment(commentPost);//adding comments to a post object
-                        }
 
-                    }
+                case 1:
+                    service.deletePost();
+                    return;
+                case 2:
+                    service.addCommentToPost();
                     break;
-                case 3:
+                /*case 3:
                     System.out.println("Choose the comment id you want to comment on: ");
                     int idComment=scanner.nextInt();
                     scanner.nextLine();
@@ -83,12 +72,10 @@ public class Menu {
                             commentComs.add(commentCom);//still adding to a list
                             //TO DO erase this logic
                         }
-
-
                     }
                     break;*/
                 case 4:
-                    service.addVoteToPost(scanner);
+                    service.addVoteToPost();
                     break;
                 case 5:
                     break;
@@ -113,14 +100,14 @@ public class Menu {
             scanner.nextLine();
             switch (option) {
                 case 1:
-                    service.createPost(scanner);
+                    service.createPost();
                     break;
                 case 2:
-                    service.showPosts(scanner);
+                    service.showPosts();
                     break;
                 case 3:
-                    service.openPost(scanner);
-                    createPostMenu(scanner);
+                    service.openPost();
+                    createPostMenu();
                     break;
                 case 4:
                     service.userLogout();

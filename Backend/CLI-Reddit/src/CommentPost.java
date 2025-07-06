@@ -35,4 +35,8 @@ public class CommentPost extends Comment {
         System.out.println(textComment);
 
     }
+
+    public void display() {
+        System.out.println("[C" + id + "] " + textComment + " (by " + user.getUsername() + ")");
+    }
 }

@@ -4,11 +4,13 @@ public class Service {
     List<Post> posts = new ArrayList<>();
     List<CommentPost> commentPosts = new ArrayList<>();
     List<CommentCom> commentComs = new ArrayList<>();
+    Scanner scanner = new Scanner(System.in);
+
     User user = new User();
     private int currentPostID;
     private Post currentPost;
 
-    public boolean login(Scanner scanner) {
+    public boolean login() {
         System.out.println("Please enter your username: ");
         String username = scanner.next();
         System.out.println("Please enter your password: ");
@@ -17,7 +19,7 @@ public class Service {
         return user.isLoggedIn();
     }
 
-    public boolean register(Scanner scanner) {
+    public boolean register() {
         System.out.println("Please enter the desired username: ");
         String username = scanner.next();
         System.out.println("Please enter the desired password: ");
@@ -26,7 +28,7 @@ public class Service {
         return user.isLoggedIn() && user.login(username, password);
     }
 
-    public void createPost(Scanner scanner) {
+    public void createPost() {
         System.out.print("Enter the summary of the post: ");
         String summary = scanner.nextLine();
         System.out.print("Enter the content of the post: ");
@@ -35,7 +37,7 @@ public class Service {
         posts.add(post);
     }
 
-    public void showPosts(Scanner scanner) {
+    public void showPosts() {
         for (Post post : posts) {
             String msg = post.display();
             System.out.println(msg);
@@ -53,38 +55,39 @@ public class Service {
         return null;
     }
 
-    public void openPost(Scanner scanner) {
+    public void openPost() {
         System.out.println("Choose the Post Id you wish to open:");
         currentPostID = scanner.nextInt(); scanner.nextLine();
         currentPost = getPostById(currentPostID);
-        expandPost();
     }
 
     public void expandPost() {
-        System.out.println(currentPost.expand());
+        currentPost.expand();
     }
 
-    public void deletePost(Scanner scanner) {
+    public void deletePost() {
         posts.remove(currentPost);
     }
 
-    public void addCommentToPost(Scanner scanner) {
+    public void addCommentToPost() {
+        System.out.println("Write your comment:");
+        String textComment = scanner.nextLine();
+        //casting and adding them to the list of comments of posts
+        CommentPost commentPost = new CommentPost(user, textComment, currentPost);
+        commentPosts.add(commentPost);//adding also in a list
+        currentPost.addComment(commentPost);//adding comments to a post object
+    }
 
-//        CommentPost commentPost=new CommentPost(user, )
-
+    public void addCommentToComment() {
 
     }
 
-    public void addCommentToComment(Scanner scanner) {
-
-    }
-
-    public void addVoteToPost(Scanner scanner) {
+    public void addVoteToPost() {
         currentPost.upvote();
     }
 
 
-    public void addVoteToComment(Scanner scanner) {
+    public void addVoteToComment() {
     }
 
     public boolean isUserLoggedIn() {

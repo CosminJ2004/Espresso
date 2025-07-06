@@ -67,11 +67,14 @@ public class Post {
         }
         return result;
     }
-    public String expand(){
+
+    public void expand() {
         String result = "[" + id + "] " + summary +" " +content + " (by " + author + ") Votes: " + votes;
         if (votes >= 10) {
             result += " ⭐";
         }
-        return result;
+        System.out.println(result);
+        for (CommentPost comment : commentList)
+            comment.display();
     }
 }
