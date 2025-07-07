@@ -29,9 +29,9 @@ public class Service {
     }
 
     public void createPost() {
-        System.out.print("Enter the summary of the post: ");
-        String summary = scanner.nextLine();
-        System.out.print("Enter the content of the post: ");
+        System.out.println("Enter the summary of the post:");
+        String summary = scanner.nextLine(); scanner.nextLine();
+        System.out.println("Enter the content of the post:");
         String content = scanner.nextLine();
         Post post = new Post(user.getUsername(), summary, content);
         posts.add(post);
