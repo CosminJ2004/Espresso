@@ -22,7 +22,7 @@ public class CommentPost extends Comment {
     {
         for (CommentCom repl:replies)
         {//all comments of a certain commm
-            repl.display();
+            repl.display(1);
         }
     }
     public String getTextComment() {
@@ -36,8 +36,12 @@ public class CommentPost extends Comment {
 
     }
 
-    public void display() {
-        System.out.println(" [" + id + "] " + textComment + " (by " + user.getUsername() + ")");
-        showReplies();
+
+    public void display(int indentLevel) {
+        String indent = "  ".repeat(indentLevel);
+        System.out.println(indent + "[" + id + "] " + textComment + " (by " + user.getUsername() + ")");
+        for (CommentCom repl : replies) {
+            repl.display(indentLevel + 1);
+        }
     }
 }

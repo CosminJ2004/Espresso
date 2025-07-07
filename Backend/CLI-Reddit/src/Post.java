@@ -99,17 +99,17 @@ public class Post {
         }
         System.out.println(result);
         for (CommentPost comment : commentList)
-            comment.display();
+            comment.display(1);
     }
 
-    public CommentPost getCommentPostById(int commentId) {
-        for (int i = 0; i < commentList.size(); i++) {
-            if (commentList.get(i).getId() == commentId) {
-                return commentList.get(i);
-            }
-        }
-
-        System.out.println("Comment not found.");
-        return null;
-    }
+//    public CommentPost getCommentPostById(int commentId) {
+//        for (int i = 0; i < commentList.size(); i++) {
+//            if (commentList.get(i).getId() == commentId) {
+//                return commentList.get(i);
+//            }
+//        }
+//
+//        System.out.println("Comment not found.");
+//        return null;
+//    }
 }

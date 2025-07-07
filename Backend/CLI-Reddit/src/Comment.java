@@ -5,6 +5,7 @@ public abstract class Comment {
     protected int upvotes;
     private static int counter=0;
 
+
     public Comment(User user, String textComment)
     {
         this.upvotes=0;
@@ -20,5 +21,6 @@ public abstract class Comment {
     {
         this.upvotes++;
     }
+
 
 }

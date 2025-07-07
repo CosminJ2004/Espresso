@@ -5,6 +5,7 @@ public class Service {
     List<Post> posts = new ArrayList<>();
     List<CommentPost> commentPosts = new ArrayList<>();
     List<CommentCom> commentComs = new ArrayList<>();
+    List<Comment> commentsAll=new ArrayList<>();
     Scanner scanner = new Scanner(System.in);
 
     User user = new User();
@@ -80,8 +81,9 @@ public class Service {
         String textComment = scanner.nextLine();
         //casting and adding them to the list of comments of posts
         CommentPost commentPost = new CommentPost(user, textComment, currentPost);
-        commentPosts.add(commentPost);//adding also in a list
+//        commentPosts.add(commentPost);//adding also in a list
         currentPost.addComment(commentPost);//adding comments to a post object
+        commentsAll.add(commentPost); //adding the comment to the list pf all comments
     }
 
     public void addCommentToComment() {
@@ -92,10 +94,41 @@ public class Service {
         System.out.println("Write your comment:");
         String textComment = scanner.nextLine();
 
-        CommentPost currentComment = currentPost.getCommentPostById(commentId);
-        currentComment.addReply(new CommentCom(user, textComment));
-    }
+        CommentCom commentCom = new CommentCom(user, textComment); // creating the comment
 
+        boolean found = false;
+        Comment currentComment = null;
+
+        for (int i = 0; i < commentsAll.size(); i++) {
+            if (commentsAll.get(i).getId() == commentId) {
+                currentComment = commentsAll.get(i);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found || currentComment == null) {
+            System.out.println("Comment not found.");
+            return;
+        }
+
+        // Cast & Add reply
+        if (currentComment instanceof CommentPost) {
+            CommentPost cp = (CommentPost) currentComment;
+            cp.addReply(commentCom); // add as reply
+//            cp.showComment();
+
+        } else if (currentComment instanceof CommentCom) {
+            CommentCom cc = (CommentCom) currentComment;
+            cc.addReply(commentCom); // add as reply
+//            cc.showReplies();
+
+        }
+        commentsAll.add(commentCom);
+
+        // Add to global list (optional, if needed)
+
+    }
     public void upVoteToPost() {
 
 
