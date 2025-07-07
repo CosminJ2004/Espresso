@@ -1,4 +1,5 @@
 import java.util.*;
+
 public class Service {
 
     List<Post> posts = new ArrayList<>();
@@ -45,19 +46,19 @@ public class Service {
     }
 
     public Post getPostById(int postID) {
-        for (int i = 0; i < posts.size(); i++) {
-            if (posts.get(i).getId() == postID) {
-                return posts.get(i);
+        for (Post post : posts) {
+            if (post.getId() == postID) {
+                return post;
             }
         }
-
         System.out.println("Post not found.");
         return null;
     }
 
     public void openPost() {
         System.out.println("Choose the Post Id you wish to open:");
-        currentPostID = scanner.nextInt(); scanner.nextLine();
+        currentPostID = scanner.nextInt();
+        scanner.nextLine();
         currentPost = getPostById(currentPostID);
     }
 
@@ -66,7 +67,12 @@ public class Service {
     }
 
     public void deletePost() {
-        posts.remove(currentPost);
+        if (currentPost.getAuthor().equals(user.getUsername())) {
+            posts.remove(currentPost);
+            System.out.println("Post deleted successfully.");
+        } else {
+            System.out.println("You can only delete your own posts.");
+        }
     }
 
     public void addCommentToPost() {
@@ -80,7 +86,8 @@ public class Service {
 
     public void addCommentToComment() {
         System.out.println("Choose the Comment Id you wish to comment on:");
-        int commentId = scanner.nextInt(); scanner.nextLine();
+        int commentId = scanner.nextInt();
+        scanner.nextLine();
 
         System.out.println("Write your comment:");
         String textComment = scanner.nextLine();
@@ -89,8 +96,18 @@ public class Service {
         currentComment.addReply(new CommentCom(user, textComment));
     }
 
-    public void addVoteToPost() {
-        currentPost.upvote();
+    public void upVoteToPost() {
+
+
+        if (currentPost.upvote(user.getUsername())) {
+            System.out.println("Post upvoted successfully!");
+        }
+    }
+
+    public void downVoteToPost() {
+        if (currentPost.downvote(user.getUsername())) {
+            System.out.println("Post upvoted successfully!");
+        }
     }
 
 
