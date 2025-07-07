@@ -75,6 +75,6 @@ public class Post {
         }
         System.out.println(result);
         for (CommentPost comment : commentList)
-            comment.display();
+            comment.display(1);
     }
 }

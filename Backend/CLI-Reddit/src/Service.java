@@ -12,25 +12,25 @@ public class Service {
 
     public boolean login() {
         System.out.println("Please enter your username: ");
-        String username = scanner.next();
+        String username = scanner.nextLine();
         System.out.println("Please enter your password: ");
-        String password = scanner.next();
+        String password = scanner.nextLine();
         user.login(username, password);
         return user.isLoggedIn();
     }
 
     public boolean register() {
         System.out.println("Please enter the desired username: ");
-        String username = scanner.next();
+        String username = scanner.nextLine();
         System.out.println("Please enter the desired password: ");
-        String password = scanner.next();
+        String password = scanner.nextLine();
         user.register(username, password);
         return user.isLoggedIn() && user.login(username, password);
     }
 
     public void createPost() {
         System.out.println("Enter the summary of the post:");
-        String summary = scanner.nextLine(); scanner.nextLine();
+        String summary = scanner.nextLine();
         System.out.println("Enter the content of the post:");
         String content = scanner.nextLine();
         Post post = new Post(user.getUsername(), summary, content);
