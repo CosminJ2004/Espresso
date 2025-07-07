@@ -36,7 +36,9 @@ public class CommentPost extends Comment {
 
     }
 
-    public void display() {
-        System.out.println("[C" + id + "] " + textComment + " (by " + user.getUsername() + ")");
+    public void display(int spaceCount) {
+        for (int i = 0; i < spaceCount; i++)
+            System.out.print(" ");
+        System.out.println("[" + id + "] " + textComment + " (by " + user.getUsername() + ")");
     }
 }
