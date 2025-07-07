@@ -79,7 +79,14 @@ public class Service {
     }
 
     public void addCommentToComment() {
+        System.out.println("Choose the Comment Id you wish to comment on:");
+        int commentId = scanner.nextInt(); scanner.nextLine();
 
+        System.out.println("Write your comment:");
+        String textComment = scanner.nextLine();
+
+        CommentPost currentComment = currentPost.getCommentPostById(commentId);
+        currentComment.addReply(new CommentCom(user, textComment));
     }
 
     public void addVoteToPost() {
@@ -88,6 +95,7 @@ public class Service {
 
 
     public void addVoteToComment() {
+
     }
 
     public boolean isUserLoggedIn() {

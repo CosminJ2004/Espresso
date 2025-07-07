@@ -22,7 +22,7 @@ public class CommentPost extends Comment {
     {
         for (CommentCom repl:replies)
         {//all comments of a certain commm
-            repl.showComment();
+            repl.display();
         }
     }
     public String getTextComment() {
@@ -36,9 +36,8 @@ public class CommentPost extends Comment {
 
     }
 
-    public void display(int spaceCount) {
-        for (int i = 0; i < spaceCount; i++)
-            System.out.print(" ");
-        System.out.println("[" + id + "] " + textComment + " (by " + user.getUsername() + ")");
+    public void display() {
+        System.out.println(" [" + id + "] " + textComment + " (by " + user.getUsername() + ")");
+        showReplies();
     }
 }

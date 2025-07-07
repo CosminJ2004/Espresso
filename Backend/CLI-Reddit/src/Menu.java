@@ -57,23 +57,9 @@ public class Menu {
                 case 2:
                     service.addCommentToPost();
                     break;
-                /*case 3:
-                    System.out.println("Choose the comment id you want to comment on: ");
-                    int idComment=scanner.nextInt();
-                    scanner.nextLine();
-                    for(CommentPost comment:commentPosts) {
-                        if(comment.getId()==idComment)
-                        {
-                            System.out.println("Write your comment: ");
-                            String textComment=scanner.nextLine();
-                            //adding comments of comments after casting them
-                            CommentCom commentCom = new CommentCom(user, textComment,comment);
-                            comment.addReply(commentCom);//adding repluies to the comment object
-                            commentComs.add(commentCom);//still adding to a list
-                            //TO DO erase this logic
-                        }
-                    }
-                    break;*/
+                case 3:
+                    service.addCommentToComment();
+                    break;
                 case 4:
                     service.addVoteToPost();
                     break;
