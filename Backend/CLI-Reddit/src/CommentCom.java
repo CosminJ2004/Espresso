@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommentCom extends Comment {
+public class CommentCom extends Comment implements IEntity {
     private Comment comment;
     public List<CommentCom> repliesCom = new ArrayList<>();
 
@@ -40,5 +40,20 @@ public class CommentCom extends Comment {
         for (CommentCom repl : repliesCom) {
             repl.display(indentLevel + 1);
         }
+    }
+
+    @Override
+    public boolean upvote(String username) {
+        return false;
+    }
+
+    @Override
+    public boolean downvote(String username) {
+        return false;
+    }
+
+    @Override
+    public void expand() {
+
     }
 }

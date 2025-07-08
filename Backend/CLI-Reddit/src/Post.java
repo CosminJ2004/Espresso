@@ -1,7 +1,7 @@
 import javax.xml.stream.events.Comment;
 import java.util.*;
 
-public class Post {
+public class Post implements IEntity {
     private static final int MIN_VOTES_FOR_STAR=10;
     private static int counter;
     private int id;

@@ -126,8 +126,6 @@ public class Service {
         }
         commentsAll.add(commentCom);
 
-        // Add to global list (optional, if needed)
-
     }
     public void upVoteToPost() {
 
