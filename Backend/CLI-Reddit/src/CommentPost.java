@@ -39,7 +39,7 @@ public class CommentPost extends Comment implements IEntity{
 
     public void display(int indentLevel) {
         String indent = "  ".repeat(indentLevel);
-        System.out.println(indent + "[" + id + "] " + textComment + " (by " + user.getUsername() + ")");
+        System.out.println(indent + "[" + id + "] " + textComment + " (by " + user.getUsername() + ") Votes: " + getVotes());
         for (CommentCom repl : replies) {
             repl.display(indentLevel + 1);
         }
@@ -47,12 +47,12 @@ public class CommentPost extends Comment implements IEntity{
     //TO DO
     @Override
     public boolean upvote(String username) {
-        return false;
+        return super.upvote(username);
     }
 
     @Override
     public boolean downvote(String username) {
-        return false;
+        return super.downvote(username);
     }
 
     @Override

@@ -2,7 +2,7 @@ import javax.xml.stream.events.Comment;
 import java.util.*;
 
 public class Post implements IEntity {
-    private static final int MIN_VOTES_FOR_STAR=10;
+    private static final int MIN_VOTES_FOR_STAR = 10;
     private static int counter;
     private int id;
     private String author;
@@ -10,7 +10,6 @@ public class Post implements IEntity {
     private String content;
     private List<CommentPost> commentList = new ArrayList<>();
     private Map<String, String> userVotes = new HashMap<>();
-
     private int votes;
 
     public Post(String author, String summary, String content) {

@@ -45,8 +45,9 @@ public class Menu {
             System.out.println("3. Add a comment to a comment");
             System.out.println("4. Upvote post");
             System.out.println("5. Downvote post");
-            System.out.println("6. Vote a comment");
-            System.out.println("7. Return");
+            System.out.println("6. Upvote a comment");
+            System.out.println("7. Downvote a comment");
+            System.out.println("8. Return");
 
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -67,8 +68,12 @@ public class Menu {
                 case 5:
                     service.downVoteToPost();
                 case 6:
+                    service.upVoteToComment();
                     break;
                 case 7:
+                    service.downVoteToComment();
+                    break;
+                case 8:
                     return;
                 default:
                     System.out.println("Invalid option, try again.");
