@@ -148,7 +148,7 @@ public class Service {
     public void upVoteToComment() {
         System.out.println("Enter the comment ID to upvote:");
         int commentId = scanner.nextInt();
-        scanner.nextLine(); // curăță newline
+        scanner.nextLine();
 
         for (Comment comment : commentsAll) {
             if (comment.getId() == commentId) {
@@ -165,7 +165,7 @@ public class Service {
     public void downVoteToComment() {
         System.out.println("Enter the comment ID to downvote:");
         int commentId = scanner.nextInt();
-        scanner.nextLine(); // curăță newline
+        scanner.nextLine();
 
         for (Comment comment : commentsAll) {
             if (comment.getId() == commentId) {
