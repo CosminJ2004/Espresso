@@ -1,9 +1,7 @@
 package logger;
 
-import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 public class FileLogger implements ILogger {
     private LogLevel minLevel;
@@ -17,14 +15,10 @@ public class FileLogger implements ILogger {
     @Override
     public void log(LogLevel level, String message) {
         if (level.ordinal() >= minLevel.ordinal()) {
-            try (FileWriter fw = new FileWriter(filePath, true);
-                 BufferedWriter bw = new BufferedWriter(fw);
-                 PrintWriter out = new PrintWriter(bw)) {
-
-                out.println("[" + level + "] " + message);
-
+            try (FileWriter writer = new FileWriter(filePath, true)){
+                writer.write("[" + level + "] " + message + "\n");
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Error writing to log file: " + e.getMessage());
             }
         }
     }
