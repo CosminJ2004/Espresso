@@ -1,5 +1,5 @@
 import java.util.*;
-
+import logger.*;
 public class Service {
 
     List<Post> posts = new ArrayList<>();
@@ -8,8 +8,12 @@ public class Service {
     List<Comment> commentsAll=new ArrayList<>();
     Scanner scanner = new Scanner(System.in);
     UserService userService=new UserService();
+    LoggerManager loggerManager = new LoggerManager();
+    // Logger care loghează doar INFO și ERROR
 
+    ILogger fileLogger = new FileLogger(LogLevel.DEBUG, "app.log");
 
+    ConsoleLogger consoleLogger = new ConsoleLogger(LogLevel.INFO);
 
 
     private int currentPostID;
@@ -21,6 +25,10 @@ public class Service {
         System.out.println("Please enter your password: ");
         String password = scanner.nextLine();
         userService.login(username, password);
+        loggerManager.addLogger(consoleLogger);
+        loggerManager.addLogger(fileLogger);
+        loggerManager.log(LogLevel.INFO,"This is a info that login is succes");
+
         return UserContext.isLoggedIn();
     }
 
