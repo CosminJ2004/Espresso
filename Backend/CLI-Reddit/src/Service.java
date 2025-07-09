@@ -145,9 +145,40 @@ public class Service {
     }
 
 
-    public void addVoteToComment() {
+    public void upVoteToComment() {
+        System.out.println("Enter the comment ID to upvote:");
+        int commentId = scanner.nextInt();
+        scanner.nextLine(); // curăță newline
 
+        for (Comment comment : commentsAll) {
+            if (comment.getId() == commentId) {
+                if (comment.upvote(UserContext.getCurrentUser().getUsername())) {
+                    System.out.println("Comment upvoted successfully!");
+                }
+                return;
+            }
+        }
+
+        System.out.println("Comment not found.");
     }
+
+    public void downVoteToComment() {
+        System.out.println("Enter the comment ID to downvote:");
+        int commentId = scanner.nextInt();
+        scanner.nextLine(); // curăță newline
+
+        for (Comment comment : commentsAll) {
+            if (comment.getId() == commentId) {
+                if (comment.downvote(UserContext.getCurrentUser().getUsername())) {
+                    System.out.println("Comment downvoted successfully!");
+                }
+                return;
+            }
+        }
+
+        System.out.println("Comment not found.");
+    }
+
 
     public boolean isUserLoggedIn() {
         return UserContext.isLoggedIn();
