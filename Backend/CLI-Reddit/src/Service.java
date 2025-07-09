@@ -7,8 +7,11 @@ public class Service {
     List<CommentCom> commentComs = new ArrayList<>();
     List<Comment> commentsAll=new ArrayList<>();
     Scanner scanner = new Scanner(System.in);
+    UserService userService=new UserService();
 
-    User user = new User();
+
+
+
     private int currentPostID;
     private Post currentPost;
 
@@ -17,8 +20,8 @@ public class Service {
         String username = scanner.nextLine();
         System.out.println("Please enter your password: ");
         String password = scanner.nextLine();
-        user.login(username, password);
-        return user.isLoggedIn();
+        userService.login(username, password);
+        return UserContext.isLoggedIn();
     }
 
     public boolean register() {
@@ -26,8 +29,8 @@ public class Service {
         String username = scanner.nextLine();
         System.out.println("Please enter the desired password: ");
         String password = scanner.nextLine();
-        user.register(username, password);
-        return user.isLoggedIn() && user.login(username, password);
+        userService.register(username, password);
+        return UserContext.isLoggedIn() && userService.login(username, password);
     }
 
     public void createPost() {
@@ -35,7 +38,7 @@ public class Service {
         String summary = scanner.nextLine();
         System.out.println("Enter the content of the post:");
         String content = scanner.nextLine();
-        Post post = new Post(user.getUsername(), summary, content);
+        Post post = new Post(UserContext.getCurrentUser().getUsername(), summary, content);
         posts.add(post);
     }
 
@@ -68,7 +71,7 @@ public class Service {
     }
 
     public void deletePost() {
-        if (currentPost.getAuthor().equals(user.getUsername())) {
+        if (currentPost.getAuthor().equals(UserContext.getCurrentUser().getUsername())) {
             posts.remove(currentPost);
             System.out.println("Post deleted successfully.");
         } else {
@@ -80,7 +83,7 @@ public class Service {
         System.out.println("Write your comment:");
         String textComment = scanner.nextLine();
         //casting and adding them to the list of comments of posts
-        CommentPost commentPost = new CommentPost(user, textComment, currentPost);
+        CommentPost commentPost = new CommentPost(UserContext.getCurrentUser(), textComment, currentPost);
 //        commentPosts.add(commentPost);//adding also in a list
         currentPost.addComment(commentPost);//adding comments to a post object
         commentsAll.add(commentPost); //adding the comment to the list pf all comments
@@ -94,7 +97,7 @@ public class Service {
         System.out.println("Write your comment:");
         String textComment = scanner.nextLine();
 
-        CommentCom commentCom = new CommentCom(user, textComment); // creating the comment
+        CommentCom commentCom = new CommentCom(UserContext.getCurrentUser(), textComment); // creating the comment
 
         boolean found = false;
         Comment currentComment = null;
@@ -130,13 +133,13 @@ public class Service {
     public void upVoteToPost() {
 
 
-        if (currentPost.upvote(user.getUsername())) {
+        if (currentPost.upvote(UserContext.getCurrentUser().getUsername())) {
             System.out.println("Post upvoted successfully!");
         }
     }
 
     public void downVoteToPost() {
-        if (currentPost.downvote(user.getUsername())) {
+        if (currentPost.downvote(UserContext.getCurrentUser().getUsername())) {
             System.out.println("Post upvoted successfully!");
         }
     }
@@ -147,10 +150,10 @@ public class Service {
     }
 
     public boolean isUserLoggedIn() {
-        return user.isLoggedIn();
+        return UserContext.isLoggedIn();
     }
 
     public void userLogout() {
-        user.logout();
+        UserContext.logout();
     }
 }
