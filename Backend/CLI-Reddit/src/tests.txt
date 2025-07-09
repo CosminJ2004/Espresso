@@ -14,6 +14,7 @@
 [x] upVoteToComment() incrementeaza votul unui comentariu specific -done
 [x] downVoteToComment() decrementeaza votul unui comentariu specific -done
 [x] isUserLoggedIn() returneaza corect starea de autentificare -done
+[x] login() nu pot exista in baza de date doi useri cu acelasi username -done
 [x] userLogout() efectueaza deconectarea utilizatorului -done
 [x] loggerManager logheaza mesaje INFO si ERROR la login -done
 [x] fileLogger scrie loguri corect in fisier
