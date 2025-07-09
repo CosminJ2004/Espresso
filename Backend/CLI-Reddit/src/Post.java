@@ -1,4 +1,3 @@
-import javax.xml.stream.events.Comment;
 import java.util.*;
 
 public class Post implements IEntity {
