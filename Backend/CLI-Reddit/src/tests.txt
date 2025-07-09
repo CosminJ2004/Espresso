@@ -1,0 +1,22 @@
+[x] login() autentifica utilizatorul corect si adauga loggerii -done
+[x] register() inregistreaza si autentifica utilizatorul corect -done
+[x] createPost() adauga o postare noua corect -done
+[x] showPosts() afiseaza toate postarile -done
+[x] getPostById() returneaza postarea corecta sau null daca nu exista -done
+[x] openPost() seteaza currentPost pe postarea selectata -done
+[x] expandPost() apeleaza metoda expand() a postarii curente -done
+[x] deletePost() sterge postarea daca apartine utilizatorului curent -done
+[x] deletePost() nu sterge postarea daca nu apartine utilizatorului curent -done
+[x] addCommentToPost() adauga un comentariu nou la postarea curenta -done
+[x] addCommentToComment() adauga un comentariu ca raspuns la un alt comentariu -done
+[x] upVoteToPost() incrementeaza votul pentru postarea curenta -done
+[x] downVoteToPost() decrementeaza votul pentru postarea curenta -done
+[x] upVoteToComment() incrementeaza votul unui comentariu specific -done
+[x] downVoteToComment() decrementeaza votul unui comentariu specific -done
+[x] isUserLoggedIn() returneaza corect starea de autentificare -done
+[x] userLogout() efectueaza deconectarea utilizatorului -done
+[x] loggerManager logheaza mesaje INFO si ERROR la login -done
+[x] fileLogger scrie loguri corect in fisier
+[x] consoleLogger afiseaza loguri cu nivel INFO si peste -done
+[x] gestionarea corecta a situatiei cand postarea nu este gasita
+[x] gestionarea corecta a situatiei cand comentariul nu este gasit
