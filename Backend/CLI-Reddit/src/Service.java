@@ -1,9 +1,6 @@
 import java.util.*;
 
-import content.Comment;
-import content.CommentCom;
-import content.CommentPost;
-import content.Post;
+import content.*;
 import logger.*;
 import user.UserContext;
 import user.UserService;
@@ -17,6 +14,7 @@ public class Service {
     Scanner scanner = new Scanner(System.in);
     UserService userService=new UserService();
     LoggerManager loggerManager = new LoggerManager();
+    InputReader inputReader = new InputReader();
     // Logger care loghează doar INFO și ERROR
 
     ILogger fileLogger = new FileLogger(LogLevel.DEBUG, "app.log");
@@ -28,10 +26,9 @@ public class Service {
     private Post currentPost;
 
     public boolean login() {
-        System.out.println("Please enter your username: ");
-        String username = scanner.nextLine();
-        System.out.println("Please enter your password: ");
-        String password = scanner.nextLine();
+        String username = inputReader.readUsername("Please enter your username: ");
+        String password = inputReader.readPassword("Please enter your password: ");
+
         userService.login(username, password);
         loggerManager.addLogger(consoleLogger);
         loggerManager.addLogger(fileLogger);
@@ -41,10 +38,9 @@ public class Service {
     }
 
     public boolean register() {
-        System.out.println("Please enter the desired username: ");
-        String username = scanner.nextLine();
-        System.out.println("Please enter the desired password: ");
-        String password = scanner.nextLine();
+        String username = inputReader.readUsername("Please enter the desired username: ");
+        String password = inputReader.readPassword("Please enter the desired password: ");
+
         userService.register(username, password);
         return UserContext.isLoggedIn() && userService.login(username, password);
     }
@@ -76,9 +72,7 @@ public class Service {
     }
 
     public void openPost() {
-        System.out.println("Choose the comment.Post Id you wish to open:");
-        currentPostID = scanner.nextInt();
-        scanner.nextLine();
+        currentPostID = inputReader.readId("Choose the Post Id you wish to open: ");
         currentPost = getPostById(currentPostID);
     }
 
@@ -106,10 +100,7 @@ public class Service {
     }
 
     public void addCommentToComment() {
-        System.out.println("Choose the comment.Comment Id you wish to comment on:");
-        int commentId = scanner.nextInt();
-        scanner.nextLine();
-
+        int commentId = inputReader.readId("Choose the comment id you wish to comment on: ");
         System.out.println("Write your comment:");
         String textComment = scanner.nextLine();
 
