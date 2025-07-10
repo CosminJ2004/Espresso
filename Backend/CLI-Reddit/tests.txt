@@ -22,6 +22,6 @@
 [x] gestionarea corecta a situatiei cand postarea nu este gasita
 [x] gestionarea corecta a situatiei cand comentariul nu este gasit
 [x] adugare unui camp de no Comments -done
-[x] modularizare in packages
-[x] adaugarea mai multor loguri si testarea lor
+[x] modularizare in packages -done
+[x] adaugarea mai multor loguri si testarea lor -done
 [x]

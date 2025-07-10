@@ -100,24 +100,33 @@ public class Service {
         return null;
     }
 
-    public void openPost() {
-        logger.log(LogLevel.INFO, "User attempting to open post");
-        System.out.println("Choose the Post ID you wish to open:");
-        currentPostID = scanner.nextInt();
-        scanner.nextLine();
-        currentPostID = inputReader.readId("Choose the Post Id you wish to open: ");
-        currentPost = getPostById(currentPostID);
+    public boolean openPost() {
+        try {
+            logger.log(LogLevel.INFO, "User attempting to open post");
+            currentPostID = inputReader.readId("Choose the Post ID you wish to open: ");
+            currentPost = getPostById(currentPostID);
+        } catch (Exception e) {
+            logger.log(LogLevel.ERROR, "Failed to open post: " + e.getMessage());
+        }
 
         if (currentPost != null) {
             logger.log(LogLevel.INFO, "Post opened successfully: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
+            return false;
         } else {
             logger.log(LogLevel.WARN, "Failed to open post with ID: " + currentPostID);
+            return true;
+
         }
     }
 
     public void expandPost() {
         logger.log(LogLevel.INFO, "Expanding post ID: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
-        currentPost.expand();
+        if (currentPost != null) {
+            currentPost.expand();
+            logger.log(LogLevel.INFO, "Post expanded successfully: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
+        } else {
+            logger.log(LogLevel.WARN, "Failed to expand post with ID: " + currentPostID);
+        }
     }
 
     public void deletePost() {

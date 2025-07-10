@@ -100,8 +100,9 @@ public class Menu {
                     service.showPosts();
                     break;
                 case 3:
-                    service.openPost();
-                    createPostMenu();
+                    if (!service.openPost()) {
+                        createPostMenu();
+                    }
                     break;
                 case 4:
                     service.userLogout();
