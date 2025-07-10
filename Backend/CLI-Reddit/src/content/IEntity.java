@@ -1,3 +1,5 @@
+package content;
+
 public interface IEntity {
     public boolean upvote(String username);
     public boolean downvote(String username);

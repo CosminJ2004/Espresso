@@ -1,3 +1,5 @@
+package user;
+
 public class UserContext {
     private static User currentUser = null;
 

@@ -1,3 +1,5 @@
+package content;
+
 import java.util.*;
 
 public class Post implements IEntity {
@@ -100,14 +102,14 @@ public class Post implements IEntity {
             comment.display(1);
     }
 
-//    public CommentPost getCommentPostById(int commentId) {
+//    public comment.CommentPost getCommentPostById(int commentId) {
 //        for (int i = 0; i < commentList.size(); i++) {
 //            if (commentList.get(i).getId() == commentId) {
 //                return commentList.get(i);
 //            }
 //        }
 //
-//        System.out.println("Comment not found.");
+//        System.out.println("comment.Comment not found.");
 //        return null;
 //    }
 }
