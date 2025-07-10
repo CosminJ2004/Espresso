@@ -74,9 +74,6 @@ public class Service {
             logger.log(LogLevel.ERROR, "Failed to create post for user: " + UserContext.getCurrentUser().getUsername() + " - " + e.getMessage());
         }
 
-
-        Post post = new Post(UserContext.getCurrentUser().getUsername(), summary, content);
-        posts.add(post);
     }
 
     public void showPosts() {
