@@ -75,6 +75,11 @@ public class Service {
         } catch (Exception e) {
             logger.log(LogLevel.ERROR, "Failed to create post for user: " + UserContext.getCurrentUser().getUsername() + " - " + e.getMessage());
         }
+        String summary = inputReader.readText("Enter the summary of the post: ");
+        String content= inputReader.readText("Enter the content of the post: ");
+
+        Post post = new Post(UserContext.getCurrentUser().getUsername(), summary, content);
+        posts.add(post);
     }
 
     public void showPosts() {
@@ -131,6 +136,12 @@ public class Service {
     }
 
     public void addCommentToPost() {
+        String textComment = inputReader("Write your comment: ");
+        //casting and adding them to the list of comments of posts
+        CommentPost commentPost = new CommentPost(UserContext.getCurrentUser(), textComment, currentPost);
+//        commentPosts.add(commentPost);//adding also in a list
+        currentPost.addComment(commentPost);//adding comments to a post object
+        commentsAll.add(commentPost); //adding the comment to the list pf all comments
         logger.log(LogLevel.INFO, "User adding comment to post ID: " + currentPostID);
         System.out.println("Write your comment:");
         String textComment = scanner.nextLine();
@@ -184,7 +195,6 @@ public class Service {
 
         }
         commentsAll.add(commentCom);
-        logger.log(LogLevel.INFO, "Reply added successfully to comment ID: " + commentId + " by user: " + UserContext.getCurrentUser().getUsername());
 
     }
     public void upVoteToPost() {
@@ -231,6 +241,7 @@ public class Service {
     }
 
     public void downVoteToComment() {
+        int commentId = inputReader.readId("Enter the comment id you wish to downvote: ");
         logger.log(LogLevel.INFO, "User attempting to downvote comment");
         System.out.println("Enter the comment ID to downvote:");
         int commentId = scanner.nextInt();

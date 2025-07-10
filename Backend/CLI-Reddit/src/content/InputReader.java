@@ -4,9 +4,10 @@ import java.util.Scanner;
 
 public class InputReader {
     private static Scanner scanner;
-    private static final String INVALID_INPUT_ID = "Id format is invalid, please retry.";
     private static final String INVALID_INPUT_USER = "Username doesn't have the required minimum of characters.";
     private static final String INVALID_INPUT_PASS = "Password doesn't have the required minimum of characters.";
+    private static final String INVALID_INPUT_TEXT = "The text cannot be empty.";
+    private static final String INVALID_INPUT_ID = "Id format is invalid, please retry.";
     private static final int MINIM_USER_CHARS= 5;
     private static final int MINIM_PASS_CHARS= 5;
 
@@ -36,6 +37,19 @@ public class InputReader {
                 System.out.println(INVALID_INPUT_PASS);
             } else {
                 return username;
+            }
+        }
+    }
+
+    public static String readText(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String text = scanner.nextLine().trim();
+
+            if (text.isEmpty()) {
+                System.out.println(INVALID_INPUT_TEXT);
+            } else {
+                return text;
             }
         }
     }
