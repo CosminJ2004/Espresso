@@ -1,9 +1,6 @@
 import java.util.*;
 
-import content.Comment;
-import content.CommentCom;
-import content.CommentPost;
-import content.Post;
+import content.*;
 import logger.*;
 import user.UserContext;
 import user.UserService;
@@ -11,54 +8,80 @@ import user.UserService;
 public class Service {
 
     List<Post> posts = new ArrayList<>();
-    List<CommentPost> commentPosts = new ArrayList<>();
-    List<CommentCom> commentComs = new ArrayList<>();
-    List<Comment> commentsAll=new ArrayList<>();
+    List<Comment> commentsAll = new ArrayList<>();
     Scanner scanner = new Scanner(System.in);
     UserService userService=new UserService();
-    LoggerManager loggerManager = new LoggerManager();
-    // Logger care loghează doar INFO și ERROR
-
+    LoggerManager logger = new LoggerManager();
     ILogger fileLogger = new FileLogger(LogLevel.DEBUG, "app.log");
+    InputReader inputReader = new InputReader();
 
-    ConsoleLogger consoleLogger = new ConsoleLogger(LogLevel.INFO);
 
 
     private int currentPostID;
     private Post currentPost;
 
-    public boolean login() {
-        System.out.println("Please enter your username: ");
-        String username = scanner.nextLine();
-        System.out.println("Please enter your password: ");
-        String password = scanner.nextLine();
-        userService.login(username, password);
-        loggerManager.addLogger(consoleLogger);
-        loggerManager.addLogger(fileLogger);
-        loggerManager.log(LogLevel.INFO,"This is a info that login is succes");
+    public Service(){
+        logger.addLogger(fileLogger);
+    }
 
-        return UserContext.isLoggedIn();
+
+    public boolean login() {
+        logger.log(LogLevel.INFO, "Login attempt initiated");
+        String username = inputReader.readUsername("Please enter your username: ");
+        String password = inputReader.readPassword("Please enter your password: ");
+
+        logger.log(LogLevel.DEBUG, "Attempting login for user: " + username);
+        userService.login(username, password);
+
+        boolean loginSuccess = UserContext.isLoggedIn();
+        if (loginSuccess) {
+            logger.log(LogLevel.INFO, "User logged in successfully: " + username);
+        } else {
+            logger.log(LogLevel.WARN, "Login failed for user: " + username);
+        }
+
+        return loginSuccess;
     }
 
     public boolean register() {
-        System.out.println("Please enter the desired username: ");
-        String username = scanner.nextLine();
-        System.out.println("Please enter the desired password: ");
-        String password = scanner.nextLine();
+        logger.log(LogLevel.INFO, "Registration attempt initiated");
+        String username = inputReader.readUsername("Please enter the desired username: ");
+        String password = inputReader.readPassword("Please enter the desired password: ");
+
+        logger.log(LogLevel.DEBUG, "Attempting registration for user: " + username);
         userService.register(username, password);
-        return UserContext.isLoggedIn() && userService.login(username, password);
+
+        boolean registrationSuccess = UserContext.isLoggedIn() && userService.login(username, password);
+        if (registrationSuccess) {
+            logger.log(LogLevel.INFO, "User registered and logged in successfully: " + username);
+        } else {
+            logger.log(LogLevel.WARN, "Registration failed for user: " + username);
+        }
+
+        return registrationSuccess;
     }
 
     public void createPost() {
-        System.out.println("Enter the summary of the post:");
-        String summary = scanner.nextLine();
-        System.out.println("Enter the content of the post:");
-        String content = scanner.nextLine();
-        Post post = new Post(UserContext.getCurrentUser().getUsername(), summary, content);
-        posts.add(post);
+        logger.log(LogLevel.INFO, "Creating new post for user: " + UserContext.getCurrentUser().getUsername());
+        String summary = inputReader.readText("Enter the summary of the post: ");
+        String content= inputReader.readText("Enter the content of the post: ");
+
+        try {
+            Post post = new Post(UserContext.getCurrentUser().getUsername(), summary, content);
+            posts.add(post);
+            logger.log(LogLevel.INFO, "Post created successfully by user: " + UserContext.getCurrentUser().getUsername() + ", Post ID: " + post.getId());
+        } catch (Exception e) {
+            logger.log(LogLevel.ERROR, "Failed to create post for user: " + UserContext.getCurrentUser().getUsername() + " - " + e.getMessage());
+        }
+
     }
 
     public void showPosts() {
+        logger.log(LogLevel.DEBUG, "Displaying " + posts.size() + " posts");
+        if(posts.isEmpty()){
+            System.out.println("There are no posts");
+            return;
+        }
         for (Post post : posts) {
             String msg = post.display();
             System.out.println(msg);
@@ -66,54 +89,81 @@ public class Service {
     }
 
     public Post getPostById(int postID) {
+        logger.log(LogLevel.DEBUG, "Searching for post with ID: " + postID);
         for (Post post : posts) {
             if (post.getId() == postID) {
+                logger.log(LogLevel.DEBUG, "Post found with ID: " + postID);
                 return post;
             }
         }
-        System.out.println("comment.Post not found.");
+        logger.log(LogLevel.WARN, "Post not found with ID: " + postID);
+        System.out.println("Post not found.");
         return null;
     }
 
-    public void openPost() {
-        System.out.println("Choose the comment.Post Id you wish to open:");
-        currentPostID = scanner.nextInt();
-        scanner.nextLine();
-        currentPost = getPostById(currentPostID);
+    public boolean openPost() {
+        try {
+            logger.log(LogLevel.INFO, "User attempting to open post");
+            currentPostID = inputReader.readId("Choose the Post ID you wish to open: ");
+            currentPost = getPostById(currentPostID);
+        } catch (Exception e) {
+            logger.log(LogLevel.ERROR, "Failed to open post: " + e.getMessage());
+        }
+
+        if (currentPost != null) {
+            logger.log(LogLevel.INFO, "Post opened successfully: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
+            return false;
+        } else {
+            logger.log(LogLevel.WARN, "Failed to open post with ID: " + currentPostID);
+            return true;
+
+        }
     }
 
     public void expandPost() {
-        currentPost.expand();
+        logger.log(LogLevel.INFO, "Expanding post ID: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
+        if (currentPost != null) {
+            currentPost.expand();
+            logger.log(LogLevel.INFO, "Post expanded successfully: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
+        } else {
+            logger.log(LogLevel.WARN, "Failed to expand post with ID: " + currentPostID);
+        }
     }
 
     public void deletePost() {
+        logger.log(LogLevel.INFO, "User attempting to delete post ID: " + currentPostID);
         if (currentPost.getAuthor().equals(UserContext.getCurrentUser().getUsername())) {
             posts.remove(currentPost);
-            System.out.println("comment.Post deleted successfully.");
+            logger.log(LogLevel.INFO, "Post deleted successfully - ID: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
+            System.out.println("Post deleted successfully.");
         } else {
+            logger.log(LogLevel.WARN, "Unauthorized delete attempt on post ID: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
             System.out.println("You can only delete your own posts.");
         }
     }
 
     public void addCommentToPost() {
-        System.out.println("Write your comment:");
-        String textComment = scanner.nextLine();
+        String textComment = inputReader.readText("Write your comment: ");
         //casting and adding them to the list of comments of posts
         CommentPost commentPost = new CommentPost(UserContext.getCurrentUser(), textComment, currentPost);
 //        commentPosts.add(commentPost);//adding also in a list
-        currentPost.addComment(commentPost);//adding comments to a post object
-        commentsAll.add(commentPost); //adding the comment to the list pf all comments
+//        currentPost.addComment(commentPost);//adding comments to a post object
+//        commentsAll.add(commentPost); //adding the comment to the list pf all comments
+//        logger.log(LogLevel.INFO, "User adding comment to post ID: " + currentPostID);
+
+        try {
+            currentPost.addComment(commentPost);
+            commentsAll.add(commentPost);
+            logger.log(LogLevel.INFO, "Comment added successfully to post ID: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
+        } catch (Exception e) {
+            logger.log(LogLevel.ERROR, "Failed to add comment to post ID: " + currentPostID + " - " + e.getMessage());
+        }
     }
 
     public void addCommentToComment() {
-        System.out.println("Choose the comment.Comment Id you wish to comment on:");
-        int commentId = scanner.nextInt();
-        scanner.nextLine();
+        logger.log(LogLevel.INFO, "User attempting to add comment to comment");
+        int commentId = inputReader.readId("Choose the comment id you wish to comment on: ");
 
-        System.out.println("Write your comment:");
-        String textComment = scanner.nextLine();
-
-        CommentCom commentCom = new CommentCom(UserContext.getCurrentUser(), textComment); // creating the comment
 
         boolean found = false;
         Comment currentComment = null;
@@ -127,9 +177,15 @@ public class Service {
         }
 
         if (!found || currentComment == null) {
-            System.out.println("comment.Comment not found.");
+            logger.log(LogLevel.WARN, "Comment not found with ID: " + commentId);
+            System.out.println("Comment not found.");
             return;
         }
+
+        String textComment = inputReader.readText("Write your comment:");
+
+        CommentCom commentCom = new CommentCom(UserContext.getCurrentUser(), textComment); // creating the comment
+
 
         // Cast & Add reply
         if (currentComment instanceof CommentPost) {
@@ -147,21 +203,28 @@ public class Service {
 
     }
     public void upVoteToPost() {
-
-
+        logger.log(LogLevel.INFO, "User attempting to upvote post ID: " + currentPostID);
         if (currentPost.upvote(UserContext.getCurrentUser().getUsername())) {
-            System.out.println("comment.Post upvoted successfully!");
+            logger.log(LogLevel.INFO, "Post upvoted successfully - ID: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
+            System.out.println("Post upvoted successfully!");
+        } else {
+            logger.log(LogLevel.WARN, "Failed to upvote post ID: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
         }
     }
 
     public void downVoteToPost() {
+        logger.log(LogLevel.INFO, "User attempting to downvote post ID: " + currentPostID);
         if (currentPost.downvote(UserContext.getCurrentUser().getUsername())) {
-            System.out.println("comment.Post upvoted successfully!");
+            logger.log(LogLevel.INFO, "Post downvoted successfully - ID: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
+            System.out.println("Post downvoted successfully!");
+        } else {
+            logger.log(LogLevel.WARN, "Failed to downvote post ID: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
         }
     }
 
 
     public void upVoteToComment() {
+        logger.log(LogLevel.INFO, "User attempting to upvote comment");
         System.out.println("Enter the comment ID to upvote:");
         int commentId = scanner.nextInt();
         scanner.nextLine();
@@ -169,30 +232,37 @@ public class Service {
         for (Comment comment : commentsAll) {
             if (comment.getId() == commentId) {
                 if (comment.upvote(UserContext.getCurrentUser().getUsername())) {
-                    System.out.println("comment.Comment upvoted successfully!");
+                    logger.log(LogLevel.INFO, "Comment upvoted successfully - ID: " + commentId + " by user: " + UserContext.getCurrentUser().getUsername());
+                    System.out.println("Comment upvoted successfully!");
+                } else {
+                    logger.log(LogLevel.WARN, "Failed to upvote comment ID: " + commentId + " by user: " + UserContext.getCurrentUser().getUsername());
                 }
                 return;
             }
         }
 
-        System.out.println("comment.Comment not found.");
+        logger.log(LogLevel.WARN, "Comment not found with ID: " + commentId);
+        System.out.println("Comment not found.");
     }
 
     public void downVoteToComment() {
-        System.out.println("Enter the comment ID to downvote:");
-        int commentId = scanner.nextInt();
-        scanner.nextLine();
+        int commentId = inputReader.readId("Enter the comment id you wish to downvote: ");
+        logger.log(LogLevel.INFO, "User attempting to downvote comment");
 
         for (Comment comment : commentsAll) {
             if (comment.getId() == commentId) {
                 if (comment.downvote(UserContext.getCurrentUser().getUsername())) {
-                    System.out.println("comment.Comment downvoted successfully!");
+                    logger.log(LogLevel.INFO, "Comment downvoted successfully - ID: " + commentId + " by user: " + UserContext.getCurrentUser().getUsername());
+                    System.out.println("Comment downvoted successfully!");
+                } else {
+                    logger.log(LogLevel.WARN, "Failed to downvote comment ID: " + commentId + " by user: " + UserContext.getCurrentUser().getUsername());
                 }
                 return;
             }
         }
 
-        System.out.println("comment.Comment not found.");
+        logger.log(LogLevel.WARN, "Comment not found with ID: " + commentId);
+        System.out.println("Comment not found.");
     }
 
 
@@ -201,6 +271,7 @@ public class Service {
     }
 
     public void userLogout() {
+        logger.log(LogLevel.INFO, "User logout: " + UserContext.getCurrentUser().getUsername());
         UserContext.logout();
     }
 }

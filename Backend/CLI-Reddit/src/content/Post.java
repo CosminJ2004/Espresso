@@ -1,8 +1,10 @@
 package content;
-
 import java.util.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Post implements IEntity {
+
     private static final int MIN_VOTES_FOR_STAR = 10;
     private static int counter;
     private int id;
@@ -12,12 +14,14 @@ public class Post implements IEntity {
     private List<CommentPost> commentList = new ArrayList<>();
     private Map<String, String> userVotes = new HashMap<>();
     private int votes;
+    private LocalDateTime dateTime;
 
     public Post(String author, String summary, String content) {
         this.id = ++counter;
         this.author = author;
         this.summary = summary;
         this.content = content;
+        this.dateTime = LocalDateTime.now();
     }
 
     public String getSummary() {
@@ -85,7 +89,9 @@ public class Post implements IEntity {
     }
 
     public String display() {
-        String result = "[" + id + "] " + summary + " (by " + author + ") Votes: " + votes;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedDateTime = dateTime.format(formatter);
+        String result = "[" + id + "] " + summary + " (by " + author + ") Votes: " + votes + " | Posted on: " + formattedDateTime;
         if (votes >= MIN_VOTES_FOR_STAR) {
             result += " ⭐";
         }
@@ -93,23 +99,30 @@ public class Post implements IEntity {
     }
 
     public void expand() {
-        String result = "[" + id + "] " + summary + " (by " + author + ") Votes: " + votes + "\n" + content;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedDateTime = dateTime.format(formatter);
+        String result = "[" + id + "] " + summary + " " + content + " (by " + author + ") Votes: " + votes+ " | Posted on: " + formattedDateTime;
         if (votes >= MIN_VOTES_FOR_STAR) {
             result += " ⭐";
         }
         System.out.println(result);
-        for (CommentPost comment : commentList)
-            comment.display(1);
+        if (commentList.isEmpty()) {
+            System.out.println("There are no comments");
+        } else {
+            for (CommentPost comment : commentList)
+                comment.display(1);
+        }
+
     }
 
-//    public comment.CommentPost getCommentPostById(int commentId) {
+//    public CommentPost getCommentPostById(int commentId) {
 //        for (int i = 0; i < commentList.size(); i++) {
 //            if (commentList.get(i).getId() == commentId) {
 //                return commentList.get(i);
 //            }
 //        }
 //
-//        System.out.println("comment.Comment not found.");
+//        System.out.println("Comment not found.");
 //        return null;
 //    }
 }

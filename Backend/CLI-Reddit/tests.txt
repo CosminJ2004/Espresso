@@ -27,3 +27,9 @@
 [x] date and time la postare done
 [x] date and time la comentarii done
 
+[x] gestionarea corecta a situatiei cand postarea nu este gasita - done
+[x] gestionarea corecta a situatiei cand comentariul nu este gasit- done
+[x] adugare unui camp de no Comments -done
+[x] modularizare in packages -done
+[x] adaugarea mai multor loguri si testarea lor -done
+[x]
