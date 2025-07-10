@@ -63,10 +63,8 @@ public class Service {
 
     public void createPost() {
         logger.log(LogLevel.INFO, "Creating new post for user: " + UserContext.getCurrentUser().getUsername());
-        System.out.println("Enter the summary of the post:");
-        String summary = scanner.nextLine();
-        System.out.println("Enter the content of the post:");
-        String content = scanner.nextLine();
+        String summary = inputReader.readText("Enter the summary of the post: ");
+        String content= inputReader.readText("Enter the content of the post: ");
 
         try {
             Post post = new Post(UserContext.getCurrentUser().getUsername(), summary, content);
@@ -75,8 +73,7 @@ public class Service {
         } catch (Exception e) {
             logger.log(LogLevel.ERROR, "Failed to create post for user: " + UserContext.getCurrentUser().getUsername() + " - " + e.getMessage());
         }
-        String summary = inputReader.readText("Enter the summary of the post: ");
-        String content= inputReader.readText("Enter the content of the post: ");
+
 
         Post post = new Post(UserContext.getCurrentUser().getUsername(), summary, content);
         posts.add(post);
@@ -136,18 +133,15 @@ public class Service {
     }
 
     public void addCommentToPost() {
-        String textComment = inputReader("Write your comment: ");
+        String textComment = inputReader.readText("Write your comment: ");
         //casting and adding them to the list of comments of posts
         CommentPost commentPost = new CommentPost(UserContext.getCurrentUser(), textComment, currentPost);
 //        commentPosts.add(commentPost);//adding also in a list
         currentPost.addComment(commentPost);//adding comments to a post object
         commentsAll.add(commentPost); //adding the comment to the list pf all comments
         logger.log(LogLevel.INFO, "User adding comment to post ID: " + currentPostID);
-        System.out.println("Write your comment:");
-        String textComment = scanner.nextLine();
 
         try {
-            CommentPost commentPost = new CommentPost(UserContext.getCurrentUser(), textComment, currentPost);
             currentPost.addComment(commentPost);
             commentsAll.add(commentPost);
             logger.log(LogLevel.INFO, "Comment added successfully to post ID: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
@@ -243,9 +237,6 @@ public class Service {
     public void downVoteToComment() {
         int commentId = inputReader.readId("Enter the comment id you wish to downvote: ");
         logger.log(LogLevel.INFO, "User attempting to downvote comment");
-        System.out.println("Enter the comment ID to downvote:");
-        int commentId = scanner.nextInt();
-        scanner.nextLine();
 
         for (Comment comment : commentsAll) {
             if (comment.getId() == commentId) {
