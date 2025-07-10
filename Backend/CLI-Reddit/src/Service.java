@@ -78,6 +78,10 @@ public class Service {
 
     public void showPosts() {
         logger.log(LogLevel.DEBUG, "Displaying " + posts.size() + " posts");
+        if(posts.isEmpty()){
+            System.out.println("There are no posts");
+            return;
+        }
         for (Post post : posts) {
             String msg = post.display();
             System.out.println(msg);

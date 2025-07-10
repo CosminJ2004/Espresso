@@ -20,7 +20,7 @@
 [x] fileLogger scrie loguri corect in fisier
 [x] consoleLogger afiseaza loguri cu nivel INFO si peste -done
 [x] gestionarea corecta a situatiei cand postarea nu este gasita - done
-[x] gestionarea corecta a situatiei cand comentariul nu este gasit
+[x] gestionarea corecta a situatiei cand comentariul nu este gasit- done
 [x] adugare unui camp de no Comments -done
 [x] modularizare in packages -done
 [x] adaugarea mai multor loguri si testarea lor -done
