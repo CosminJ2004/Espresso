@@ -143,9 +143,9 @@ public class Service {
         //casting and adding them to the list of comments of posts
         CommentPost commentPost = new CommentPost(UserContext.getCurrentUser(), textComment, currentPost);
 //        commentPosts.add(commentPost);//adding also in a list
-        currentPost.addComment(commentPost);//adding comments to a post object
-        commentsAll.add(commentPost); //adding the comment to the list pf all comments
-        logger.log(LogLevel.INFO, "User adding comment to post ID: " + currentPostID);
+//        currentPost.addComment(commentPost);//adding comments to a post object
+//        commentsAll.add(commentPost); //adding the comment to the list pf all comments
+//        logger.log(LogLevel.INFO, "User adding comment to post ID: " + currentPostID);
 
         try {
             currentPost.addComment(commentPost);
@@ -160,10 +160,6 @@ public class Service {
         logger.log(LogLevel.INFO, "User attempting to add comment to comment");
         int commentId = inputReader.readId("Choose the comment id you wish to comment on: ");
 
-        System.out.println("Write your comment:");
-        String textComment = scanner.nextLine();
-
-        CommentCom commentCom = new CommentCom(UserContext.getCurrentUser(), textComment); // creating the comment
 
         boolean found = false;
         Comment currentComment = null;
@@ -181,6 +177,11 @@ public class Service {
             System.out.println("Comment not found.");
             return;
         }
+
+        String textComment = inputReader.readText("Write your comment:");
+
+        CommentCom commentCom = new CommentCom(UserContext.getCurrentUser(), textComment); // creating the comment
+
 
         // Cast & Add reply
         if (currentComment instanceof CommentPost) {
