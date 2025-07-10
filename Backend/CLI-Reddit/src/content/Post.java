@@ -93,7 +93,7 @@ public class Post implements IEntity {
     }
 
     public void expand() {
-        String result = "[" + id + "] " + summary + " " + content + " (by " + author + ") Votes: " + votes;
+        String result = "[" + id + "] " + summary + " (by " + author + ") Votes: " + votes + "\n" + content;
         if (votes >= MIN_VOTES_FOR_STAR) {
             result += " ⭐";
         }
