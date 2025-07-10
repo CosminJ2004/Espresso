@@ -1,31 +1,32 @@
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+package content;
+
+import user.User;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommentPost extends Comment implements IEntity{
-    private Post post;
-    public List<CommentCom> replies = new ArrayList<>();
-    private LocalDateTime dateTime;
+public class CommentCom extends Comment implements IEntity {
+    private Comment comment;
+    public List<CommentCom> repliesCom = new ArrayList<>();
 
-    public CommentPost(User user, String textComment,Post post)
+
+    public CommentCom(User user, String textComment)
     {
         super(user,textComment);
-        this.post=post;
-        this.dateTime = LocalDateTime.now();
     }
+
     public void setTextComment(String textComment) {
         this.textComment = textComment;
     }
     public void addReply(CommentCom com)
     {
-        replies.add(com);
+        repliesCom.add(com);
     }
     public void showReplies()
     {
-        for (CommentCom repl:replies)
+        for (CommentCom repl:repliesCom)
         {//all comments of a certain commm
-            repl.display(1);
+            repl.display(0);
         }
     }
     public String getTextComment() {
@@ -33,23 +34,18 @@ public class CommentPost extends Comment implements IEntity{
     }
     public void showComment()
     {
-        System.out.println(post.getSummary());
         System.out.println(user.getUsername());
         System.out.println(textComment);
-
     }
 
-
     public void display(int indentLevel) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        String formattedDateTime = dateTime.format(formatter);
         String indent = "  ".repeat(indentLevel);
-        System.out.println(indent + "[" + id + "] " + textComment + " (by " + user.getUsername() + ") Votes: " + getVotes()+ " | Posted on: " + formattedDateTime);
-        for (CommentCom repl : replies) {
+        System.out.println(indent + "[" + id + "] " + textComment + " (by " + user.getUsername() + ") Votes: " + getVotes());
+        for (CommentCom repl : repliesCom) {
             repl.display(indentLevel + 1);
         }
     }
-    //TO DO
+
     @Override
     public boolean upvote(String username) {
         return super.upvote(username);
