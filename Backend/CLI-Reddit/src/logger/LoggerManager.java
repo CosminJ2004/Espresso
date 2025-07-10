@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LoggerManager {
-    private List<ILogger> loggers = new ArrayList<>();
+    private final List<ILogger> loggers = new ArrayList<>();
 
     public void addLogger(ILogger logger) {
         loggers.add(logger);
