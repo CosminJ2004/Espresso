@@ -1,9 +1,6 @@
 import java.util.*;
 
-import content.Comment;
-import content.CommentCom;
-import content.CommentPost;
-import content.Post;
+import content.*;
 import logger.*;
 import user.UserContext;
 import user.UserService;
@@ -13,10 +10,15 @@ public class Service {
     List<Post> posts = new ArrayList<>();
     List<Comment> commentsAll = new ArrayList<>();
     Scanner scanner = new Scanner(System.in);
+    UserService userService=new UserService();
+    LoggerManager loggerManager = new LoggerManager();
+    InputReader inputReader = new InputReader();
+    // Logger care loghează doar INFO și ERROR
+
     UserService userService = new UserService();
     LoggerManager logger = new LoggerManager();
     ILogger fileLogger = new FileLogger(LogLevel.DEBUG, "app.log");
-    
+
     private int currentPostID;
     private Post currentPost;
 
@@ -31,10 +33,13 @@ public class Service {
         String username = scanner.nextLine();
         System.out.println("Please enter your password: ");
         String password = scanner.nextLine();
-        
+
         logger.log(LogLevel.DEBUG, "Attempting login for user: " + username);
+        String username = inputReader.readUsername("Please enter your username: ");
+        String password = inputReader.readPassword("Please enter your password: ");
+
         userService.login(username, password);
-        
+
         boolean loginSuccess = UserContext.isLoggedIn();
         if (loginSuccess) {
             logger.log(LogLevel.INFO, "User logged in successfully: " + username);
@@ -51,17 +56,20 @@ public class Service {
         String username = scanner.nextLine();
         System.out.println("Please enter the desired password: ");
         String password = scanner.nextLine();
-        
+
         logger.log(LogLevel.DEBUG, "Attempting registration for user: " + username);
+        String username = inputReader.readUsername("Please enter the desired username: ");
+        String password = inputReader.readPassword("Please enter the desired password: ");
+
         userService.register(username, password);
-        
+
         boolean registrationSuccess = UserContext.isLoggedIn() && userService.login(username, password);
         if (registrationSuccess) {
             logger.log(LogLevel.INFO, "User registered and logged in successfully: " + username);
         } else {
             logger.log(LogLevel.WARN, "Registration failed for user: " + username);
         }
-        
+
         return registrationSuccess;
     }
 
@@ -71,7 +79,7 @@ public class Service {
         String summary = scanner.nextLine();
         System.out.println("Enter the content of the post:");
         String content = scanner.nextLine();
-        
+
         try {
             Post post = new Post(UserContext.getCurrentUser().getUsername(), summary, content);
             posts.add(post);
@@ -107,8 +115,9 @@ public class Service {
         System.out.println("Choose the Post ID you wish to open:");
         currentPostID = scanner.nextInt();
         scanner.nextLine();
+        currentPostID = inputReader.readId("Choose the Post Id you wish to open: ");
         currentPost = getPostById(currentPostID);
-        
+
         if (currentPost != null) {
             logger.log(LogLevel.INFO, "Post opened successfully: " + currentPostID + " by user: " + UserContext.getCurrentUser().getUsername());
         } else {
@@ -137,7 +146,7 @@ public class Service {
         logger.log(LogLevel.INFO, "User adding comment to post ID: " + currentPostID);
         System.out.println("Write your comment:");
         String textComment = scanner.nextLine();
-        
+
         try {
             CommentPost commentPost = new CommentPost(UserContext.getCurrentUser(), textComment, currentPost);
             currentPost.addComment(commentPost);
@@ -154,6 +163,7 @@ public class Service {
         int commentId = scanner.nextInt();
         scanner.nextLine();
 
+        int commentId = inputReader.readId("Choose the comment id you wish to comment on: ");
         System.out.println("Write your comment:");
         String textComment = scanner.nextLine();
 
