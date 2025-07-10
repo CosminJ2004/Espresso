@@ -33,3 +33,12 @@
 [x] modularizare in packages -done
 [x] adaugarea mai multor loguri si testarea lor -done
 [x]
+
+
+spargere in serviceuri separat
+modele pt fieceare
+queryuri in DB
+Logger ->
+Votes model si service
+
+

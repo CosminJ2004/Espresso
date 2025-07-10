@@ -17,7 +17,15 @@ public class DB {
         }
     }
 
+    public static void CheckDBDriver()
+
+    {
+
+    }
+
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASS);
     }
+
+
 }
