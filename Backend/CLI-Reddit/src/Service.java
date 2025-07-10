@@ -1,5 +1,13 @@
 import java.util.*;
+
+import content.Comment;
+import content.CommentCom;
+import content.CommentPost;
+import content.Post;
 import logger.*;
+import user.UserContext;
+import user.UserService;
+
 public class Service {
 
     List<Post> posts = new ArrayList<>();
@@ -63,12 +71,12 @@ public class Service {
                 return post;
             }
         }
-        System.out.println("Post not found.");
+        System.out.println("comment.Post not found.");
         return null;
     }
 
     public void openPost() {
-        System.out.println("Choose the Post Id you wish to open:");
+        System.out.println("Choose the comment.Post Id you wish to open:");
         currentPostID = scanner.nextInt();
         scanner.nextLine();
         currentPost = getPostById(currentPostID);
@@ -81,7 +89,7 @@ public class Service {
     public void deletePost() {
         if (currentPost.getAuthor().equals(UserContext.getCurrentUser().getUsername())) {
             posts.remove(currentPost);
-            System.out.println("Post deleted successfully.");
+            System.out.println("comment.Post deleted successfully.");
         } else {
             System.out.println("You can only delete your own posts.");
         }
@@ -98,7 +106,7 @@ public class Service {
     }
 
     public void addCommentToComment() {
-        System.out.println("Choose the Comment Id you wish to comment on:");
+        System.out.println("Choose the comment.Comment Id you wish to comment on:");
         int commentId = scanner.nextInt();
         scanner.nextLine();
 
@@ -119,7 +127,7 @@ public class Service {
         }
 
         if (!found || currentComment == null) {
-            System.out.println("Comment not found.");
+            System.out.println("comment.Comment not found.");
             return;
         }
 
@@ -142,13 +150,13 @@ public class Service {
 
 
         if (currentPost.upvote(UserContext.getCurrentUser().getUsername())) {
-            System.out.println("Post upvoted successfully!");
+            System.out.println("comment.Post upvoted successfully!");
         }
     }
 
     public void downVoteToPost() {
         if (currentPost.downvote(UserContext.getCurrentUser().getUsername())) {
-            System.out.println("Post upvoted successfully!");
+            System.out.println("comment.Post upvoted successfully!");
         }
     }
 
@@ -161,13 +169,13 @@ public class Service {
         for (Comment comment : commentsAll) {
             if (comment.getId() == commentId) {
                 if (comment.upvote(UserContext.getCurrentUser().getUsername())) {
-                    System.out.println("Comment upvoted successfully!");
+                    System.out.println("comment.Comment upvoted successfully!");
                 }
                 return;
             }
         }
 
-        System.out.println("Comment not found.");
+        System.out.println("comment.Comment not found.");
     }
 
     public void downVoteToComment() {
@@ -178,13 +186,13 @@ public class Service {
         for (Comment comment : commentsAll) {
             if (comment.getId() == commentId) {
                 if (comment.downvote(UserContext.getCurrentUser().getUsername())) {
-                    System.out.println("Comment downvoted successfully!");
+                    System.out.println("comment.Comment downvoted successfully!");
                 }
                 return;
             }
         }
 
-        System.out.println("Comment not found.");
+        System.out.println("comment.Comment not found.");
     }
 
 
