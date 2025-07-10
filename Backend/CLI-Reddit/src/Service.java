@@ -11,13 +11,11 @@ public class Service {
     List<Comment> commentsAll = new ArrayList<>();
     Scanner scanner = new Scanner(System.in);
     UserService userService=new UserService();
-    LoggerManager loggerManager = new LoggerManager();
-    InputReader inputReader = new InputReader();
-    // Logger care loghează doar INFO și ERROR
-
-    UserService userService = new UserService();
     LoggerManager logger = new LoggerManager();
     ILogger fileLogger = new FileLogger(LogLevel.DEBUG, "app.log");
+    InputReader inputReader = new InputReader();
+
+
 
     private int currentPostID;
     private Post currentPost;
@@ -29,15 +27,10 @@ public class Service {
 
     public boolean login() {
         logger.log(LogLevel.INFO, "Login attempt initiated");
-        System.out.println("Please enter your username: ");
-        String username = scanner.nextLine();
-        System.out.println("Please enter your password: ");
-        String password = scanner.nextLine();
-
-        logger.log(LogLevel.DEBUG, "Attempting login for user: " + username);
         String username = inputReader.readUsername("Please enter your username: ");
         String password = inputReader.readPassword("Please enter your password: ");
 
+        logger.log(LogLevel.DEBUG, "Attempting login for user: " + username);
         userService.login(username, password);
 
         boolean loginSuccess = UserContext.isLoggedIn();
@@ -52,15 +45,10 @@ public class Service {
 
     public boolean register() {
         logger.log(LogLevel.INFO, "Registration attempt initiated");
-        System.out.println("Please enter the desired username: ");
-        String username = scanner.nextLine();
-        System.out.println("Please enter the desired password: ");
-        String password = scanner.nextLine();
-
-        logger.log(LogLevel.DEBUG, "Attempting registration for user: " + username);
         String username = inputReader.readUsername("Please enter the desired username: ");
         String password = inputReader.readPassword("Please enter the desired password: ");
 
+        logger.log(LogLevel.DEBUG, "Attempting registration for user: " + username);
         userService.register(username, password);
 
         boolean registrationSuccess = UserContext.isLoggedIn() && userService.login(username, password);
@@ -159,11 +147,8 @@ public class Service {
 
     public void addCommentToComment() {
         logger.log(LogLevel.INFO, "User attempting to add comment to comment");
-        System.out.println("Choose the Comment Id you wish to comment on:");
-        int commentId = scanner.nextInt();
-        scanner.nextLine();
-
         int commentId = inputReader.readId("Choose the comment id you wish to comment on: ");
+
         System.out.println("Write your comment:");
         String textComment = scanner.nextLine();
 
