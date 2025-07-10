@@ -1,6 +1,10 @@
+package content;
 import java.util.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Post implements IEntity {
+
     private static final int MIN_VOTES_FOR_STAR = 10;
     private static int counter;
     private int id;

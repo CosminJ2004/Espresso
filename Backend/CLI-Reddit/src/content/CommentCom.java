@@ -1,18 +1,22 @@
 package content;
-
 import user.User;
-
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+
 
 public class CommentCom extends Comment implements IEntity {
     private Comment comment;
     public List<CommentCom> repliesCom = new ArrayList<>();
-
+    private LocalDateTime dateTime;
 
     public CommentCom(User user, String textComment)
     {
+
         super(user,textComment);
+        this.dateTime = LocalDateTime.now();
     }
 
     public void setTextComment(String textComment) {
@@ -40,7 +44,9 @@ public class CommentCom extends Comment implements IEntity {
 
     public void display(int indentLevel) {
         String indent = "  ".repeat(indentLevel);
-        System.out.println(indent + "[" + id + "] " + textComment + " (by " + user.getUsername() + ") Votes: " + getVotes());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedDateTime = dateTime.format(formatter);
+        System.out.println(indent + "[" + id + "] " + textComment + " (by " + user.getUsername() + ") Votes: " + getVotes()+ " | Posted on: " + formattedDateTime);
         for (CommentCom repl : repliesCom) {
             repl.display(indentLevel + 1);
         }
