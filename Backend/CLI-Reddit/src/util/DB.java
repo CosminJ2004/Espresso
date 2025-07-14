@@ -9,18 +9,14 @@ public class DB {
     private static final String USER = "mysql";
     private static final String PASS = "QIcgFPwlBt1JnI57QTv1gS36YZVvkKUVyZAolfbw20fZ76lAoTzuGdkrHsTHs0ON";
 
-    static {
+
+    public static void CheckDBDriver()
+    {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             throw new ExceptionInInitializerError("MySQL Driver not found");
         }
-    }
-
-    public static void CheckDBDriver()
-
-    {
-
     }
 
     public static Connection getConnection() throws SQLException {

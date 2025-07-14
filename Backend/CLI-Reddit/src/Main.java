@@ -8,12 +8,8 @@ public class Main {
         Service service = new Service();
         Menu menu = new Menu(service);
 
-        try {
-            DB.CheckDBDriver();
-        } catch (Exception e)
-        {
+        DB.CheckDBDriver();
 
-        }
 
         // Log.InitLoggingSystem();
         FileLogger mahFileLogger = new FileLogger(LogLevel.DEBUG,"superLog1.txt");

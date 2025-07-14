@@ -9,6 +9,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserService {
+    private static User currentUser = null;
+
+    public static User getCurrentUser() {
+        return currentUser;
+    }
+
+    public static void setCurrentUser(User user) {
+        currentUser = user;
+    }
+
+    public static void logout() {
+        currentUser = null;
+    }
+
+    public static boolean isLoggedIn() {
+        return currentUser != null;
+    }
 
     public boolean register(String username, String password) {
         try (Connection conn = DB.getConnection();
@@ -19,7 +36,7 @@ public class UserService {
 
             int affected = stmt.executeUpdate();
             if (affected > 0) {
-                UserContext.setCurrentUser(new User(username, password));
+                setCurrentUser(new User(username, password));
                 System.out.println("Registered and logged in.");
                 return true;
             }
@@ -39,7 +56,7 @@ public class UserService {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 User user = new User(username, password);
-                UserContext.setCurrentUser(user);
+                setCurrentUser(user);
                 System.out.println("Logged in as " + username);
                 return true;
             }
@@ -50,12 +67,12 @@ public class UserService {
     }
 
     public boolean deleteCurrentUser() {
-        if (!UserContext.isLoggedIn()) {
+        if (!isLoggedIn()) {
             System.out.println("Not logged in.");
             return false;
         }
 
-        String username = UserContext.getCurrentUser().getUsername();
+        String username = getCurrentUser().getUsername();
 
         try (Connection conn = DB.getConnection();
              PreparedStatement stmt = conn.prepareStatement("DELETE FROM Users WHERE username = ?")) {
@@ -64,7 +81,7 @@ public class UserService {
             int affected = stmt.executeUpdate();
 
             if (affected > 0) {
-                UserContext.logout();
+                logout();
                 System.out.println("Account deleted.");
                 return true;
             }
@@ -76,12 +93,12 @@ public class UserService {
     }
 
     public boolean changeUsername(String newUsername) {
-        if (!UserContext.isLoggedIn()) {
+        if (!isLoggedIn()) {
             System.out.println("Not logged in.");
             return false;
         }
 
-        String currentUsername = UserContext.getCurrentUser().getUsername();
+        String currentUsername = getCurrentUser().getUsername();
 
         try (Connection conn = DB.getConnection();
              PreparedStatement stmt = conn.prepareStatement("UPDATE Users SET username = ? WHERE username = ?")) {
@@ -92,7 +109,7 @@ public class UserService {
             int affected = stmt.executeUpdate();
 
             if (affected > 0) {
-                UserContext.getCurrentUser().setUsername(newUsername);
+                getCurrentUser().setUsername(newUsername);
                 System.out.println("Username changed.");
                 return true;
             }
@@ -105,12 +122,12 @@ public class UserService {
     }
 
     public boolean changePassword(String newPassword) {
-        if (!UserContext.isLoggedIn()) {
+        if (!isLoggedIn()) {
             System.out.println("Not logged in.");
             return false;
         }
 
-        String currentUsername = UserContext.getCurrentUser().getUsername();
+        String currentUsername = getCurrentUser().getUsername();
 
         try (Connection conn = DB.getConnection();
              PreparedStatement stmt = conn.prepareStatement("UPDATE Users SET password = ? WHERE username = ?")) {
@@ -121,7 +138,7 @@ public class UserService {
             int affected = stmt.executeUpdate();
 
             if (affected > 0) {
-                UserContext.getCurrentUser().setPassword(newPassword);
+                getCurrentUser().setPassword(newPassword);
                 System.out.println("Password changed.");
                 return true;
             }
