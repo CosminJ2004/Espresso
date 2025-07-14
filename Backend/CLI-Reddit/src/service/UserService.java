@@ -1,15 +1,21 @@
 package service;
 
 import model.User;
-import util.DB;
+import repository.UserRepository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.Optional;
 
 public class UserService {
     private static User currentUser = null;
+    private final UserRepository userRepository;
+
+    public UserService() {
+        this.userRepository = new UserRepository();
+    }
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public static User getCurrentUser() {
         return currentUser;
@@ -28,41 +34,51 @@ public class UserService {
     }
 
     public boolean register(String username, String password) {
-        try (Connection conn = DB.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("INSERT INTO Users (username, password) VALUES (?, ?)")) {
-
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-
-            int affected = stmt.executeUpdate();
-            if (affected > 0) {
-                setCurrentUser(new User(username, password));
-                System.out.println("Registered and logged in.");
-                return true;
-            }
-        } catch (SQLException e) {
-            System.err.println("Register failed: " + e.getMessage());
+        if (username == null || username.trim().isEmpty()) {
+            System.out.println("Username cannot be empty.");
+            return false;
         }
+
+        if (password == null || password.length() < 6) {
+            System.out.println("Password must be at least 6 characters.");
+            return false;
+        }
+
+        if (userRepository.exists(username)) {
+            System.out.println("Username already exists.");
+            return false;
+        }
+
+        User newUser = new User(username, password);
+        if (userRepository.save(newUser)) {
+            setCurrentUser(newUser);
+            System.out.println("Registered and logged in.");
+            return true;
+        }
+
+        System.out.println("Registration failed.");
         return false;
     }
 
     public boolean login(String username, String password) {
-        try (Connection conn = DB.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Users WHERE username = ? AND password = ?")) {
-
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                User user = new User(username, password);
-                setCurrentUser(user);
-                System.out.println("Logged in as " + username);
-                return true;
-            }
-        } catch (SQLException e) {
-            System.err.println("Login failed: " + e.getMessage());
+        if (username == null || username.trim().isEmpty()) {
+            System.out.println("Username cannot be empty.");
+            return false;
         }
+
+        if (password == null || password.isEmpty()) {
+            System.out.println("Password cannot be empty.");
+            return false;
+        }
+
+        Optional<User> user = userRepository.findByUsernameAndPassword(username, password);
+        if (user.isPresent()) {
+            setCurrentUser(user.get());
+            System.out.println("Logged in as " + username);
+            return true;
+        }
+
+        System.out.println("Invalid username or password.");
         return false;
     }
 
@@ -74,21 +90,13 @@ public class UserService {
 
         String username = getCurrentUser().getUsername();
 
-        try (Connection conn = DB.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("DELETE FROM Users WHERE username = ?")) {
-
-            stmt.setString(1, username);
-            int affected = stmt.executeUpdate();
-
-            if (affected > 0) {
-                logout();
-                System.out.println("Account deleted.");
-                return true;
-            }
-        } catch (SQLException e) {
-            System.err.println("Delete failed: " + e.getMessage());
+        if (userRepository.deleteByUsername(username)) {
+            logout();
+            System.out.println("Account deleted.");
+            return true;
         }
 
+        System.out.println("Failed to delete account.");
         return false;
     }
 
@@ -98,26 +106,25 @@ public class UserService {
             return false;
         }
 
-        String currentUsername = getCurrentUser().getUsername();
-
-        try (Connection conn = DB.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("UPDATE Users SET username = ? WHERE username = ?")) {
-
-            stmt.setString(1, newUsername);
-            stmt.setString(2, currentUsername);
-
-            int affected = stmt.executeUpdate();
-
-            if (affected > 0) {
-                getCurrentUser().setUsername(newUsername);
-                System.out.println("Username changed.");
-                return true;
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Change failed: " + e.getMessage());
+        if (newUsername == null || newUsername.trim().isEmpty()) {
+            System.out.println("New username cannot be empty.");
+            return false;
         }
 
+        if (userRepository.exists(newUsername)) {
+            System.out.println("Username already exists.");
+            return false;
+        }
+
+        String currentUsername = getCurrentUser().getUsername();
+
+        if (userRepository.updateUsername(currentUsername, newUsername)) {
+            getCurrentUser().setUsername(newUsername);
+            System.out.println("Username changed.");
+            return true;
+        }
+
+        System.out.println("Failed to change username.");
         return false;
     }
 
@@ -127,26 +134,20 @@ public class UserService {
             return false;
         }
 
-        String currentUsername = getCurrentUser().getUsername();
-
-        try (Connection conn = DB.getConnection();
-             PreparedStatement stmt = conn.prepareStatement("UPDATE Users SET password = ? WHERE username = ?")) {
-
-            stmt.setString(1, newPassword);
-            stmt.setString(2, currentUsername);
-
-            int affected = stmt.executeUpdate();
-
-            if (affected > 0) {
-                getCurrentUser().setPassword(newPassword);
-                System.out.println("Password changed.");
-                return true;
-            }
-
-        } catch (SQLException e) {
-            System.err.println("Change failed: " + e.getMessage());
+        if (newPassword == null || newPassword.length() < 6) {
+            System.out.println("New password must be at least 6 characters.");
+            return false;
         }
 
+        String currentUsername = getCurrentUser().getUsername();
+
+        if (userRepository.updatePassword(currentUsername, newPassword)) {
+            getCurrentUser().setPassword(newPassword);
+            System.out.println("Password changed.");
+            return true;
+        }
+
+        System.out.println("Failed to change password.");
         return false;
     }
 }
