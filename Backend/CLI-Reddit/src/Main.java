@@ -1,11 +1,17 @@
 import logger.FileLogger;
 import logger.Log;
 import logger.LogLevel;
+import service.CommentService;
+import service.PostService;
+import service.UserService;
 import util.DB;
 
 public class Main {
     public static void main(String[] args) {
-        Service service = new Service();
+        UserService userService=new UserService();
+        PostService postService=new PostService();
+        CommentService commentService=new CommentService();
+        Service service = new Service(userService,postService,commentService);
         Menu menu = new Menu(service);
 
         DB.CheckDBDriver();

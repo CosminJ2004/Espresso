@@ -11,9 +11,9 @@ public class PostService {
     private static final int MIN_VOTES_FOR_STAR = 10;
 
     private Map<Integer, Post> posts = new HashMap<>();
-    private Map<Integer, List<Comment>> commentsMap = new HashMap<>();
-    private Map<Integer, Map<String, String>> votesMap = new HashMap<>();
-    private Map<Integer, Integer> votesCountMap = new HashMap<>();
+    private static Map<Integer, List<Comment>> commentsMap = new HashMap<>();
+    private static Map<Integer, Map<String, String>> votesMap = new HashMap<>();
+    private static Map<Integer, Integer> votesCountMap = new HashMap<>();
 
     // Adaugă post
     public void addPost(Post post) {
@@ -67,16 +67,19 @@ public class PostService {
         return votesCountMap.getOrDefault(post.getId(), 0);
     }
 
-    // Adaugă comentariu la post
     public void addComment(Post post, Comment comment) {
-//        commentsMap.get(post.getId()).add(comment);
+        System.out.println("ADDING: post ID = " + post.getId());
+        System.out.println("Map before = " + commentsMap);
         commentsMap.computeIfAbsent(post.getId(), k -> new ArrayList<>()).add(comment);
-
+        System.out.println("Map after = " + commentsMap);
     }
 
     public List<Comment> getComments(Post post) {
+        System.out.println("GETTING: post ID = " + post.getId());
+        System.out.println("Map = " + commentsMap);
         return commentsMap.getOrDefault(post.getId(), new ArrayList<>());
     }
+
 
     // Afișează toate comentariile
     public void showAllComments(Post post) {
@@ -112,6 +115,8 @@ public class PostService {
         System.out.println(result);
 
         List<Comment> commentList = getComments(post);
+        System.out.println("DEBUG: post ID = " + post.getId() + ", comments count = " + commentList.size());
+
         if (commentList.isEmpty()) {
             System.out.println("There are no comments");
         } else {

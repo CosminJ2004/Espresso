@@ -76,6 +76,7 @@ public class Comment {
         String prefix = "  ".repeat(indent);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         System.out.println(prefix + "[" + id + "] " + text + " (by " + author + ") Votes: " + votes + " | Posted: " + dateTime.format(formatter));
+        System.out.println(replies.size());
         for (Comment reply : replies) {
             reply.display(indent + 1);
         }

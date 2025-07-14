@@ -14,21 +14,24 @@ public class Service {
     List<Post> posts = new ArrayList<>();
     List<Comment> commentsAll = new ArrayList<>();
     Scanner scanner = new Scanner(System.in);
-    UserService userService=new UserService();
+
     LoggerManager logger = new LoggerManager();
     ILogger fileLogger = new FileLogger(LogLevel.DEBUG, "app.log");
     InputReader inputReader = new InputReader();
-    PostService postService=new PostService();
-    CommentService commentService=new CommentService();
 
-
-
+    private final UserService userService;
+    private final PostService postService;
+    private final CommentService commentService;
 
     private int currentPostID;
     private Post currentPost;
 
-    public Service(){
+    public Service(UserService userService,PostService postService, CommentService commentService){
         logger.addLogger(fileLogger);
+        this.userService=userService;
+        this.commentService=commentService;
+        this.postService=postService;
+
     }
 
 
@@ -158,19 +161,19 @@ public class Service {
             System.out.println("Post not found.");
             return;
         }
-        currentPost = postService.getPostById(postId);
+        currentPost=postService.getPostById(postId);
         if (currentPost == null) {
-            System.out.println("No post selected.");
-            return;
-        }
+        System.out.println("No post selected.");
+        return;
+    }
         //chestia asta cu check de post poate fi scoase intro metoda e TODO
 
-        String text = inputReader.readText("Write your comment: ");
+    String text = inputReader.readText("Write your comment: ");
+    Comment comment = commentService.addComment(UserService.getCurrentUser(), text, currentPost, null);
 
-        commentService.addComment(UserService.getCurrentUser(), text, currentPost, null); // trebuie să ai o listă de comentarii în `Post`
-
-
-    }
+    logger.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
+        " added comment ID " + comment.getId() + " to post ID " + postId);
+}
 
     public void addCommentToComment() {
         System.out.print("Enter comment ID to comment: ");
@@ -184,9 +187,9 @@ public class Service {
         //chestia asta cu check de post/commnet poate fi scoase intro metoda e TODO
 
         String text = inputReader.readText("Write your comment: ");
-        Comment newComment = new Comment(UserService.getCurrentUser(), text, currentPost, comment);
+//        Comment newComment = new Comment(UserService.getCurrentUser(), text, currentPost, comment);
 
-        commentService.addComment(UserService.getCurrentUser(),text,currentPost,newComment); // trebuie să ai o listă de comentarii în `Post`
+        commentService.addComment(UserService.getCurrentUser(),text,currentPost,comment); // trebuie să ai o listă de comentarii în `Post`
 
 
         logger.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +

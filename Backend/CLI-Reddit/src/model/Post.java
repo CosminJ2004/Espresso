@@ -6,13 +6,12 @@ import java.util.List;
 
 public class Post {
 
-    private static int counter;
+    private static int counter=0;
     private int id;
     private User author;
     private String summary;
     private String content;
     private LocalDateTime dateTime;
-
     public Post(User author, String summary, String content) {
         this.id = ++counter;
         this.author = author;

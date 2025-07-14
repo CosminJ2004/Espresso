@@ -5,7 +5,7 @@ import model.*;
 import java.util.*;
 
 public class CommentService {
-    private final Map<Integer, Comment> allComments = new HashMap<>();
+    private static final Map<Integer, Comment> allComments = new HashMap<>();
      PostService postService=new PostService();
 
 
@@ -14,9 +14,12 @@ public class CommentService {
         allComments.put(comment.getId(), comment);
 
         if (parent == null) {
+            System.out.println("e comment la post");
             postService.addComment(post,comment);
+
         } else {
             parent.addReply(comment);
+            System.out.println("e comment la com");
         }
         return comment;
     }
