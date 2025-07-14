@@ -1,62 +1,83 @@
 package model;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
-public abstract class Comment {
-    protected User user;
-    protected String textComment;
-    protected int id;
-    private static int counter=0;
-    private Map<String, String> comVotes = new HashMap<>();
-    private int votes;
+public class Comment {
+    private static int counter = 0;
 
-    public int getVotes() {
-        return votes;
-    }
+    private int id;
+    private User author;
+    private String text;
+    private Post post;
+    private Comment parent; // null dacă e top-level
+    private List<Comment> replies = new ArrayList<>();
+    private Map<String, String> userVotes = new HashMap<>();
+    private int votes = 0;
+    private LocalDateTime dateTime;
 
-    public Comment(User user, String textComment)
-    {
-
-        this.user=user;
-        this.textComment=textComment;
-        this.id=++counter;
+    public Comment(User author, String text, Post post, Comment parent) {
+        this.id = ++counter;
+        this.author = author;
+        this.text = text;
+        this.post = post;
+        this.parent = parent;
+        this.dateTime = LocalDateTime.now();
     }
 
     public int getId() {
         return id;
     }
 
+    public User getAuthor() {
+        return author;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public int getVotes() {
+        return votes;
+    }
+
+    public Comment getParent() {
+        return parent;
+    }
+
+    public List<Comment> getReplies() {
+        return replies;
+    }
+
+    public void addReply(Comment reply) {
+        replies.add(reply);
+    }
 
     public boolean upvote(String username) {
-        String previousVote = comVotes.get(username);
-        if ("upvote".equals(previousVote)) {
-            System.out.println("You already voted this post.");
-            return false;
-        }
-        if ("downvote".equals(previousVote)) {
-            votes += 2;
-        } else {
-            votes += 1;
-        }
-        comVotes.put(username, "upvote");
+        String prev = userVotes.get(username);
+        if ("upvote".equals(prev)) return false;
+        if ("downvote".equals(prev)) votes += 2;
+        else votes += 1;
+        userVotes.put(username, "upvote");
         return true;
     }
 
     public boolean downvote(String username) {
-        String previousVote = comVotes.get(username);
-        if ("downvote".equals(previousVote)) {
-            System.out.println("You already voted this post.");
-            return false;
-        }
-        if ("upvote".equals(previousVote)) {
-            votes -= 2;
-        } else {
-            votes -= 1;
-        }
-
-        comVotes.put(username, "downvote");
+        String prev = userVotes.get(username);
+        if ("downvote".equals(prev)) return false;
+        if ("upvote".equals(prev)) votes -= 2;
+        else votes -= 1;
+        userVotes.put(username, "downvote");
         return true;
     }
 
+    public void display(int indent) {
+        String prefix = "  ".repeat(indent);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        System.out.println(prefix + "[" + id + "] " + text + " (by " + author + ") Votes: " + votes + " | Posted: " + dateTime.format(formatter));
+        for (Comment reply : replies) {
+            reply.display(indent + 1);
+        }
+    }
 }

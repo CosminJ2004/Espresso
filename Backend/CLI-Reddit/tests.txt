@@ -34,11 +34,16 @@
 [x] adaugarea mai multor loguri si testarea lor -done
 [x]
 
+spargere in serviceuri separat
+modele pt fieceare
+queryuri in DB
 
 spargere in service-uri separat - service
 modele pt fiecare - models
 queryuri in DB - repository
 Logger ->
 Votes model si service
-Proiect Maven
+
+
+
 

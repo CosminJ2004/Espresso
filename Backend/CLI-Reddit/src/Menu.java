@@ -1,8 +1,12 @@
+//import service.CommentService;
+
 import java.util.Scanner;
 
 public class Menu {
     private Scanner scanner;
     private Service service;
+
+//    private CommentService commentService;
 
     public Menu(Service myService) {
         scanner = new Scanner(System.in);
@@ -63,10 +67,10 @@ public class Menu {
                     service.addCommentToComment();
                     break;
                 case 4:
-                    service.upVoteToPost();
+//                    service.upVoteToPost();
                     break;
                 case 5:
-                    service.downVoteToPost();
+//                    service.downVoteToPost();
                 case 6:
                     service.upVoteToComment();
                     break;
@@ -97,10 +101,10 @@ public class Menu {
                     service.createPost();
                     break;
                 case 2:
-                    service.showPosts();
+                    service.showAllPosts();
                     break;
                 case 3:
-                    if (!service.openPost()) {
+                {
                         createPostMenu();
                     }
                     break;
