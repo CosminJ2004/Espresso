@@ -1,4 +1,4 @@
-package content;
+package model;
 
 public interface IEntity {
     public boolean upvote(String username);

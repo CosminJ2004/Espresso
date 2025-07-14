@@ -1,4 +1,7 @@
-package user;
+package service;
+
+import model.User;
+import util.DB;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

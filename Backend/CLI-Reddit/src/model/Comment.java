@@ -1,6 +1,4 @@
-package content;
-
-import user.User;
+package model;
 
 import java.util.HashMap;
 import java.util.Map;

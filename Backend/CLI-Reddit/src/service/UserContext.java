@@ -1,4 +1,6 @@
-package user;
+package service;
+
+import model.User;
 
 public class UserContext {
     private static User currentUser = null;

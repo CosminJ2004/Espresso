@@ -1,4 +1,5 @@
-package content;
+package model;
+
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -115,7 +116,7 @@ public class Post implements IEntity {
 
     }
 
-//    public CommentPost getCommentPostById(int commentId) {
+//    public model.CommentPost getCommentPostById(int commentId) {
 //        for (int i = 0; i < commentList.size(); i++) {
 //            if (commentList.get(i).getId() == commentId) {
 //                return commentList.get(i);

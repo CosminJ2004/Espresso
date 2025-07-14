@@ -1,9 +1,13 @@
 import java.util.*;
 
-import content.*;
 import logger.*;
-import user.UserContext;
-import user.UserService;
+import model.Comment;
+import model.CommentCom;
+import model.CommentPost;
+import model.Post;
+import service.UserContext;
+import service.UserService;
+import util.InputReader;
 
 public class Service {
 
