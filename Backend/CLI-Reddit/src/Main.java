@@ -1,32 +1,24 @@
 import logger.FileLogger;
 import logger.Log;
 import logger.LogLevel;
-import user.DB;
 
 public class Main {
     public static void main(String[] args) {
+        /*
         Service service = new Service();
         Menu menu = new Menu(service);
+        DB.CheckDBDriver();
+        */
+        Log.RegisterLogger(new FileLogger(LogLevel.DEBUG,"DebugLogs.txt"));
+        Log.RegisterLogger(new FileLogger(LogLevel.ERROR, "ErrorsLogs.txt"));
 
-        try {
-            DB.CheckDBDriver();
-        } catch (Exception e)
-        {
+        Log.log(LogLevel.DEBUG,"Debug Message");
+        Log.log(LogLevel.WARN,"Debug Message");
+        Log.log(LogLevel.ERROR,"Error Message");
 
-        }
-
-        // Log.InitLoggingSystem();
-        FileLogger mahFileLogger = new FileLogger(LogLevel.DEBUG,"superLog1.txt");
-        FileLogger errLogger = new FileLogger(LogLevel.ERROR, "errors.txt");
-
-        Log.RegisterLogger(mahFileLogger);
-        Log.RegisterLogger(errLogger);
-
-        Log.log(LogLevel.ERROR,"Hello from main");
-
-        while (true) {
+        /*while (true) {
             menu.createLoginMenu();
             menu.createMainMenu();
-        }
+        }*/
     }
 }
