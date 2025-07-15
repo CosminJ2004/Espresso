@@ -12,7 +12,6 @@ import java.awt.*;
 public class Main {
     public static void main(String[] args) {
 
-        Service service = new Service();
         UserService userService=new UserService();
         PostService postService=new PostService();
         CommentService commentService=new CommentService();

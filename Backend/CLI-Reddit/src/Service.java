@@ -15,10 +15,6 @@ public class Service {
     List<Comment> commentsAll = new ArrayList<>();
     Scanner scanner = new Scanner(System.in);
 
-    LoggerManager logger = new LoggerManager();
-    ILogger fileLogger = new FileLogger(LogLevel.DEBUG, "app.log");
-    InputReader inputReader = new InputReader();
-
     private final UserService userService;
     private final PostService postService;
     private final CommentService commentService;
@@ -27,11 +23,9 @@ public class Service {
     private Post currentPost;
 
     public Service(UserService userService,PostService postService, CommentService commentService){
-        logger.addLogger(fileLogger);
         this.userService=userService;
         this.commentService=commentService;
         this.postService=postService;
-
     }
 
 
@@ -168,10 +162,10 @@ public class Service {
     }
         //chestia asta cu check de post poate fi scoase intro metoda e TODO
 
-    String text = inputReader.readText("Write your comment: ");
+    String text = Console.readText("Write your comment: ");
     Comment comment = commentService.addComment(UserService.getCurrentUser(), text, currentPost, null);
 
-    logger.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
+    Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
         " added comment ID " + comment.getId() + " to post ID " + postId);
 }
 
@@ -186,7 +180,7 @@ public class Service {
         }
         //chestia asta cu check de post/commnet poate fi scoase intro metoda e TODO
 
-        String text = inputReader.readText("Write your comment: ");
+        String text = Console.readText("Write your comment: ");
 //        Comment newComment = new Comment(UserService.getCurrentUser(), text, currentPost, comment);
 
         commentService.addComment(UserService.getCurrentUser(),text,currentPost,comment); // trebuie să ai o listă de comentarii în `Post`
