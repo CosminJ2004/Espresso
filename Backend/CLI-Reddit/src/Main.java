@@ -5,8 +5,7 @@ import service.VoteService;
 import service.CommentService;
 import service.PostService;
 import service.UserService;
-import util.DB;
-
+import util.Database;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,7 +17,7 @@ public class Main {
         Service service = new Service(userService, postService, commentService, voteService);
         Menu menu = new Menu(service);
 
-        DB.CheckDBDriver();
+        Database.CheckDriver();
 
         Log.RegisterLogger(new FileLogger(LogLevel.DEBUG,"DebugLogs.txt"));
         Log.RegisterLogger(new FileLogger(LogLevel.ERROR, "ErrorsLogs.txt"));

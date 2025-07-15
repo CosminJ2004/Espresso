@@ -1,7 +1,7 @@
 package repository;
 
 import model.User;
-import util.DB;
+import util.Database;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +13,7 @@ public class UserRepository {
 
     public boolean save(User user) {
         String sql = "INSERT INTO Users (username, password) VALUES (?, ?)";
-        try (Connection conn = DB.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getUsername());
@@ -28,7 +28,7 @@ public class UserRepository {
 
     public Optional<User> findByUsername(String username) {
         String sql = "SELECT * FROM Users WHERE username = ?";
-        try (Connection conn = DB.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, username);
@@ -49,7 +49,7 @@ public class UserRepository {
 
     public Optional<User> findByUsernameAndPassword(String username, String password) {
         String sql = "SELECT * FROM Users WHERE username = ? AND password = ?";
-        try (Connection conn = DB.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, username);
@@ -71,7 +71,7 @@ public class UserRepository {
 
     public boolean updateUsername(String oldUsername, String newUsername) {
         String sql = "UPDATE Users SET username = ? WHERE username = ?";
-        try (Connection conn = DB.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, newUsername);
@@ -86,7 +86,7 @@ public class UserRepository {
 
     public boolean updatePassword(String username, String newPassword) {
         String sql = "UPDATE Users SET password = ? WHERE username = ?";
-        try (Connection conn = DB.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, newPassword);
@@ -101,7 +101,7 @@ public class UserRepository {
 
     public boolean deleteByUsername(String username) {
         String sql = "DELETE FROM Users WHERE username = ?";
-        try (Connection conn = DB.getConnection();
+        try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, username);

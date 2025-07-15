@@ -83,4 +83,37 @@ public class Comment implements Votable {
             reply.display(level + 1, voteService);
         }
     }
+
+    public Post getPost() {
+        return post;
+    }
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Comment)) return false;
+        Comment comment = (Comment) o;
+        return id == comment.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "id=" + id +
+                ", author='" + author.getUsername() + '\'' +
+                ", text='" + text + '\'' +
+                ", post=" + post.getId() +
+                ", parent=" + (parent != null ? parent.getId() : "none") +
+                ", dateTime=" + dateTime +
+                '}';
+    }
 }
