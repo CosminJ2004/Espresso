@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Post {
+public class Post implements Votable {
 
     private static int counter=0;
     private int id;
@@ -12,6 +12,9 @@ public class Post {
     private String summary;
     private String content;
     private LocalDateTime dateTime;
+
+
+
     public Post(User author, String summary, String content) {
         this.id = ++counter;
         this.author = author;
@@ -39,4 +42,6 @@ public class Post {
     public LocalDateTime getDateTime() {
         return dateTime;
     }
+
+
 }

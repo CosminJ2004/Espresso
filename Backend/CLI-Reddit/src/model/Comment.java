@@ -1,10 +1,12 @@
 package model;
 
+import service.VoteService;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class Comment {
+public class Comment implements Votable {
     private static int counter = 0;
 
     private int id;
@@ -72,13 +74,15 @@ public class Comment {
         return true;
     }
 
-    public void display(int indent) {
-        String prefix = "  ".repeat(indent);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        System.out.println(prefix + "[" + id + "] " + text + " (by " + author + ") Votes: " + votes + " | Posted: " + dateTime.format(formatter));
-        System.out.println(replies.size());
+    public void display(int level, VoteService voteService) {
+        int votes = voteService.getVoteCount(this);
+        // indentare în funcție de level
+        String indent = " ".repeat(level * 2);
+        System.out.println(indent + "Comment ID: " + getId() + " Votes: " + votes);
+        System.out.println(indent + getText());
+
         for (Comment reply : replies) {
-            reply.display(indent + 1);
+            reply.display(level + 1, voteService);
         }
     }
 }

@@ -1,6 +1,8 @@
 import logger.FileLogger;
 import logger.Log;
 import logger.LogLevel;
+import model.Vote;
+import service.VoteService;
 import util.Console;
 import service.CommentService;
 import service.PostService;
@@ -13,9 +15,12 @@ public class Main {
     public static void main(String[] args) {
 
         UserService userService=new UserService();
-        PostService postService=new PostService();
-        CommentService commentService=new CommentService();
-        Service service = new Service(userService,postService,commentService);
+
+
+        VoteService voteService=new VoteService();
+        PostService postService=new PostService(voteService);
+        CommentService commentService=new CommentService(postService);
+        Service service = new Service(userService,postService,commentService,voteService);
         Menu menu = new Menu(service);
 
         DB.CheckDBDriver();

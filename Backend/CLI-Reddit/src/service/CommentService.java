@@ -6,8 +6,13 @@ import java.util.*;
 
 public class CommentService {
     private static final Map<Integer, Comment> allComments = new HashMap<>();
-     PostService postService=new PostService();
+     private final PostService postService;
 
+
+     public CommentService(PostService postService)
+         {
+             this.postService=postService;
+         }
 
     public Comment addComment(User user, String text, Post post, Comment parent) {
         Comment comment = new Comment(user, text, post, parent);

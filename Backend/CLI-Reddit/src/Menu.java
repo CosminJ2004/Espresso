@@ -67,10 +67,11 @@ public class Menu {
                     service.addCommentToComment();
                     break;
                 case 4:
-//                    service.upVoteToPost();
+                    service.upvoteToPost();
                     break;
                 case 5:
-//                    service.downVoteToPost();
+                    service.downvoteToPost();
+                    break;
                 case 6:
                     service.upVoteToComment();
                     break;
