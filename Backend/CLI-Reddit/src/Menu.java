@@ -106,8 +106,8 @@ public class Menu {
                     break;
                 case 3:
                 {
-                        createPostMenu();
-                    }
+                    createPostMenu();
+                }
                     break;
                 case 4:
                     service.userLogout();

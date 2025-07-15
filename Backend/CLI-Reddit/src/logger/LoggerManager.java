@@ -8,6 +8,7 @@ public class LoggerManager {
     private final List<ILogger> loggers = new ArrayList<>();
 
     private LoggerManager() {}
+
     public void addLogger(ILogger logger) {
         loggers.add(logger);
     }

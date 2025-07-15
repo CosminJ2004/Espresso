@@ -93,11 +93,13 @@
 
 
         }
+
         public void showAllPosts() {
             for (Post post : postService.getAllPosts()) {
                 System.out.println(postService.display(post));
             }
         }
+
         public void expandPost() {
             System.out.print("Enter post ID to expand: ");
             int postId = Integer.parseInt(scanner.nextLine());

@@ -36,6 +36,7 @@ public class UserRepository {
 
             if (rs.next()) {
                 return Optional.of(new User(
+                        rs.getInt("id"),
                     rs.getString("username"),
                     rs.getString("password")
                 ));
@@ -57,6 +58,7 @@ public class UserRepository {
 
             if (rs.next()) {
                 return Optional.of(new User(
+                        rs.getInt("id"),
                     rs.getString("username"),
                     rs.getString("password")
                 ));

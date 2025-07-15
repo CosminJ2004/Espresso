@@ -28,4 +28,6 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-app.log
+### Logs ###
+ErrorsLogs.txt
+DebugLogs.txt

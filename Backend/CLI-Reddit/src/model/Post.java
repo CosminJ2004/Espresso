@@ -1,18 +1,14 @@
 package model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Post implements Votable {
-
-    private static int counter=0;
+    private static int counter = 0;
     private int id;
     private User author;
     private String summary;
     private String content;
     private LocalDateTime dateTime;
-
 
 
     public Post(User author, String summary, String content) {

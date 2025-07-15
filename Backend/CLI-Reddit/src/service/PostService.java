@@ -28,7 +28,6 @@ public class PostService {
 
     }
 
-
     public void addComment(Post post, Comment comment) {
         System.out.println("ADDING: post ID = " + post.getId());
         System.out.println("Map before = " + commentsMap);
@@ -57,7 +56,7 @@ public class PostService {
         String formattedDateTime = post.getDateTime().format(formatter);
         int votes = voteService.getVoteCount(post);
 
-        String result = "[" + post.getId() + "] " + post.getSummary() + " (by " + post.getAuthor() + ") Votes: " + votes + " | Posted on: " + formattedDateTime;
+        String result = "[" + post.getId() + "] " + post.getSummary() + " (by " + post.getAuthor().getUsername() + ") Votes: " + votes + " | Posted on: " + formattedDateTime;
         if (votes >= MIN_VOTES_FOR_STAR) {
             result += " ⭐";
         }

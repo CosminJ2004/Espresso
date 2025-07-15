@@ -1,26 +1,21 @@
 import logger.FileLogger;
 import logger.Log;
 import logger.LogLevel;
-import model.Vote;
 import service.VoteService;
-import util.Console;
 import service.CommentService;
 import service.PostService;
 import service.UserService;
 import util.DB;
 
-import java.awt.*;
 
 public class Main {
     public static void main(String[] args) {
+        UserService userService = new UserService();
+        VoteService voteService = new VoteService();
+        PostService postService = new PostService(voteService);
+        CommentService commentService = new CommentService(postService);
 
-        UserService userService=new UserService();
-
-
-        VoteService voteService=new VoteService();
-        PostService postService=new PostService(voteService);
-        CommentService commentService=new CommentService(postService);
-        Service service = new Service(userService,postService,commentService,voteService);
+        Service service = new Service(userService, postService, commentService, voteService);
         Menu menu = new Menu(service);
 
         DB.CheckDBDriver();

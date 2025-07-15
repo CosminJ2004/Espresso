@@ -3,12 +3,10 @@ package model;
 import service.VoteService;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Comment implements Votable {
     private static int counter = 0;
-
     private int id;
     private User author;
     private String text;
