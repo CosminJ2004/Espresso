@@ -10,10 +10,10 @@ import util.DB;
 
 public class Main {
     public static void main(String[] args) {
-        UserService userService = new UserService();
-        VoteService voteService = new VoteService();
-        PostService postService = new PostService(voteService);
-        CommentService commentService = new CommentService(postService);
+        UserService userService = UserService.getInstance();
+        VoteService voteService = VoteService.getInstance();
+        PostService postService = PostService.getInstance();
+        CommentService commentService = CommentService.getInstance();
 
         Service service = new Service(userService, postService, commentService, voteService);
         Menu menu = new Menu(service);

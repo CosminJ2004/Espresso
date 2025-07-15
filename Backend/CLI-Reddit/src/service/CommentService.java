@@ -5,14 +5,17 @@ import model.*;
 import java.util.*;
 
 public class CommentService {
+    private static final CommentService instance = new CommentService();
     private static final Map<Integer, Comment> allComments = new HashMap<>();
-     private final PostService postService;
+    private final PostService postService;
 
+    private CommentService() {
+        this.postService = PostService.getInstance();
+    }
 
-     public CommentService(PostService postService)
-         {
-             this.postService=postService;
-         }
+    public static CommentService getInstance() {
+        return instance;
+    }
 
     public Comment addComment(User user, String text, Post post, Comment parent) {
         Comment comment = new Comment(user, text, post, parent);

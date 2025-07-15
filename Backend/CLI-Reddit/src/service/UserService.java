@@ -6,15 +6,16 @@ import repository.UserRepository;
 import java.util.Optional;
 
 public class UserService {
+    private static final UserService instance = new UserService();
     private static User currentUser = null;
     private final UserRepository userRepository;
 
-    public UserService() {
+    private UserService() {
         this.userRepository = new UserRepository();
     }
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public static UserService getInstance() {
+        return instance;
     }
 
     public static User getCurrentUser() {

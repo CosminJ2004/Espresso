@@ -7,14 +7,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class PostService {
-
+    private static final PostService instance = new PostService();
     private static final int MIN_VOTES_FOR_STAR = 10;
 
     private VoteService voteService;
 
-    public PostService(VoteService voteService)
-    {
-        this.voteService=voteService;
+    private PostService() {
+        this.voteService = VoteService.getInstance();
+    }
+
+    public static PostService getInstance() {
+        return instance;
     }
 
     private Map<Integer, Post> posts = new HashMap<>();

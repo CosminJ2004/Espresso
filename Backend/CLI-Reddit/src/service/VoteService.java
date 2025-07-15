@@ -6,11 +6,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class VoteService {
-
-    // Voturile pentru orice Votable (Post sau Comment)
-    private final Map<Votable, Map<User, Vote>> voteData = new HashMap<>();
-
+    private static final VoteService instance = new VoteService();
+    private final Map<Votable, Map<User, Vote>> voteData = new HashMap<>();     // Voturile pentru orice Votable (Post sau Comment)
     private final Map<Votable, Integer> voteCounts = new HashMap<>();
+
+    private VoteService() {
+    }
+
+    public static VoteService getInstance() {
+        return instance;
+    }
 
     public boolean vote(Votable votable, User user, VoteType voteType) {
         Map<User, Vote> userVotes = voteData.computeIfAbsent(votable, k -> new HashMap<>());
