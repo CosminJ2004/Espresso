@@ -1,16 +1,25 @@
+package service;
+
+import model.Post;
 import java.util.Scanner;
 
-public class Menu {
-    private Scanner scanner;
-    private Service service;
+public class MenuService {
+    private final Scanner scanner;
+    private final UserService userService;
+    private final PostService postService;
+    private final CommentService commentService;
+    private final VoteService voteService;
 
-    public Menu(Service myService) {
-        scanner = new Scanner(System.in);
-        service = myService;
+    public MenuService(UserService userService, PostService postService, CommentService commentService, VoteService voteService) {
+        this.scanner = new Scanner(System.in);
+        this.userService = userService;
+        this.commentService = commentService;
+        this.postService = postService;
+        this.voteService = voteService;
     }
 
     public void createLoginMenu() {
-        while (!service.isUserLoggedIn()) {
+        while (!UserService.isLoggedIn()) {
             System.out.println("Choose your action:");
             System.out.println("1. Login");
             System.out.println("2. Register");
@@ -20,10 +29,10 @@ public class Menu {
             scanner.nextLine();
             switch (option) {
                 case 1:
-                    service.login();
+                    userService.login();
                     break;
                 case 2:
-                    service.register();
+                    userService.register();
                     break;
                 case 3:
                     System.out.println("Goodbye!");
@@ -36,7 +45,7 @@ public class Menu {
     }
 
     public void createMainMenu() {
-        while (service.isUserLoggedIn()) {
+        while (UserService.isLoggedIn()) {
             System.out.println("Choose your action:");
             System.out.println("1. Write a post");
             System.out.println("2. Show posts");
@@ -47,18 +56,19 @@ public class Menu {
             scanner.nextLine();
             switch (option) {
                 case 1:
-                    service.createPost();
+                    postService.createPost();
                     break;
                 case 2:
-                    service.showAllPosts();
+                    for (Post post : postService.getAllPosts()) {
+                        System.out.println(postService.display(post));
+                    }
                     break;
-                case 3:
-                {
+                case 3: {
                     createPostMenu();
                 }
                 break;
                 case 4:
-                    service.userLogout();
+                    userService.userLogout();
                     break;
                 default:
                     System.out.println("Invalid option, try again.");
@@ -69,7 +79,7 @@ public class Menu {
 
     public void createPostMenu() {
         while (true) {
-            service.expandPost();
+            postService.expandPost();
 
             System.out.println("Choose your action for this post:");
             System.out.println("1. Delete the post");
@@ -84,27 +94,26 @@ public class Menu {
             int option = scanner.nextInt();
             scanner.nextLine();
             switch (option) {
-
                 case 1:
-                    service.deletePost();
+                    postService.deletePost();
                     return;
                 case 2:
-                    service.addCommentToPost();
+                    commentService.addCommentToPost();
                     break;
                 case 3:
-                    service.addCommentToComment();
+                    commentService.addCommentToComment();
                     break;
                 case 4:
-                    service.upvoteToPost();
+                    voteService.upvoteToPost();
                     break;
                 case 5:
-                    service.downvoteToPost();
+                    voteService.downvoteToPost();
                     break;
                 case 6:
-                    service.upVoteToComment();
+                    voteService.upVoteToComment();
                     break;
                 case 7:
-                    service.downVoteToComment();
+                    voteService.downVoteToComment();
                     break;
                 case 8:
                     return;

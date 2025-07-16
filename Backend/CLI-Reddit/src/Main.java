@@ -1,10 +1,7 @@
 import logger.FileLogger;
 import logger.Log;
 import logger.LogLevel;
-import service.VoteService;
-import service.CommentService;
-import service.PostService;
-import service.UserService;
+import service.*;
 import util.Database;
 
 public class Main {
@@ -14,8 +11,7 @@ public class Main {
         PostService postService = PostService.getInstance();
         CommentService commentService = CommentService.getInstance();
 
-        Service service = new Service(userService, postService, commentService, voteService);
-        Menu menu = new Menu(service);
+        MenuService menuService = new MenuService(userService, postService, commentService, voteService);
 
         Database.CheckDriver();
 
@@ -27,8 +23,8 @@ public class Main {
         Log.log(LogLevel.ERROR,"Error Message");
 
         while (true) {
-            menu.createLoginMenu();
-            menu.createMainMenu();
+            menuService.createLoginMenu();
+            menuService.createMainMenu();
         }
     }
 }

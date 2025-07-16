@@ -1,15 +1,20 @@
 package service;
 
 import model.*;
+import logger.*;
+import util.Console;
 import java.util.*;
+import java.util.Scanner;
 
 public class CommentService {
     private static final CommentService instance = new CommentService();
     private static final Map<Integer, Comment> allComments = new HashMap<>();
     private final PostService postService;
+    private final Scanner scanner;
 
     private CommentService() {
         this.postService = PostService.getInstance();
+        this.scanner = new Scanner(System.in);
     }
 
     public static CommentService getInstance() {
@@ -68,5 +73,41 @@ public class CommentService {
         for (Comment reply : comment.getReplies()) {
             displayComment(reply, level + 1);
         }
+    }
+
+    public void addCommentToPost() {
+        System.out.print("Enter post ID to comment: ");
+        int postId = Integer.parseInt(scanner.nextLine());
+
+        Post post = postService.getPostById(postId);
+        if (post == null) {
+            System.out.println("Post not found.");
+            return;
+        }
+        
+        String text = Console.readText("Write your comment: ");
+        Comment comment = addComment(UserService.getCurrentUser(), text, post, null);
+
+        Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
+            " added comment ID " + comment.getId() + " to post ID " + postId);
+    }
+
+    public void addCommentToComment() {
+        System.out.print("Enter comment ID to comment: ");
+        int commentId = Integer.parseInt(scanner.nextLine());
+
+        Comment comment = getById(commentId);
+        if (comment == null) {
+            System.out.println("Comment not found.");
+            return;
+        }
+
+        String text = Console.readText("Write your comment: ");
+        Post currentPost = comment.getPost(); // Get the post from the parent comment
+        
+        Comment newComment = addComment(UserService.getCurrentUser(), text, currentPost, comment);
+
+        Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
+                " added reply comment ID " + newComment.getId() + " to comment ID " + commentId);
     }
 }

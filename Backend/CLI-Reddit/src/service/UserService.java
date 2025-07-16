@@ -2,16 +2,21 @@ package service;
 
 import model.User;
 import repository.UserRepository;
+import logger.*;
+import util.Console;
 
 import java.util.Optional;
+import java.util.Scanner;
 
 public class UserService {
     private static final UserService instance = new UserService();
     private static User currentUser = null;
     private final UserRepository userRepository;
+    private final Scanner scanner;
 
     private UserService() {
         this.userRepository = new UserRepository();
+        this.scanner = new Scanner(System.in);
     }
 
     public static UserService getInstance() {
@@ -150,5 +155,46 @@ public class UserService {
 
         System.out.println("Failed to change password.");
         return false;
+    }
+
+    public boolean login() {
+        Log.log(LogLevel.INFO, "Login attempt initiated");
+        String username = Console.readCredential("Please enter your username: ");
+        String password = Console.readCredential("Please enter your password: ");
+
+        Log.log(LogLevel.DEBUG, "Attempting login for user: " + username);
+        boolean loginSuccess = login(username, password);
+
+        if (loginSuccess) {
+            Log.log(LogLevel.INFO, "User logged in successfully: " + username);
+        } else {
+            Log.log(LogLevel.WARN, "Login failed for user: " + username);
+        }
+
+        return loginSuccess;
+    }
+
+    public boolean register() {
+        Log.log(LogLevel.INFO, "Registration attempt initiated");
+        String username = Console.readCredential("Please enter the desired username: ");
+        String password = Console.readCredential("Please enter the desired password: ");
+
+        Log.log(LogLevel.DEBUG, "Attempting registration for user: " + username);
+        boolean registrationSuccess = register(username, password);
+
+        if (registrationSuccess) {
+            Log.log(LogLevel.INFO, "User registered and logged in successfully: " + username);
+        } else {
+            Log.log(LogLevel.WARN, "Registration failed for user: " + username);
+        }
+
+        return registrationSuccess;
+    }
+
+    public void userLogout() {
+        if (getCurrentUser() != null) {
+            Log.log(LogLevel.INFO, "User logout: " + getCurrentUser().getUsername());
+        }
+        logout();
     }
 }
