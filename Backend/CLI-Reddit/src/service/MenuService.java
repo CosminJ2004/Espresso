@@ -59,11 +59,11 @@ public class MenuService {
                     postService.createPost();
                     break;
                 case 2:
-                    for (Post post : postService.getAllPosts()) {
-                        System.out.println(postService.display(post));
-                    }
+
+                    postService.showAllPosts();
                     break;
                 case 3: {
+                    postService.expandPost();
                     createPostMenu();
                 }
                 break;
@@ -79,7 +79,8 @@ public class MenuService {
 
     public void createPostMenu() {
         while (true) {
-            postService.expandPost();
+
+
 
             System.out.println("Choose your action for this post:");
             System.out.println("1. Delete the post");
@@ -96,30 +97,38 @@ public class MenuService {
             switch (option) {
                 case 1:
                     postService.deletePost();
+
                     return;
                 case 2:
                     commentService.addCommentToPost();
+                    postService.expandPost();
                     break;
                 case 3:
                     commentService.addCommentToComment();
+                    postService.expandPost();
                     break;
                 case 4:
                     voteService.upvoteToPost();
+                    postService.expandPost();
                     break;
                 case 5:
                     voteService.downvoteToPost();
+                    postService.expandPost();
                     break;
                 case 6:
                     voteService.upVoteToComment();
+                    postService.expandPost();
                     break;
                 case 7:
                     voteService.downVoteToComment();
+                    postService.expandPost();
                     break;
                 case 8:
                     return;
                 default:
                     System.out.println("Invalid option, try again.");
                     break;
+
             }
         }
     }

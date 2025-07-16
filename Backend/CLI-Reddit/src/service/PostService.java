@@ -29,7 +29,7 @@ public class PostService {
     private static final Map<Integer, List<Comment>> commentsMap = new HashMap<>();
 
 
-    // Adaugă post
+    // Adauga post
     public void addPost(Post post) {
         posts.put(post.getId(), post);
         commentsMap.put(post.getId(), new ArrayList<>());
@@ -37,29 +37,17 @@ public class PostService {
     }
 
     public void addComment(Post post, Comment comment) {
-        System.out.println("ADDING: post ID = " + post.getId());
-//        System.out.println("Map before = " + commentsMap);
+
         commentsMap.computeIfAbsent(post.getId(), k -> new ArrayList<>()).add(comment);
-//        System.out.println("Map after = " + commentsMap);
     }
 
     public List<Comment> getComments(Post post) {
-//        System.out.println("GETTING: post ID = " + post.getId());
-//        System.out.println("Map = " + commentsMap);
+
         return commentsMap.getOrDefault(post.getId(), new ArrayList<>());
     }
 
 
-    // Afișează toate comentariile
-    public void showAllComments(Post post) {
-        List<Comment> commentList = getComments(post);
-        CommentService commentService = CommentService.getInstance();
-        for (Comment comment : commentList) {
-            commentService.displayComment(comment, 1);
-        }
-    }
 
-    // Afișare sumarizată
     public String display(Post post) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String formattedDateTime = post.getDateTime().format(formatter);
@@ -72,7 +60,6 @@ public class PostService {
         return result;
     }
 
-    // Afișare detaliată
     public void expand(Post post) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String formattedDateTime = post.getDateTime().format(formatter);
@@ -86,7 +73,7 @@ public class PostService {
         System.out.println(result);
 
         List<Comment> commentList = getComments(post);
-//        System.out.println("DEBUG: post ID = " + post.getId() + ", comments count = " + commentList.size());
+
 
         if (commentList.isEmpty()) {
             System.out.println("There are no comments");
@@ -130,16 +117,7 @@ public class PostService {
         System.out.println("Post created with ID: " + post.getId());
     }
 
-    public void showPost() {
-        System.out.print("Enter post ID: ");
-        int postId = Integer.parseInt(scanner.nextLine());
-        Post postTemp = getPostById(postId);
-        if (postTemp != null) {
-            display(postTemp);
-        } else {
-            System.out.println("Post not found.");
-        }
-    }
+
 
     public void expandPost() {
         System.out.print("Enter post ID to expand: ");
@@ -154,24 +132,13 @@ public class PostService {
         expand(post);
     }
 
-    public Post openPost() {
-        try {
-            Log.log(LogLevel.INFO, "User attempting to open post");
-            int currentPostID = Console.readInt("Choose the Post ID you wish to open: ");
-            Post currentPost = getPostById(currentPostID);
-            
-            if (currentPost != null) {
-                Log.log(LogLevel.INFO, "Post opened successfully: " + currentPostID + " by user: " + UserService.getCurrentUser().getUsername());
-                return currentPost;
-            } else {
-                Log.log(LogLevel.WARN, "Failed to open post with ID: " + currentPostID);
-                return null;
-            }
-        } catch (Exception e) {
-            Log.log(LogLevel.ERROR, "Failed to open post: " + e.getMessage());
-            return null;
+    public void showAllPosts()
+    {
+        for (Post post : getAllPosts()) {
+            System.out.println(display(post));
         }
     }
+
 
     public void deletePost() {
         System.out.print("Enter post ID to delete: ");
