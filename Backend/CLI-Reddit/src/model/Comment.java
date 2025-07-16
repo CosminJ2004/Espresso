@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class Comment implements Votable {
-    private int id = 0;
+    private int id;
+    private static int counter=0;
     private User author;
     private String text;
     private Post post;
@@ -15,7 +16,7 @@ public class Comment implements Votable {
     private LocalDateTime dateTime;
 
     public Comment(User author, String text, Post post, Comment parent) {
-        this.id = ++id;
+        this.id = ++counter;
         this.author = author;
         this.text = text;
         this.post = post;

@@ -38,14 +38,14 @@ public class PostService {
 
     public void addComment(Post post, Comment comment) {
         System.out.println("ADDING: post ID = " + post.getId());
-        System.out.println("Map before = " + commentsMap);
+//        System.out.println("Map before = " + commentsMap);
         commentsMap.computeIfAbsent(post.getId(), k -> new ArrayList<>()).add(comment);
-        System.out.println("Map after = " + commentsMap);
+//        System.out.println("Map after = " + commentsMap);
     }
 
     public List<Comment> getComments(Post post) {
-        System.out.println("GETTING: post ID = " + post.getId());
-        System.out.println("Map = " + commentsMap);
+//        System.out.println("GETTING: post ID = " + post.getId());
+//        System.out.println("Map = " + commentsMap);
         return commentsMap.getOrDefault(post.getId(), new ArrayList<>());
     }
 
@@ -86,7 +86,7 @@ public class PostService {
         System.out.println(result);
 
         List<Comment> commentList = getComments(post);
-        System.out.println("DEBUG: post ID = " + post.getId() + ", comments count = " + commentList.size());
+//        System.out.println("DEBUG: post ID = " + post.getId() + ", comments count = " + commentList.size());
 
         if (commentList.isEmpty()) {
             System.out.println("There are no comments");
