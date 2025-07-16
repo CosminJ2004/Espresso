@@ -1,6 +1,5 @@
 package service;
 
-import model.Post;
 import java.util.Scanner;
 
 public class MenuService {
@@ -25,21 +24,26 @@ public class MenuService {
             System.out.println("2. Register");
             System.out.println("3. Exit");
 
-            int option = scanner.nextInt();
-            scanner.nextLine();
-            switch (option) {
-                case 1:
-                    userService.loginUI();
-                    break;
-                case 2:
-                    userService.registerUI();
-                    break;
-                case 3:
-                    System.out.println("Goodbye!");
-                    System.exit(0);
-                default:
-                    System.out.println("Invalid option, try again.");
-                    break;
+            try {
+                int option = scanner.nextInt();
+                scanner.nextLine();
+                switch (option) {
+                    case 1:
+                        userService.loginUI();
+                        break;
+                    case 2:
+                        userService.registerUI();
+                        break;
+                    case 3:
+                        System.out.println("Goodbye!");
+                        System.exit(0);
+                    default:
+                        System.out.println("Invalid option, try again.");
+                        break;
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine();
             }
         }
     }
@@ -52,36 +56,37 @@ public class MenuService {
             System.out.println("3. Open post");
             System.out.println("4. Log out");
 
-            int option = scanner.nextInt();
-            scanner.nextLine();
-            switch (option) {
-                case 1:
-                    postService.createPostUI();
+            try {
+                int option = scanner.nextInt();
+                scanner.nextLine();
+                switch (option) {
+                    case 1:
+                        postService.createPostUI();
+                        break;
+                    case 2:
+                        postService.showAllPosts();
+                        break;
+                    case 3: {
+                        postService.expandPostUI();
+                        createPostMenu();
+                    }
                     break;
-                case 2:
-
-                    postService.showAllPosts();
-                    break;
-                case 3: {
-                    postService.expandPostUI();
-                    createPostMenu();
+                    case 4:
+                        userService.userLogout();
+                        break;
+                    default:
+                        System.out.println("Invalid option, try again.");
+                        break;
                 }
-                break;
-                case 4:
-                    userService.userLogout();
-                    break;
-                default:
-                    System.out.println("Invalid option, try again.");
-                    break;
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine();
             }
         }
     }
 
     public void createPostMenu() {
         while (true) {
-
-
-
             System.out.println("Choose your action for this post:");
             System.out.println("1. Delete post");
             System.out.println("2. Add a comment");
@@ -92,43 +97,46 @@ public class MenuService {
             System.out.println("7. Downvote a comment");
             System.out.println("8. Return");
 
-            int option = scanner.nextInt();
-            scanner.nextLine();
-            switch (option) {
-                case 1:
-                    postService.deletePostUI();
-
-                    return;
-                case 2:
-                    commentService.addCommentToPost();
-                    postService.expandPostUI();
-                    break;
-                case 3:
-                    commentService.addCommentToComment();
-                    postService.expandPostUI();
-                    break;
-                case 4:
-                    voteService.upvoteToPost();
-                    postService.expandPostUI();
-                    break;
-                case 5:
-                    voteService.downvoteToPost();
-                    postService.expandPostUI();
-                    break;
-                case 6:
-                    voteService.upVoteToComment();
-                    postService.expandPostUI();
-                    break;
-                case 7:
-                    voteService.downVoteToComment();
-                    postService.expandPostUI();
-                    break;
-                case 8:
-                    return;
-                default:
-                    System.out.println("Invalid option, try again.");
-                    break;
-
+            try {
+                int option = scanner.nextInt();
+                scanner.nextLine();
+                switch (option) {
+                    case 1:
+                        postService.deletePostUI();
+                        return;
+                    case 2:
+                        commentService.addCommentToPost();
+                        postService.expandPostUI();
+                        break;
+                    case 3:
+                        commentService.addCommentToComment();
+                        postService.expandPostUI();
+                        break;
+                    case 4:
+                        voteService.upvoteToPost();
+                        postService.expandPostUI();
+                        break;
+                    case 5:
+                        voteService.downvoteToPost();
+                        postService.expandPostUI();
+                        break;
+                    case 6:
+                        voteService.upVoteToComment();
+                        postService.expandPostUI();
+                        break;
+                    case 7:
+                        voteService.downVoteToComment();
+                        postService.expandPostUI();
+                        break;
+                    case 8:
+                        return;
+                    default:
+                        System.out.println("Invalid option, try again.");
+                        break;
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.nextLine();
             }
         }
     }
