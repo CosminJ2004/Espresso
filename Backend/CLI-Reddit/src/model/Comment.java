@@ -1,24 +1,21 @@
 package model;
 
-import service.VoteService;
-
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class Comment implements Votable {
-    private static int counter = 0;
-    private int id;
+    private int id = 0;
     private User author;
     private String text;
     private Post post;
+    private int votes = 0;
+    private Map<String, String> userVotes = new HashMap<>();
     private Comment parent; // null dacă e top-level
     private List<Comment> replies = new ArrayList<>();
-    private Map<String, String> userVotes = new HashMap<>();
-    private int votes = 0;
     private LocalDateTime dateTime;
 
     public Comment(User author, String text, Post post, Comment parent) {
-        this.id = ++counter;
+        this.id = ++id;
         this.author = author;
         this.text = text;
         this.post = post;
@@ -38,8 +35,16 @@ public class Comment implements Votable {
         return text;
     }
 
+    public Post getPost() {
+        return post;
+    }
+
     public int getVotes() {
         return votes;
+    }
+
+    public Map<String, String> getUserVotes() {
+        return userVotes;
     }
 
     public Comment getParent() {
@@ -50,46 +55,12 @@ public class Comment implements Votable {
         return replies;
     }
 
-    public void addReply(Comment reply) {
-        replies.add(reply);
-    }
-
-    public boolean upvote(String username) {
-        String prev = userVotes.get(username);
-        if ("upvote".equals(prev)) return false;
-        if ("downvote".equals(prev)) votes += 2;
-        else votes += 1;
-        userVotes.put(username, "upvote");
-        return true;
-    }
-
-    public boolean downvote(String username) {
-        String prev = userVotes.get(username);
-        if ("downvote".equals(prev)) return false;
-        if ("upvote".equals(prev)) votes -= 2;
-        else votes -= 1;
-        userVotes.put(username, "downvote");
-        return true;
-    }
-
-    public void display(int level, VoteService voteService) {
-        int votes = voteService.getVoteCount(this);
-        // indentare în funcție de level
-        String indent = " ".repeat(level * 2);
-        System.out.println(indent + "Comment ID: " + getId() + " Votes: " + votes);
-        System.out.println(indent + getText());
-
-        for (Comment reply : replies) {
-            reply.display(level + 1, voteService);
-        }
-    }
-
-    public Post getPost() {
-        return post;
-    }
-
     public LocalDateTime getDateTime() {
         return dateTime;
+    }
+
+    public void setVotes(int votes) {
+        this.votes = votes;
     }
 
     @Override

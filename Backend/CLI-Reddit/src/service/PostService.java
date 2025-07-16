@@ -48,8 +48,9 @@ public class PostService {
     // Afișează toate comentariile
     public void showAllComments(Post post) {
         List<Comment> commentList = getComments(post);
+        CommentService commentService = CommentService.getInstance();
         for (Comment comment : commentList) {
-            comment.display(1,voteService);
+            commentService.displayComment(comment, 1);
         }
     }
 
@@ -85,8 +86,9 @@ public class PostService {
         if (commentList.isEmpty()) {
             System.out.println("There are no comments");
         } else {
+            CommentService commentService = CommentService.getInstance();
             for (Comment comment : commentList) {
-                comment.display(1,voteService);
+                commentService.displayComment(comment, 1);
             }
         }
     }

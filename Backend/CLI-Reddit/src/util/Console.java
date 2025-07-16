@@ -12,7 +12,7 @@ public class Console {
     private static final String INVALID_INPUT_INT = "The format is invalid, please retry.";
     private static final String INVALID_INPUT_TEXT = "The text cannot be empty.";
     private static final String INVALID_INPUT_CRED = "Credentials doesn't have the required minimum of characters.";
-    private static final int MINIM_CRED_CHARS= 5;
+    private static final int MINIM_CRED_CHARS = 5;
 
     private Console() {
         scanner = new Scanner(System.in);

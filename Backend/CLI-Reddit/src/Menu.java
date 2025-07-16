@@ -1,12 +1,8 @@
-//import service.CommentService;
-
 import java.util.Scanner;
 
 public class Menu {
     private Scanner scanner;
     private Service service;
-
-//    private CommentService commentService;
 
     public Menu(Service myService) {
         scanner = new Scanner(System.in);
@@ -32,6 +28,38 @@ public class Menu {
                 case 3:
                     System.out.println("Goodbye!");
                     System.exit(0);
+                default:
+                    System.out.println("Invalid option, try again.");
+                    break;
+            }
+        }
+    }
+
+    public void createMainMenu() {
+        while (service.isUserLoggedIn()) {
+            System.out.println("Choose your action:");
+            System.out.println("1. Write a post");
+            System.out.println("2. Show posts");
+            System.out.println("3. Open post");
+            System.out.println("4. Log out");
+
+            int option = scanner.nextInt();
+            scanner.nextLine();
+            switch (option) {
+                case 1:
+                    service.createPost();
+                    break;
+                case 2:
+                    service.showAllPosts();
+                    break;
+                case 3:
+                {
+                    createPostMenu();
+                }
+                break;
+                case 4:
+                    service.userLogout();
+                    break;
                 default:
                     System.out.println("Invalid option, try again.");
                     break;
@@ -87,35 +115,4 @@ public class Menu {
         }
     }
 
-    public void createMainMenu() {
-        while (service.isUserLoggedIn()) {
-            System.out.println("Choose your action:");
-            System.out.println("1. Write a post");
-            System.out.println("2. Show posts");
-            System.out.println("3. Open post");
-            System.out.println("4. Log out");
-
-            int option = scanner.nextInt();
-            scanner.nextLine();
-            switch (option) {
-                case 1:
-                    service.createPost();
-                    break;
-                case 2:
-                    service.showAllPosts();
-                    break;
-                case 3:
-                {
-                    createPostMenu();
-                }
-                    break;
-                case 4:
-                    service.userLogout();
-                    break;
-                default:
-                    System.out.println("Invalid option, try again.");
-                    break;
-            }
-        }
-    }
 }
