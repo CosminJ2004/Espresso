@@ -6,17 +6,14 @@ import logger.*;
 import util.Console;
 
 import java.util.Optional;
-import java.util.Scanner;
 
 public class UserService {
     private static final UserService instance = new UserService();
     private static User currentUser = null;
     private final UserRepository userRepository;
-    private final Scanner scanner;
 
     private UserService() {
         this.userRepository = new UserRepository();
-        this.scanner = new Scanner(System.in);
     }
 
     public static UserService getInstance() {
@@ -157,7 +154,7 @@ public class UserService {
         return false;
     }
 
-    public boolean login() {
+    public void loginUI() {
         Log.log(LogLevel.INFO, "Login attempt initiated");
         String username = Console.readCredential("Please enter your username: ");
         String password = Console.readCredential("Please enter your password: ");
@@ -170,11 +167,9 @@ public class UserService {
         } else {
             Log.log(LogLevel.WARN, "Login failed for user: " + username);
         }
-
-        return loginSuccess;
     }
 
-    public boolean register() {
+    public void registerUI() {
         Log.log(LogLevel.INFO, "Registration attempt initiated");
         String username = Console.readCredential("Please enter the desired username: ");
         String password = Console.readCredential("Please enter the desired password: ");
@@ -187,8 +182,6 @@ public class UserService {
         } else {
             Log.log(LogLevel.WARN, "Registration failed for user: " + username);
         }
-
-        return registrationSuccess;
     }
 
     public void userLogout() {

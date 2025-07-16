@@ -29,10 +29,10 @@ public class MenuService {
             scanner.nextLine();
             switch (option) {
                 case 1:
-                    userService.login();
+                    userService.loginUI();
                     break;
                 case 2:
-                    userService.register();
+                    userService.registerUI();
                     break;
                 case 3:
                     System.out.println("Goodbye!");
