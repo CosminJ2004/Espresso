@@ -4,19 +4,26 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Post implements Votable {
-    private static int counter = 0;
     private int id;
     private User author;
     private String summary;
     private String content;
-    private LocalDateTime dateTime;
+    private LocalDateTime createdAt;
 
     public Post(User author, String summary, String content) {
-        this.id = ++counter;
+        this.id = 0;
         this.author = author;
         this.summary = summary;
         this.content = content;
-        this.dateTime = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public Post(int id, User author, String summary, String content, LocalDateTime createdAt) {
+        this.id = id;
+        this.author = author;
+        this.summary = summary;
+        this.content = content;
+        this.createdAt = createdAt;
     }
 
     public int getId() {
@@ -35,8 +42,12 @@ public class Post implements Votable {
         return content;
     }
 
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
@@ -58,7 +69,7 @@ public class Post implements Votable {
                 "id=" + id +
                 ", author='" + author.getUsername() + '\'' +
                 ", summary='" + summary + '\'' +
-                ", dateTime=" + dateTime +
+                ", createdAt=" + createdAt +
                 '}';
     }
 }

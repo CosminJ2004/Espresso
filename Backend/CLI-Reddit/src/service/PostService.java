@@ -3,7 +3,7 @@ package service;
 import model.Post;
 import model.Comment;
 import logger.*;
-import util.Console;
+import repository.PostRepository;
 
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -12,12 +12,14 @@ import java.util.Scanner;
 public class PostService {
     private static final PostService instance = new PostService();
     private static final int MIN_VOTES_FOR_STAR = 10;
-
+    private final PostRepository postRepository;
     private final VoteService voteService;
     private final Scanner scanner;
+    private static final Map<Integer, List<Comment>> commentsMap = new HashMap<>();
 
     private PostService() {
         this.voteService = VoteService.getInstance();
+        this.postRepository = new PostRepository();
         this.scanner = new Scanner(System.in);
     }
 
@@ -25,16 +27,39 @@ public class PostService {
         return instance;
     }
 
-    private final Map<Integer, Post> posts = new HashMap<>();
-    private static final Map<Integer, List<Comment>> commentsMap = new HashMap<>();
-
-
-    // Adauga post
     public void addPost(Post post) {
-        posts.put(post.getId(), post);
-        commentsMap.put(post.getId(), new ArrayList<>());
-
+        boolean saved = postRepository.save(post);
+        if (saved) {
+            commentsMap.put(post.getId(), new ArrayList<>());
+            Log.log(LogLevel.INFO, "Post saved to database with ID: " + post.getId());
+        } else {
+            Log.log(LogLevel.ERROR, "Failed to save post to database");
+        }
     }
+
+    public Post getPostById(int id) {
+        return postRepository.findById(id).orElse(null);
+    }
+
+    public List<Post> getAllPosts() {
+        return postRepository.findAll();
+    }
+
+    public boolean deletePostById(int postId) {
+        if (postRepository.findById(postId).isEmpty()) {
+            return false;
+        }
+
+        boolean deleted = postRepository.deleteById(postId);
+        if (deleted) {
+            commentsMap.remove(postId);
+            Log.log(LogLevel.INFO, "Post deleted from database with ID: " + postId);
+        } else {
+            Log.log(LogLevel.ERROR, "Failed to delete post from database with ID: " + postId);
+        }
+        return deleted;
+    }
+
 
     public void addComment(Post post, Comment comment) {
 
@@ -46,11 +71,9 @@ public class PostService {
         return commentsMap.getOrDefault(post.getId(), new ArrayList<>());
     }
 
-
-
     public String display(Post post) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        String formattedDateTime = post.getDateTime().format(formatter);
+        String formattedDateTime = post.getCreatedAt().format(formatter);
         int votes = voteService.getVoteCount(post);
 
         String result = "[" + post.getId() + "] " + post.getSummary() + " (by " + post.getAuthor().getUsername() + ") Votes: " + votes + " | Posted on: " + formattedDateTime;
@@ -62,11 +85,11 @@ public class PostService {
 
     public void expand(Post post) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        String formattedDateTime = post.getDateTime().format(formatter);
+        String formattedDateTime = post.getCreatedAt().format(formatter);
         int votes = voteService.getVoteCount(post);
 
 
-        String result = "[" + post.getId() + "] " + post.getSummary() + " " + post.getContent() + " (by " + post.getAuthor() + ") Votes: " + votes + " | Posted on: " + formattedDateTime;
+        String result = "[" + post.getId() + "] " + post.getSummary() + " " + post.getContent() + " (by " + post.getAuthor().getUsername() + ") Votes: " + votes + " | Posted on: " + formattedDateTime;
         if (votes >= MIN_VOTES_FOR_STAR) {
             result += " ⭐";
         }
@@ -84,26 +107,15 @@ public class PostService {
             }
         }
     }
-    public Post getPostById(int id) {
-        return posts.get(id);
-    }
 
-    public List<Post> getAllPosts() {
-        return new ArrayList<>(posts.values());
-    }
-
-    public boolean deletePostById(int postId) {
-        if (!posts.containsKey(postId)) {
-            return false;
+    public void showAllPosts()
+    {
+        for (Post post : getAllPosts()) {
+            System.out.println(display(post));
         }
-
-        posts.remove(postId);
-        commentsMap.remove(postId);
-
-        return true;
     }
 
-    public void createPost() {
+    public void createPostUI() {
         Log.log(LogLevel.INFO, "Creating new post for user: " + UserService.getCurrentUser().getUsername());
         System.out.print("Enter summary: ");
         String summary = scanner.nextLine();
@@ -117,9 +129,7 @@ public class PostService {
         System.out.println("Post created with ID: " + post.getId());
     }
 
-
-
-    public void expandPost() {
+    public void expandPostUI() {
         System.out.print("Enter post ID to expand: ");
         int postId = Integer.parseInt(scanner.nextLine());
 
@@ -132,15 +142,7 @@ public class PostService {
         expand(post);
     }
 
-    public void showAllPosts()
-    {
-        for (Post post : getAllPosts()) {
-            System.out.println(display(post));
-        }
-    }
-
-
-    public void deletePost() {
+    public void deletePostUI() {
         System.out.print("Enter post ID to delete: ");
         int postId = Integer.parseInt(scanner.nextLine());
 
