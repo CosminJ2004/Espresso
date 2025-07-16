@@ -1,6 +1,7 @@
 package service;
 
 import model.*;
+import logger.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +9,7 @@ import java.util.Scanner;
 
 public class VoteService {
     private static final VoteService instance = new VoteService();
-    private final Map<Votable, Map<User, Vote>> voteData = new HashMap<>();     // Voturile pentru orice Votable (Post sau Comment)
+    private final Map<Votable, Map<User, Vote>> voteData = new HashMap<>();
     private final Map<Votable, Integer> voteCounts = new HashMap<>();
     private final Scanner scanner;
 
@@ -27,16 +28,20 @@ public class VoteService {
 
         if (existingVote != null && existingVote.getType() == voteType) {
             System.out.println("You already voted this way.");
+            Log.log(LogLevel.INFO, "User " + user.getUsername() + " attempted to " + voteType +
+                    " on ID " + votable.getId() + " again (no change).");
             return false;
         }
 
         if (existingVote != null) {
             // schimbare vot
             if (voteType == VoteType.UPVOTE) {
-                currentVotes += 2; // de la down la up
+                currentVotes += 2;
             } else {
-                currentVotes -= 2; // de la up la down
+                currentVotes -= 2;
             }
+            Log.log(LogLevel.INFO, "User " + user.getUsername() + " changed vote from " +
+                    existingVote.getType() + " to " + voteType + " on ID " + votable.getId());
             existingVote.setType(voteType);
         } else {
             // vot nou
@@ -46,6 +51,8 @@ public class VoteService {
                 currentVotes -= 1;
             }
             userVotes.put(user, new Vote(user, voteType));
+            Log.log(LogLevel.INFO, "User " + user.getUsername() + " cast " + voteType +
+                    " on ID " + votable.getId());
         }
 
         voteCounts.put(votable, currentVotes);
@@ -59,6 +66,7 @@ public class VoteService {
     public void clearVotes(Votable votable) {
         voteData.remove(votable);
         voteCounts.remove(votable);
+        Log.log(LogLevel.INFO, "Votes cleared for ID " + votable.getId());
     }
 
     public void printVotes(Votable votable) {
@@ -72,6 +80,7 @@ public class VoteService {
         for (Map.Entry<User, Vote> entry : userVotes.entrySet()) {
             System.out.println("User: " + entry.getKey().getUsername() + " - " + entry.getValue().getType());
         }
+        Log.log(LogLevel.INFO, "Displayed votes for ID " + votable.getId());
     }
 
     public boolean upvoteToPost() {
@@ -81,9 +90,15 @@ public class VoteService {
         Post post = postService.getPostById(postId);
         if (post == null) {
             System.out.println("Post not found.");
+            Log.log(LogLevel.WARN, "Attempted upvote on non-existent post ID " + postId);
             return false;
         }
-        return vote(post, UserService.getCurrentUser(), VoteType.UPVOTE);
+        boolean success = vote(post, UserService.getCurrentUser(), VoteType.UPVOTE);
+        if (success) {
+            Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
+                    " upvoted post ID " + postId);
+        }
+        return success;
     }
 
     public boolean downvoteToPost() {
@@ -93,9 +108,15 @@ public class VoteService {
         Post post = postService.getPostById(postId);
         if (post == null) {
             System.out.println("Post not found.");
+            Log.log(LogLevel.WARN, "Attempted downvote on non-existent post ID " + postId);
             return false;
         }
-        return vote(post, UserService.getCurrentUser(), VoteType.DOWNVOTE);
+        boolean success = vote(post, UserService.getCurrentUser(), VoteType.DOWNVOTE);
+        if (success) {
+            Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
+                    " downvoted post ID " + postId);
+        }
+        return success;
     }
 
     public boolean upVoteToComment() {
@@ -105,9 +126,15 @@ public class VoteService {
         Comment comment = commentService.getById(commentId);
         if (comment == null) {
             System.out.println("Comment not found.");
+            Log.log(LogLevel.WARN, "Attempted upvote on non-existent comment ID " + commentId);
             return false;
         }
-        return vote(comment, UserService.getCurrentUser(), VoteType.UPVOTE);
+        boolean success = vote(comment, UserService.getCurrentUser(), VoteType.UPVOTE);
+        if (success) {
+            Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
+                    " upvoted comment ID " + commentId);
+        }
+        return success;
     }
 
     public boolean downVoteToComment() {
@@ -117,8 +144,14 @@ public class VoteService {
         Comment comment = commentService.getById(commentId);
         if (comment == null) {
             System.out.println("Comment not found.");
+            Log.log(LogLevel.WARN, "Attempted downvote on non-existent comment ID " + commentId);
             return false;
         }
-        return vote(comment, UserService.getCurrentUser(), VoteType.DOWNVOTE);
+        boolean success = vote(comment, UserService.getCurrentUser(), VoteType.DOWNVOTE);
+        if (success) {
+            Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
+                    " downvoted comment ID " + commentId);
+        }
+        return success;
     }
 }

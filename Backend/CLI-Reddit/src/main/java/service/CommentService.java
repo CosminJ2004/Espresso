@@ -15,6 +15,7 @@ public class CommentService {
     private CommentService() {
         this.postService = PostService.getInstance();
         this.scanner = new Scanner(System.in);
+        Log.log(LogLevel.INFO, "CommentService initialized.");
     }
 
     public static CommentService getInstance() {
@@ -26,31 +27,39 @@ public class CommentService {
         allComments.put(comment.getId(), comment);
 
         if (parent == null) {
-
-            postService.addComment(post,comment);
-
+            postService.addComment(post, comment);
+            Log.log(LogLevel.INFO, "Comment ID " + comment.getId() + " added to post ID " + post.getId());
         } else {
             this.addReply(parent, comment);
+            Log.log(LogLevel.INFO, "Reply ID " + comment.getId() + " added to parent comment ID " + parent.getId());
         }
+
         return comment;
     }
 
     public Comment getById(int id) {
-        return allComments.get(id);
+        Comment comment = allComments.get(id);
+        if (comment == null) {
+            Log.log(LogLevel.WARN, "Tried to fetch comment with ID " + id + " but it does not exist.");
+        } else {
+            Log.log(LogLevel.INFO, "Fetched comment with ID " + id);
+        }
+        return comment;
     }
 
     public void addReply(Comment parent, Comment reply) {
         parent.getReplies().add(reply);
+        Log.log(LogLevel.INFO, "Reply ID " + reply.getId() + " added to comment ID " + parent.getId());
     }
-
 
     public void displayComment(Comment comment, int level) {
         VoteService voteService = VoteService.getInstance();
         int votes = voteService.getVoteCount(comment);
-        // indentare in functie de level
         String indent = " ".repeat(level * 2);
-//        System.out.println(indent + ");
-        System.out.println(  indent + comment.getText() +" written by "+ comment.getAuthor().getUsername() + " Comment ID: " + comment.getId() + " Votes: " + votes);
+        System.out.println(indent + comment.getText() + " written by " + comment.getAuthor().getUsername()
+                + " Comment ID: " + comment.getId() + " Votes: " + votes);
+
+        Log.log(LogLevel.INFO, "Displayed comment ID " + comment.getId() + " with " + votes + " votes");
 
         for (Comment reply : comment.getReplies()) {
             displayComment(reply, level + 1);
@@ -64,14 +73,15 @@ public class CommentService {
         Post post = postService.getPostById(postId);
         if (post == null) {
             System.out.println("Post not found.");
+            Log.log(LogLevel.ERROR, "User attempted to comment on non-existent post ID " + postId);
             return;
         }
-        
+
         String text = Console.readText("Write your comment: ");
         Comment comment = addComment(UserService.getCurrentUser(), text, post, null);
 
         Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
-            " added comment ID " + comment.getId() + " to post ID " + postId);
+                " added comment ID " + comment.getId() + " to post ID " + postId);
     }
 
     public void addCommentToComment() {
@@ -81,12 +91,13 @@ public class CommentService {
         Comment comment = getById(commentId);
         if (comment == null) {
             System.out.println("Comment not found.");
+            Log.log(LogLevel.ERROR, "User attempted to reply to non-existent comment ID " + commentId);
             return;
         }
 
         String text = Console.readText("Write your comment: ");
-        Post currentPost = comment.getPost(); // Get the post from the parent comment
-        
+        Post currentPost = comment.getPost();
+
         Comment newComment = addComment(UserService.getCurrentUser(), text, currentPost, comment);
 
         Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
