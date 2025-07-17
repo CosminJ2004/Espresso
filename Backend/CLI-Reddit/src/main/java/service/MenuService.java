@@ -1,11 +1,12 @@
 package service;
 
+import com.mysql.cj.exceptions.ClosedOnExpiredPasswordException;
 import model.Post;
+import util.Console;
 
 import java.util.Scanner;
 
 public class MenuService {
-    private final Scanner scanner;
     private final UserService userService;
     private final PostService postService;
     private final CommentService commentService;
@@ -13,7 +14,7 @@ public class MenuService {
     private Post currentPost=null;
 
     public MenuService(UserService userService, PostService postService, CommentService commentService, VoteService voteService) {
-        this.scanner = new Scanner(System.in);
+
         this.userService = userService;
         this.commentService = commentService;
         this.postService = postService;
@@ -28,8 +29,7 @@ public class MenuService {
             System.out.println("3. Exit");
 
             try {
-                int option = scanner.nextInt();
-                scanner.nextLine();
+                int option= Console.readInt("");
                 switch (option) {
                     case 1:
                         userService.loginUI();
@@ -38,7 +38,6 @@ public class MenuService {
                         userService.registerUI();
                         break;
                     case 3:
-
                         AnimationService.showGoodbyeAnimation();
                         System.exit(0);
                     default:
@@ -47,7 +46,7 @@ public class MenuService {
                 }
             } catch (Exception e) {
                 System.out.println("Invalid input. Please enter a number.");
-                scanner.nextLine();
+
             }
         }
     }
@@ -61,8 +60,8 @@ public class MenuService {
             System.out.println("4. Log out");
 
             try {
-                int option = scanner.nextInt();
-                scanner.nextLine();
+                int option = Console.readInt("");
+
                 switch (option) {
                     case 1:
                         postService.createPostUI();
@@ -86,7 +85,7 @@ public class MenuService {
                 }
             } catch (Exception e) {
                 System.out.println("Invalid input. Please enter a number.");
-                scanner.nextLine();
+
             }
         }
     }
@@ -104,8 +103,8 @@ public class MenuService {
             System.out.println("8. Return");
 
             try {
-                int option = scanner.nextInt();
-                scanner.nextLine();
+                int option = Console.readInt("");
+
                 switch (option) {
                     case 1:
                         postService.deletePostUI();
@@ -142,7 +141,7 @@ public class MenuService {
                 }
             } catch (Exception e) {
                 System.out.println("Invalid input. Please enter a number.");
-                scanner.nextLine();
+
             }
         }
     }

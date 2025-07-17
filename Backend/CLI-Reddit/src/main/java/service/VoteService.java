@@ -9,13 +9,13 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class VoteService {
-    private static final VoteService instance = new VoteService();
+    private static VoteService instance = new VoteService();
     private final Map<Votable, Map<User, Vote>> voteData = new HashMap<>();
     private final Map<Votable, Integer> voteCounts = new HashMap<>();
-    private final Scanner scanner;
+
 
     private VoteService() {
-        this.scanner = new Scanner(System.in);
+
     }
 
     public static VoteService getInstance() {
@@ -154,5 +154,8 @@ public class VoteService {
                     " downvoted comment ID " + commentId);
         }
         return success;
+    }
+    public static void resetInstance() {
+        instance = null;
     }
 }

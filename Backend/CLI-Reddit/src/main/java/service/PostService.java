@@ -11,17 +11,17 @@ import java.util.*;
 import java.util.Scanner;
 
 public class PostService {
-    private static final PostService instance = new PostService();
+    private static PostService instance = new PostService();
     private static final int MIN_VOTES_FOR_STAR = 10;
     private final PostRepository postRepository;
     private final VoteService voteService;
-    private final Scanner scanner;
+
     private static final Map<Integer, List<Comment>> commentsMap = new HashMap<>();
 
     private PostService() {
         this.voteService = VoteService.getInstance();
         this.postRepository = new PostRepository();
-        this.scanner = new Scanner(System.in);
+
     }
 
     public static PostService getInstance() {
@@ -163,5 +163,10 @@ public class PostService {
             Log.log(LogLevel.WARN, "Unauthorized delete attempt on post ID: " + postId + " by user: " + UserService.getCurrentUser().getUsername());
             System.out.println("You can only delete your own posts.");
         }
+    }
+
+    // Pentru testare: poți adăuga reset()
+    public static void resetInstance() {
+        instance = null;
     }
 }

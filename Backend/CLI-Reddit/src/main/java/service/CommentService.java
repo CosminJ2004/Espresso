@@ -9,14 +9,14 @@ import java.util.*;
 import java.util.Scanner;
 
 public class CommentService {
-    private static final CommentService instance = new CommentService();
+    private static  CommentService instance = new CommentService();
     private static final Map<Integer, Comment> allComments = new HashMap<>();
     private final PostService postService;
-    private final Scanner scanner;
+
 
     private CommentService() {
         this.postService = PostService.getInstance();
-        this.scanner = new Scanner(System.in);
+
         Log.log(LogLevel.INFO, "CommentService initialized.");
     }
 
@@ -26,12 +26,14 @@ public class CommentService {
 
     public Comment addComment(User user, String text, Post post, Comment parent) {
         Comment comment = new Comment(user, text, post, parent);
+        //creating the comment
         allComments.put(comment.getId(), comment);
 
         if (parent == null) {
+            //if the parrent is null -> comment to a post
             postService.addComment(post, comment);
             Log.log(LogLevel.INFO, "Comment ID " + comment.getId() + " added to post ID " + post.getId());
-        } else {
+        } else { //otherwise it is a reply
             this.addReply(parent, comment);
             Log.log(LogLevel.INFO, "Reply ID " + comment.getId() + " added to parent comment ID " + parent.getId());
         }
@@ -69,15 +71,7 @@ public class CommentService {
     }
 
     public void addCommentToPost(Post post) {
-//        System.out.print("Enter post ID to comment: ");
-//        int postId = Integer.parseInt(scanner.nextLine());
-//
-//        Post post = postService.getPostById(postId);
-//        if (post == null) {
-//            System.out.println("Post not found.");
-//            Log.log(LogLevel.ERROR, "User attempted to comment on non-existent post ID " + postId);
-//            return;
-//        }
+
 
         String text = Console.readText("Write your comment: ");
         Comment comment = addComment(UserService.getCurrentUser(), text, post, null);
@@ -87,7 +81,7 @@ public class CommentService {
     }
 
     public void addCommentToComment() {
-//        System.out.print("Enter comment ID to comment: ");
+
         int commentId=Console.readInt("Enter comment ID to comment: ");
 
         Comment comment = getById(commentId);
@@ -104,5 +98,9 @@ public class CommentService {
 
         Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
                 " added reply comment ID " + newComment.getId() + " to comment ID " + commentId);
+    }
+
+    public static void resetInstance() {
+        instance = null;
     }
 }
