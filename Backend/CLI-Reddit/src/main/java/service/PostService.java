@@ -141,16 +141,12 @@ public class PostService {
     }
 
     public void deletePostUI(Post post) {
-
         if (post == null) {
             System.out.println("Post not found.");
             return;
         }
         
         Log.log(LogLevel.INFO, "User attempting to delete post ID: " + post.getId());
-
-        System.out.println(post.getAuthor());
-        System.out.println(UserService.getCurrentUser());
 
         if (post.getAuthor().equals(UserService.getCurrentUser())) {
             boolean deleted = deletePostById(post.getId());
