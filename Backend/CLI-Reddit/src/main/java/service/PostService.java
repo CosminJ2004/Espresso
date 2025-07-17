@@ -28,14 +28,6 @@ public class PostService {
         return instance;
     }
 
-    public PostRepository getPostRepository() {
-        return postRepository;
-    }
-
-    public VoteService getVoteService() {
-        return voteService;
-    }
-
     public void addPost(Post post) {
         boolean saved = postRepository.save(post);
         if (saved) {
@@ -158,9 +150,6 @@ public class PostService {
         }
 
         Log.log(LogLevel.INFO, "User attempting to delete post ID: " + post.getId());
-
-        System.out.println(post.getAuthor());
-        System.out.println(UserService.getCurrentUser());
 
         if (post.getAuthor().equals(UserService.getCurrentUser())) {
             boolean deleted = deletePostById(post.getId());
