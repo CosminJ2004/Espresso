@@ -108,6 +108,7 @@ public class MenuService {
                 switch (option) {
                     case 1:
                         postService.deletePostUI(currentPost);
+
                         return;
                     case 2:
                         commentService.addCommentToPost(currentPost);

@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class PostService {
     private static PostService instance = new PostService();
-    private static final int MIN_VOTES_FOR_STAR = 10;
+    private static final int MIN_VOTES_FOR_STAR = 3;
     private final PostRepository postRepository;
     private final VoteService voteService;
 
@@ -26,6 +26,14 @@ public class PostService {
 
     public static PostService getInstance() {
         return instance;
+    }
+
+    public PostRepository getPostRepository() {
+        return postRepository;
+    }
+
+    public VoteService getVoteService() {
+        return voteService;
     }
 
     public void addPost(Post post) {
@@ -142,11 +150,13 @@ public class PostService {
 
     public void deletePostUI(Post post) {
 
+        Log.log(LogLevel.INFO, "User attempting to delete post ID: " + post.getId());
+
         if (post == null) {
             System.out.println("Post not found.");
             return;
         }
-        
+
         Log.log(LogLevel.INFO, "User attempting to delete post ID: " + post.getId());
 
         System.out.println(post.getAuthor());
