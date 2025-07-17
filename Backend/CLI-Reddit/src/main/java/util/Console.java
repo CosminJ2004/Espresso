@@ -7,14 +7,16 @@ import java.util.Scanner;
 
 public class Console {
     private static final Console instance = new Console();
+    private static ProfanityFilter filter;
     private static Scanner scanner;
 
     private static final String INVALID_INPUT_INT = "The format is invalid, please retry.";
     private static final String INVALID_INPUT_TEXT = "The text cannot be empty.";
-    private static final String INVALID_INPUT_CRED = "Credentials doesn't have the required minimum of characters.";
+    private static final String INVALID_INPUT_CRED = "Credentials doesn't have the required minimum of characters, nor they contain profanity";
     private static final int MINIM_CRED_CHARS = 5;
 
     private Console() {
+        filter = new ProfanityFilter("BadWords.txt");
         scanner = new Scanner(System.in);
     }
 
@@ -43,11 +45,11 @@ public class Console {
         Console.println(prompt);
         while (true) {
             String input = scanner.nextLine().trim();
-            Log.log(LogLevel.DEBUG, "User Input:" + input);
+            Log.log(LogLevel.DEBUG, "User Input: " + input);
             if (input.isEmpty()) {
                 System.out.println(INVALID_INPUT_TEXT);
             } else {
-                return input;
+                return filter.censorText(input);
             }
         }
     }
@@ -56,9 +58,9 @@ public class Console {
         Console.println(prompt);
         while (true) {
             String input = scanner.nextLine().trim();
-            Log.log(LogLevel.DEBUG, "User Input:" + input);
-            if (input.length() < MINIM_CRED_CHARS) {
-                System.out.println(INVALID_INPUT_CRED);
+            Log.log(LogLevel.DEBUG, "User Input: " + input);
+            if (input.length() < MINIM_CRED_CHARS && filter.containsProfanity(input)) {
+                Console.println(INVALID_INPUT_CRED);
             } else {
                 return input;
             }
