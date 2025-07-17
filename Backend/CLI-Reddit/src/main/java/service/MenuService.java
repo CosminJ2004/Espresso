@@ -38,7 +38,8 @@ public class MenuService {
                         userService.registerUI();
                         break;
                     case 3:
-                        System.out.println("Goodbye!");
+
+                        AnimationService.showGoodbyeAnimation();
                         System.exit(0);
                     default:
                         System.out.println("Invalid option, try again.");

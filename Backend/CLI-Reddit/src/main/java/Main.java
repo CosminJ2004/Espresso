@@ -22,9 +22,13 @@ public class Main {
         Log.log(LogLevel.WARN,"Debug Message");
         Log.log(LogLevel.ERROR,"Error Message");
 
+
+        AnimationService.showStartupAnimation();
+
         while (true) {
             menuService.createLoginMenu();
             menuService.createMainMenu();
         }
+
     }
 }
