@@ -5,15 +5,14 @@ import java.util.*;
 
 public class Comment implements Votable {
     private int id;
-    private static int counter=0;
+    private static int counter = 0;
     private User author;
     private String text;
     private Post post;
     private int votes = 0;
-    private Map<String, String> userVotes = new HashMap<>();
     private Comment parent; // null dacă e top-level
     private List<Comment> replies = new ArrayList<>();
-    private LocalDateTime dateTime;
+    private LocalDateTime createdAt;
 
     public Comment(User author, String text, Post post, Comment parent) {
         this.id = ++counter;
@@ -21,7 +20,7 @@ public class Comment implements Votable {
         this.text = text;
         this.post = post;
         this.parent = parent;
-        this.dateTime = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
     }
 
     public int getId() {
@@ -44,10 +43,6 @@ public class Comment implements Votable {
         return votes;
     }
 
-    public Map<String, String> getUserVotes() {
-        return userVotes;
-    }
-
     public Comment getParent() {
         return parent;
     }
@@ -56,8 +51,8 @@ public class Comment implements Votable {
         return replies;
     }
 
-    public LocalDateTime getDateTime() {
-        return dateTime;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public void setVotes(int votes) {
@@ -85,7 +80,7 @@ public class Comment implements Votable {
                 ", text='" + text + '\'' +
                 ", post=" + post.getId() +
                 ", parent=" + (parent != null ? parent.getId() : "none") +
-                ", dateTime=" + dateTime +
+                ", dateTime=" + createdAt +
                 '}';
     }
 }

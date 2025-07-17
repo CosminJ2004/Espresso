@@ -90,7 +90,7 @@ public class PostService {
         int votes = voteService.getVoteCount(post);
 
 
-        String result = "[" + post.getId() + "] " + post.getSummary() + " \n" + post.getContent() + "; (by " + post.getAuthor().getUsername() + ") Votes: " + votes + " | Posted on: " + formattedDateTime;
+        String result = "[" + post.getId() + "] " + post.getSummary() + " " + post.getContent() + "; (by " + post.getAuthor().getUsername() + ") Votes: " + votes + " | Posted on: " + formattedDateTime;
         if (votes >= MIN_VOTES_FOR_STAR) {
             result += " ⭐";
         }
@@ -100,7 +100,7 @@ public class PostService {
 
 
         if (commentList.isEmpty()) {
-            System.out.println("There are no comments");
+            System.out.println("There are no comments. \n");
         } else {
             CommentService commentService = CommentService.getInstance();
             for (Comment comment : commentList) {

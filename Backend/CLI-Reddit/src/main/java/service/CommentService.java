@@ -3,6 +3,8 @@ package service;
 import model.*;
 import logger.*;
 import util.Console;
+
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Scanner;
 
@@ -57,7 +59,7 @@ public class CommentService {
         int votes = voteService.getVoteCount(comment);
         String indent = " ".repeat(level * 2);
         System.out.println(indent + comment.getText() + " written by " + comment.getAuthor().getUsername()
-                + " Comment ID: " + comment.getId() + " Votes: " + votes);
+                + " Comment ID: " + comment.getId() + " Votes: " + votes + " | Posted on: " + comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
 
         Log.log(LogLevel.INFO, "Displayed comment ID " + comment.getId() + " with " + votes + " votes");
 
