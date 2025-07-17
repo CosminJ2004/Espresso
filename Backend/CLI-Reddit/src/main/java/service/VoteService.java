@@ -83,38 +83,38 @@ public class VoteService {
         Log.log(LogLevel.INFO, "Displayed votes for ID " + votable.getId());
     }
 
-    public boolean upvoteToPost() {
-        System.out.print("Enter post ID to upvote: ");
-        int postId = Integer.parseInt(scanner.nextLine());
-        PostService postService = PostService.getInstance();
-        Post post = postService.getPostById(postId);
-        if (post == null) {
-            System.out.println("Post not found.");
-            Log.log(LogLevel.WARN, "Attempted upvote on non-existent post ID " + postId);
-            return false;
-        }
+    public boolean upvoteToPost(Post post) {
+//        System.out.print("Enter post ID to upvote: ");
+//        int postId = Integer.parseInt(scanner.nextLine());
+//        PostService postService = PostService.getInstance();
+//        Post post = postService.getPostById(postId);
+//        if (post == null) {
+//            System.out.println("Post not found.");
+//            Log.log(LogLevel.WARN, "Attempted upvote on non-existent post ID " + postId);
+//            return false;
+//        }
         boolean success = vote(post, UserService.getCurrentUser(), VoteType.UPVOTE);
         if (success) {
             Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
-                    " upvoted post ID " + postId);
+                    " upvoted post ID " + post.getId());
         }
         return success;
     }
 
-    public boolean downvoteToPost() {
-        System.out.print("Enter post ID to downvote: ");
-        int postId = Integer.parseInt(scanner.nextLine());
-        PostService postService = PostService.getInstance();
-        Post post = postService.getPostById(postId);
-        if (post == null) {
-            System.out.println("Post not found.");
-            Log.log(LogLevel.WARN, "Attempted downvote on non-existent post ID " + postId);
-            return false;
-        }
+    public boolean downvoteToPost(Post post) {
+//        System.out.print("Enter post ID to downvote: ");
+//        int postId = Integer.parseInt(scanner.nextLine());
+//        PostService postService = PostService.getInstance();
+//        Post post = postService.getPostById(postId);
+//        if (post == null) {
+//            System.out.println("Post not found.");
+//            Log.log(LogLevel.WARN, "Attempted downvote on non-existent post ID " + postId);
+//            return false;
+//        }
         boolean success = vote(post, UserService.getCurrentUser(), VoteType.DOWNVOTE);
         if (success) {
             Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
-                    " downvoted post ID " + postId);
+                    " downvoted post ID " + post.getId());
         }
         return success;
     }

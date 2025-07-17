@@ -118,11 +118,11 @@ public class MenuService {
                         postService.expand(currentPost);
                         break;
                     case 4:
-                        voteService.upvoteToPost();
+                        voteService.upvoteToPost(currentPost);
                         postService.expand(currentPost);
                         break;
                     case 5:
-                        voteService.downvoteToPost();
+                        voteService.downvoteToPost(currentPost);
                         postService.expand(currentPost);
                         break;
                     case 6:
