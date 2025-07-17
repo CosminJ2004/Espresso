@@ -66,22 +66,22 @@ public class CommentService {
         }
     }
 
-    public void addCommentToPost() {
-        System.out.print("Enter post ID to comment: ");
-        int postId = Integer.parseInt(scanner.nextLine());
-
-        Post post = postService.getPostById(postId);
-        if (post == null) {
-            System.out.println("Post not found.");
-            Log.log(LogLevel.ERROR, "User attempted to comment on non-existent post ID " + postId);
-            return;
-        }
+    public void addCommentToPost(Post post) {
+//        System.out.print("Enter post ID to comment: ");
+//        int postId = Integer.parseInt(scanner.nextLine());
+//
+//        Post post = postService.getPostById(postId);
+//        if (post == null) {
+//            System.out.println("Post not found.");
+//            Log.log(LogLevel.ERROR, "User attempted to comment on non-existent post ID " + postId);
+//            return;
+//        }
 
         String text = Console.readText("Write your comment: ");
         Comment comment = addComment(UserService.getCurrentUser(), text, post, null);
 
         Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
-                " added comment ID " + comment.getId() + " to post ID " + postId);
+                " added comment ID " + comment.getId() + " to post ID " + post.getId());
     }
 
     public void addCommentToComment() {

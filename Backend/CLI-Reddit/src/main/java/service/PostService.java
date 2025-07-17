@@ -89,7 +89,7 @@ public class PostService {
         int votes = voteService.getVoteCount(post);
 
 
-        String result = "[" + post.getId() + "] " + post.getSummary() + " " + post.getContent() + " (by " + post.getAuthor().getUsername() + ") Votes: " + votes + " | Posted on: " + formattedDateTime;
+        String result = "[" + post.getId() + "] " + post.getSummary() + " \n" + post.getContent() + "; (by " + post.getAuthor().getUsername() + ") Votes: " + votes + " | Posted on: " + formattedDateTime;
         if (votes >= MIN_VOTES_FOR_STAR) {
             result += " ⭐";
         }
@@ -129,17 +129,18 @@ public class PostService {
         System.out.println("Post created with ID: " + post.getId());
     }
 
-    public void expandPostUI() {
+    public Post expandPostUI() {
         System.out.print("Enter post ID to expand: ");
         int postId = Integer.parseInt(scanner.nextLine());
 
         Post post = getPostById(postId);
         if (post == null) {
             System.out.println("Post not found.");
-            return;
+            return null;
         }
 
         expand(post);
+        return post;
     }
 
     public void deletePostUI() {

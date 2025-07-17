@@ -1,5 +1,7 @@
 package service;
 
+import model.Post;
+
 import java.util.Scanner;
 
 public class MenuService {
@@ -8,6 +10,7 @@ public class MenuService {
     private final PostService postService;
     private final CommentService commentService;
     private final VoteService voteService;
+    private Post currentPost=null;
 
     public MenuService(UserService userService, PostService postService, CommentService commentService, VoteService voteService) {
         this.scanner = new Scanner(System.in);
@@ -67,8 +70,10 @@ public class MenuService {
                         postService.showAllPosts();
                         break;
                     case 3: {
-                        postService.expandPostUI();
-                        createPostMenu();
+                        currentPost=postService.expandPostUI();
+                        if (currentPost!=null) {
+                            createPostMenu();
+                        }
                     }
                     break;
                     case 4:
@@ -105,28 +110,28 @@ public class MenuService {
                         postService.deletePostUI();
                         return;
                     case 2:
-                        commentService.addCommentToPost();
-                        postService.expandPostUI();
+                        commentService.addCommentToPost(currentPost);
+                        postService.expand(currentPost);
                         break;
                     case 3:
                         commentService.addCommentToComment();
-                        postService.expandPostUI();
+                        postService.expand(currentPost);
                         break;
                     case 4:
                         voteService.upvoteToPost();
-                        postService.expandPostUI();
+                        postService.expand(currentPost);
                         break;
                     case 5:
                         voteService.downvoteToPost();
-                        postService.expandPostUI();
+                        postService.expand(currentPost);
                         break;
                     case 6:
                         voteService.upVoteToComment();
-                        postService.expandPostUI();
+                        postService.expand(currentPost);
                         break;
                     case 7:
                         voteService.downVoteToComment();
-                        postService.expandPostUI();
+                        postService.expand(currentPost);
                         break;
                     case 8:
                         return;
