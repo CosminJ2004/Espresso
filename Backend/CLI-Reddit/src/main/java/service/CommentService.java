@@ -85,8 +85,8 @@ public class CommentService {
     }
 
     public void addCommentToComment() {
-        System.out.print("Enter comment ID to comment: ");
-        int commentId = Integer.parseInt(scanner.nextLine());
+//        System.out.print("Enter comment ID to comment: ");
+        int commentId=Console.readInt("Enter comment ID to comment: ");
 
         Comment comment = getById(commentId);
         if (comment == null) {

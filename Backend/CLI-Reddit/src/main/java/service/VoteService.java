@@ -2,6 +2,7 @@ package service;
 
 import model.*;
 import logger.*;
+import util.Console;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -120,8 +121,8 @@ public class VoteService {
     }
 
     public boolean upVoteToComment() {
-        System.out.print("Enter comment ID to upvote: ");
-        int commentId = Integer.parseInt(scanner.nextLine());
+
+        int commentId = Console.readInt("Enter comment ID to upvote");
         CommentService commentService = CommentService.getInstance();
         Comment comment = commentService.getById(commentId);
         if (comment == null) {
@@ -138,8 +139,8 @@ public class VoteService {
     }
 
     public boolean downVoteToComment() {
-        System.out.print("Enter comment ID to downvote: ");
-        int commentId = Integer.parseInt(scanner.nextLine());
+
+        int commentId = Console.readInt("Enter comment ID to downvote: ");
         CommentService commentService = CommentService.getInstance();
         Comment comment = commentService.getById(commentId);
         if (comment == null) {
