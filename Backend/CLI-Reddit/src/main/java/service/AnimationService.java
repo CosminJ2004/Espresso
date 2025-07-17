@@ -14,7 +14,7 @@ public class AnimationService {
 
                 """;
 
-        System.out.println("Starting Reddit Clone...");
+        System.out.println("Starting Reddit...");
         try {
             Thread.sleep(500);
             System.out.print(".");
@@ -29,7 +29,6 @@ public class AnimationService {
         }
 
         System.out.println(logo);
-        System.out.println("Ready.\n");
     }
 
     public static void showGoodbyeAnimation() {
