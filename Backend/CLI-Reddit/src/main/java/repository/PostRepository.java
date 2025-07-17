@@ -1,5 +1,7 @@
 package repository;
 
+import logger.Log;
+import logger.LogLevel;
 import model.Post;
 import model.User;
 import util.Database;
@@ -32,7 +34,7 @@ public class PostRepository {
             }
             return false;
         } catch (SQLException e) {
-            System.err.println("Error saving post: " + e.getMessage());
+            Log.log(LogLevel.ERROR,"Error saving post: " + e.getMessage());
             return false;
         }
     }
@@ -49,15 +51,17 @@ public class PostRepository {
 
             if (rs.next()) {
                 User author = new User(
-                    rs.getInt("id"),
+                    rs.getInt("u.id"),
                     rs.getString("author"),
                     rs.getString("password")
                 );
+
+
                 
                 return Optional.of(createPostFromResultSet(rs, author));
             }
         } catch (SQLException e) {
-            System.err.println("Error finding post by ID: " + e.getMessage());
+            Log.log(LogLevel.ERROR,"Error finding post by ID: " + e.getMessage());
         }
         return Optional.empty();
     }
@@ -74,7 +78,7 @@ public class PostRepository {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 User author = new User(
-                    rs.getInt("id"),
+                    rs.getInt("u.id"),
                     rs.getString("author"),
                     rs.getString("password")
                 );
@@ -82,7 +86,7 @@ public class PostRepository {
                 posts.add(createPostFromResultSet(rs, author));
             }
         } catch (SQLException e) {
-            System.err.println("Error finding all posts: " + e.getMessage());
+            Log.log(LogLevel.ERROR,"Error finding all posts: " + e.getMessage());
         }
         return posts;
     }
@@ -103,7 +107,7 @@ public class PostRepository {
                 posts.add(createPostFromResultSet(rs, author));
             }
         } catch (SQLException e) {
-            System.err.println("Error finding posts by author: " + e.getMessage());
+            Log.log(LogLevel.ERROR,"Error finding posts by author: " + e.getMessage());
         }
         return posts;
     }
@@ -116,7 +120,7 @@ public class PostRepository {
             stmt.setInt(1, id);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error deleting post: " + e.getMessage());
+            Log.log(LogLevel.ERROR,"Error deleting post: " + e.getMessage());
             return false;
         }
     }
@@ -132,7 +136,7 @@ public class PostRepository {
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error updating post: " + e.getMessage());
+            Log.log(LogLevel.ERROR,"Error updating post: " + e.getMessage());
             return false;
         }
     }
@@ -147,7 +151,7 @@ public class PostRepository {
                 return rs.getLong(1);
             }
         } catch (SQLException e) {
-            System.err.println("Error counting posts: " + e.getMessage());
+            Log.log(LogLevel.ERROR,"Error counting posts: " + e.getMessage());
         }
         return 0;
     }

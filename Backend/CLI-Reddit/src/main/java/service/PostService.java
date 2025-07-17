@@ -140,27 +140,28 @@ public class PostService {
         return post;
     }
 
-    public void deletePostUI() {
-        int postId = Console.readInt("Enter post ID to expand: ");
+    public void deletePostUI(Post post) {
 
-        Post post = getPostById(postId);
         if (post == null) {
             System.out.println("Post not found.");
             return;
         }
         
-        Log.log(LogLevel.INFO, "User attempting to delete post ID: " + postId);
-        
+        Log.log(LogLevel.INFO, "User attempting to delete post ID: " + post.getId());
+
+        System.out.println(post.getAuthor());
+        System.out.println(UserService.getCurrentUser());
+
         if (post.getAuthor().equals(UserService.getCurrentUser())) {
-            boolean deleted = deletePostById(postId);
+            boolean deleted = deletePostById(post.getId());
             if (deleted) {
-                Log.log(LogLevel.INFO, "Post deleted successfully - ID: " + postId + " by user: " + UserService.getCurrentUser().getUsername());
+                Log.log(LogLevel.INFO, "Post deleted successfully - ID: " + post.getId() + " by user: " + UserService.getCurrentUser().getUsername());
                 System.out.println("Post deleted successfully.");
             } else {
                 System.out.println("Failed to delete post.");
             }
         } else {
-            Log.log(LogLevel.WARN, "Unauthorized delete attempt on post ID: " + postId + " by user: " + UserService.getCurrentUser().getUsername());
+            Log.log(LogLevel.WARN, "Unauthorized delete attempt on post ID: " + post.getId() + " by user: " + UserService.getCurrentUser().getUsername());
             System.out.println("You can only delete your own posts.");
         }
     }

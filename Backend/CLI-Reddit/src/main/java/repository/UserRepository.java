@@ -1,5 +1,6 @@
 package repository;
 
+import logger.*;
 import model.User;
 import util.Database;
 
@@ -21,7 +22,7 @@ public class UserRepository {
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error saving user: " + e.getMessage());
+            Log.log(LogLevel.ERROR,"Error saving user: " + e.getMessage());
             return false;
         }
     }
@@ -42,7 +43,7 @@ public class UserRepository {
                 ));
             }
         } catch (SQLException e) {
-            System.err.println("Error finding user: " + e.getMessage());
+            Log.log(LogLevel.ERROR,"Error finding user: " + e.getMessage());
         }
         return Optional.empty();
     }
@@ -64,7 +65,7 @@ public class UserRepository {
                 ));
             }
         } catch (SQLException e) {
-            System.err.println("Error authenticating user: " + e.getMessage());
+            Log.log(LogLevel.ERROR,"Error authenticating user: " + e.getMessage());
         }
         return Optional.empty();
     }
@@ -79,7 +80,7 @@ public class UserRepository {
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error updating username: " + e.getMessage());
+            Log.log(LogLevel.ERROR,"Error updating username: " + e.getMessage());
             return false;
         }
     }
@@ -94,7 +95,7 @@ public class UserRepository {
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error updating password: " + e.getMessage());
+            Log.log(LogLevel.ERROR,"Error updating password: " + e.getMessage());
             return false;
         }
     }
@@ -107,7 +108,7 @@ public class UserRepository {
             stmt.setString(1, username);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error deleting user: " + e.getMessage());
+            Log.log(LogLevel.ERROR,"Error deleting user: " + e.getMessage());
             return false;
         }
     }
