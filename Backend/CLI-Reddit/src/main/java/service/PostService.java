@@ -4,6 +4,7 @@ import model.Post;
 import model.Comment;
 import logger.*;
 import repository.PostRepository;
+import util.Console;
 
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -117,11 +118,8 @@ public class PostService {
 
     public void createPostUI() {
         Log.log(LogLevel.INFO, "Creating new post for user: " + UserService.getCurrentUser().getUsername());
-        System.out.print("Enter summary: ");
-        String summary = scanner.nextLine();
-
-        System.out.print("Enter content: ");
-        String content = scanner.nextLine();
+        String summary = Console.readText("Enter summary:");
+        String content = Console.readText("Enter content:");
 
         Post post = new Post(UserService.getCurrentUser(), summary, content);
         addPost(post);
@@ -130,8 +128,7 @@ public class PostService {
     }
 
     public Post expandPostUI() {
-        System.out.print("Enter post ID to expand: ");
-        int postId = Integer.parseInt(scanner.nextLine());
+        int postId = Console.readInt("Enter post ID to expand: ");
 
         Post post = getPostById(postId);
         if (post == null) {
@@ -144,8 +141,7 @@ public class PostService {
     }
 
     public void deletePostUI() {
-        System.out.print("Enter post ID to delete: ");
-        int postId = Integer.parseInt(scanner.nextLine());
+        int postId = Console.readInt("Enter post ID to expand: ");
 
         Post post = getPostById(postId);
         if (post == null) {
