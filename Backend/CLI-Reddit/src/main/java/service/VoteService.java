@@ -6,7 +6,7 @@ import util.Console;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
+
 
 public class VoteService {
     private static VoteService instance = new VoteService();
@@ -85,15 +85,7 @@ public class VoteService {
     }
 
     public boolean upvoteToPost(Post post) {
-//        System.out.print("Enter post ID to upvote: ");
-//        int postId = Integer.parseInt(scanner.nextLine());
-//        PostService postService = PostService.getInstance();
-//        Post post = postService.getPostById(postId);
-//        if (post == null) {
-//            System.out.println("Post not found.");
-//            Log.log(LogLevel.WARN, "Attempted upvote on non-existent post ID " + postId);
-//            return false;
-//        }
+
         boolean success = vote(post, UserService.getCurrentUser(), VoteType.UPVOTE);
         if (success) {
             Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
@@ -103,15 +95,7 @@ public class VoteService {
     }
 
     public boolean downvoteToPost(Post post) {
-//        System.out.print("Enter post ID to downvote: ");
-//        int postId = Integer.parseInt(scanner.nextLine());
-//        PostService postService = PostService.getInstance();
-//        Post post = postService.getPostById(postId);
-//        if (post == null) {
-//            System.out.println("Post not found.");
-//            Log.log(LogLevel.WARN, "Attempted downvote on non-existent post ID " + postId);
-//            return false;
-//        }
+
         boolean success = vote(post, UserService.getCurrentUser(), VoteType.DOWNVOTE);
         if (success) {
             Log.log(LogLevel.INFO, "User " + UserService.getCurrentUser().getUsername() +
