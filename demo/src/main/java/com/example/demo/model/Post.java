@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "posts") // poți schimba numele dacă vrei
+@Table(name = "posts")
 public class Post implements Votable {
 
     @Id
@@ -20,6 +20,8 @@ public class Post implements Votable {
 
     @Column(columnDefinition = "TEXT")
     private String content;
+
+    private String filePath;
 
     private LocalDateTime createdAt;
 
@@ -64,6 +66,14 @@ public class Post implements Votable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public void setAuthor(User author) {
