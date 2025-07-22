@@ -1,7 +1,6 @@
 package com.example.demo.utils;
 
-import logger.Log;
-import logger.LogLevel;
+import com.example.demo.logger.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

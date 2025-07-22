@@ -1,9 +1,6 @@
 package com.example.demo.utils;
 
-
-import logger.Log;
-import logger.LogLevel;
-
+import com.example.demo.logger.*;
 import java.util.Scanner;
 
 public class Console {
