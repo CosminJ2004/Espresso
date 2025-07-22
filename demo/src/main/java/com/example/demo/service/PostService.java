@@ -14,6 +14,7 @@ public class PostService {
     private final List<Post> posts = new ArrayList<>();
     private final AtomicInteger idCounter = new AtomicInteger(1);
 
+
     // Simulăm o bază de date de useri
     private final List<User> users = List.of(
             new User("john", "123"),
@@ -21,6 +22,9 @@ public class PostService {
     );
 
     public List<Post> getAllPosts() {
+        User user=new User("john","asgasgas");
+        Post postTest=new Post(user,"asnf","asdfasd");
+        posts.add(postTest);
         return posts;
     }
 
