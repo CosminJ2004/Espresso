@@ -10,14 +10,14 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private User currentUser;
+    private static User currentUser;
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public Optional<User> getCurrentUser() {
-        return Optional.ofNullable(currentUser);
+    public static User getCurrentUser() {
+        return (currentUser);
     }
 
     public void logout() {

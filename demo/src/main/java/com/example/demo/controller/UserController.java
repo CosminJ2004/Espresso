@@ -53,7 +53,7 @@ public class UserController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
         if (userService.isLoggedIn()) {
-            String username = userService.getCurrentUser().get().getUsername();
+            String username = userService.getCurrentUser().getUsername();
             userService.logout();
             return ResponseEntity.ok("User " + username + " logged out.");
         } else {
@@ -63,10 +63,9 @@ public class UserController {
 
     // 👤 Get current user
     @GetMapping("/me")
-    public ResponseEntity<?> currentUser() {
-        Optional<User> currentUser = userService.getCurrentUser();
-        return currentUser
-                .<ResponseEntity<?>>map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(401).body("No user logged in."));
+    public User currentUser() {
+        User currentUser = userService.getCurrentUser();
+        return currentUser;
+
     }
 }
