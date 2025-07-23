@@ -14,7 +14,7 @@ public class Post implements Votable {
 
     @ManyToOne(optional = false) // fiecare post are un autor
     @JoinColumn(name = "author_id", nullable = false)
-    private User author;
+    private Users author;
 
     private String summary;
 
@@ -29,14 +29,14 @@ public class Post implements Votable {
         // Constructorul gol e necesar pentru JPA
     }
 
-    public Post(User author, String summary, String content) {
+    public Post(Users author, String summary, String content) {
         this.author = author;
         this.summary = summary;
         this.content = content;
         this.createdAt = LocalDateTime.now();
     }
 
-    public Post(int id, User author, String summary, String content, LocalDateTime createdAt) {
+    public Post(int id, Users author, String summary, String content, LocalDateTime createdAt) {
         this.id = id;
         this.author = author;
         this.summary = summary;
@@ -48,7 +48,7 @@ public class Post implements Votable {
         return id;
     }
 
-    public User getAuthor() {
+    public Users getAuthor() {
         return author;
     }
 
@@ -76,7 +76,7 @@ public class Post implements Votable {
         this.filePath = filePath;
     }
 
-    public void setAuthor(User author) {
+    public void setAuthor(Users author) {
         this.author = author;
     }
 
@@ -113,5 +113,9 @@ public class Post implements Votable {
                 ", summary='" + summary + '\'' +
                 ", createdAt=" + createdAt +
                 '}';
+    }
+
+    public String getAuthorUsername() {
+        return author.getUsername();
     }
 }

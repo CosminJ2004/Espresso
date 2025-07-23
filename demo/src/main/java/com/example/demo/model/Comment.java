@@ -6,7 +6,7 @@ import java.util.*;
 public class Comment implements Votable {
     private int id;
     private static int counter = 0;
-    private User author;
+    private Users author;
     private String text;
     private Post post;
     private int votes = 0;
@@ -14,7 +14,7 @@ public class Comment implements Votable {
     private List<Comment> replies = new ArrayList<>();
     private LocalDateTime createdAt;
 
-    public Comment(User author, String text, Post post, Comment parent) {
+    public Comment(Users author, String text, Post post, Comment parent) {
         this.id = ++counter;
         this.author = author;
         this.text = text;
@@ -27,7 +27,7 @@ public class Comment implements Votable {
         return id;
     }
 
-    public User getAuthor() {
+    public Users getAuthor() {
         return author;
     }
 

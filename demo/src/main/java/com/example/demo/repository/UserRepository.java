@@ -1,19 +1,20 @@
 package com.example.demo.repository;
 
-import com.example.demo.model.User;
+import com.example.demo.model.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<Users, Integer> {
+
 
     boolean existsByUsername(String username);
 
-    Optional<User> findByUsernameAndPassword(String username, String password);
+    Optional<Users> findByUsernameAndPassword(String username, String password);
 
-    Optional<User> findByUsername(String username);
+    Optional<Users> findByUsername(String username);
 
     void deleteByUsername(String username);
 }

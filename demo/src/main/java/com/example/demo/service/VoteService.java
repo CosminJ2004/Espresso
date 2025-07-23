@@ -13,13 +13,13 @@ import java.util.Optional;
 public class VoteService {
 
     // Using a Map to keep track of votes, same as your original logic
-    private final Map<Votable, Map<User, Vote>> voteData = new HashMap<>();
+    private final Map<Votable, Map<Users, Vote>> voteData = new HashMap<>();
     private final Map<Votable, Integer> voteCounts = new HashMap<>();
 
     // No static instance; Spring manages the bean lifecycle
 
-    public boolean vote(Votable votable, User user, VoteType voteType) {
-        Map<User, Vote> userVotes = voteData.computeIfAbsent(votable, k -> new HashMap<>());
+    public boolean vote(Votable votable, Users user, VoteType voteType) {
+        Map<Users, Vote> userVotes = voteData.computeIfAbsent(votable, k -> new HashMap<>());
         Vote existingVote = userVotes.get(user);
         int currentVotes = voteCounts.getOrDefault(votable, 0);
 
@@ -67,14 +67,14 @@ public class VoteService {
     }
 
     public void printVotes(Votable votable) {
-        Map<User, Vote> userVotes = voteData.get(votable);
+        Map<Users, Vote> userVotes = voteData.get(votable);
         if (userVotes == null || userVotes.isEmpty()) {
             System.out.println("No votes for id [" + votable.getId() + "]");
             return;
         }
 
         System.out.println("Votes for id [" + votable.getId() + "]:");
-        for (Map.Entry<User, Vote> entry : userVotes.entrySet()) {
+        for (Map.Entry<Users, Vote> entry : userVotes.entrySet()) {
             System.out.println("User: " + entry.getKey().getUsername() + " - " + entry.getValue().getType());
         }
         Log.log(LogLevel.INFO, "Displayed votes for ID " + votable.getId());
@@ -92,7 +92,7 @@ public class VoteService {
     }
 
     public boolean upvoteToPost(Post post) {
-        User currentUser = userService.getCurrentUser();
+        Users currentUser = userService.getCurrentUser();
         boolean success = vote(post, currentUser, VoteType.UPVOTE);
         if (success) {
             Log.log(LogLevel.INFO, "User " + currentUser.getUsername() +
@@ -102,7 +102,7 @@ public class VoteService {
     }
 
     public boolean downvoteToPost(Post post) {
-        User currentUser = userService.getCurrentUser();
+        Users currentUser = userService.getCurrentUser();
         boolean success = vote(post, currentUser, VoteType.DOWNVOTE);
         if (success) {
 //            Log.log(LogLevel.INFO, "User " + currentUser.getUsername() +
@@ -119,7 +119,7 @@ public class VoteService {
             Log.log(LogLevel.WARN, "Attempted upvote on non-existent comment ID " + commentId);
             return false;
         }
-        User currentUser = userService.getCurrentUser();
+        Users currentUser = userService.getCurrentUser();
         boolean success = vote(comment, currentUser, VoteType.UPVOTE);
         if (success) {
             Log.log(LogLevel.INFO, "User " + currentUser.getUsername() +
@@ -136,7 +136,7 @@ public class VoteService {
             Log.log(LogLevel.WARN, "Attempted downvote on non-existent comment ID " + commentId);
             return false;
         }
-        User currentUser = userService.getCurrentUser();
+        Users currentUser = userService.getCurrentUser();
         boolean success = vote(comment, currentUser, VoteType.DOWNVOTE);
         if (success) {
             Log.log(LogLevel.INFO, "User " + currentUser.getUsername() +

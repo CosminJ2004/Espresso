@@ -3,15 +3,15 @@ package com.example.demo.model;
 import java.util.Objects;
 
 public class Vote {
-    private User user;
+    private Users user;
     private VoteType type;
 
-    public Vote(User user, VoteType type) {
+    public Vote(Users user, VoteType type) {
         this.user = user;
         this.type = type;
     }
 
-    public User getUser() {
+    public Users getUser() {
         return user;
     }
 

@@ -1,5 +1,7 @@
 package com.example.demo.dto;
 
+import com.example.demo.model.Users;
+
 public class PostDto {
     private String authorUsername;
     private String summary;
@@ -38,4 +40,6 @@ public class PostDto {
     public void setContent(String content) {
         this.content = content;
     }
+
+
 }

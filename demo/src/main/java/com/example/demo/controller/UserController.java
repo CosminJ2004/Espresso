@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.User;
+import com.example.demo.model.Users;
 import com.example.demo.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +18,8 @@ public class UserController {
         this.userService = userService;
     }
     @GetMapping
-    public User getAllUsers() {
-        User user=new User("casni","aasfjnas");
+    public Users getAllUsers() {
+        Users user=new Users("casni","aasfjnas");
         return user;
     }
 
@@ -63,8 +63,8 @@ public class UserController {
 
     // 👤 Get current user
     @GetMapping("/me")
-    public User currentUser() {
-        User currentUser = userService.getCurrentUser();
+    public Users currentUser() {
+        Users currentUser = userService.getCurrentUser();
         return currentUser;
 
     }

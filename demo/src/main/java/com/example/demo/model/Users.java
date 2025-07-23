@@ -7,20 +7,20 @@ import java.util.Objects;
 
 
 @Entity
-public class User {
+public class Users {
 
     @Id
     private int id;
     private String username;
     private String password;
 
-    public User(String username, String password) {
+    public Users(String username, String password) {
         id = 0;
         this.username = username.trim();
         this.password = password;
     }
 
-    public User(int id, String username, String password) {
+    public Users(int id, String username, String password) {
         this.id = id;
         this.username = username.trim();
         this.password = password;
@@ -43,8 +43,8 @@ public class User {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof User)) return false;
-        User user = (User) o;
+        if (!(o instanceof Users)) return false;
+        Users user = (Users) o;
         return id == user.id;
     }
 

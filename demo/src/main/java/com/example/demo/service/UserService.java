@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.model.User;
+import com.example.demo.model.Users;
 import com.example.demo.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -10,13 +10,13 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private static User currentUser;
+    private static Users currentUser;
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public static User getCurrentUser() {
+    public static Users getCurrentUser() {
         return (currentUser);
     }
 
@@ -41,7 +41,7 @@ public class UserService {
             throw new IllegalStateException("Username already exists.");
         }
 
-        User newUser = new User(username, password);
+        Users newUser = new Users(username, password);
         userRepository.save(newUser);
         currentUser = newUser;
         return true;
@@ -56,7 +56,7 @@ public class UserService {
             throw new IllegalArgumentException("Password cannot be empty.");
         }
 
-        Optional<User> user = userRepository.findByUsernameAndPassword(username, password);
+        Optional<Users> user = userRepository.findByUsernameAndPassword(username, password);
         if (user.isPresent()) {
             currentUser = user.get();
             return true;
@@ -89,7 +89,7 @@ public class UserService {
             throw new IllegalStateException("Username already exists.");
         }
 
-        User user = currentUser;
+        Users user = currentUser;
         user.setUsername(newUsername);
 //        userRepository.update(user);
         currentUser = user;
@@ -105,7 +105,7 @@ public class UserService {
             throw new IllegalArgumentException("New password must be at least 6 characters.");
         }
 
-        User user = currentUser;
+        Users user = currentUser;
         user.setPassword(newPassword);
 //        userRepository.update(user);
         return true;

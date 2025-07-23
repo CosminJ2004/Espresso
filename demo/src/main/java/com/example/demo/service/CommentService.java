@@ -2,8 +2,9 @@ package com.example.demo.service;
 
 import com.example.demo.model.Comment;
 import com.example.demo.model.Post;
-import com.example.demo.model.User;
+import com.example.demo.model.Users;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
@@ -18,13 +19,16 @@ public class CommentService {
     private final UserService userService;
 
     @Autowired
-    public CommentService(PostService postService, VoteService voteService, UserService userService) {
+    public CommentService(
+            @Lazy PostService postService,
+           @Lazy VoteService voteService,
+           @Lazy UserService userService) {
         this.postService = postService;
         this.voteService = voteService;
         this.userService = userService;
     }
 
-    public Comment addComment(User user, String text, Post post, Comment parent) {
+    public Comment addComment(Users user, String text, Post post, Comment parent) {
         Comment comment = new Comment(user, text, post, parent);
         allComments.put(comment.getId(), comment);
 
@@ -65,12 +69,12 @@ public class CommentService {
     }
 
     // Metoda care adaugă comment direct, primind parametrii (nu consolă)
-    public Comment addCommentToPost(User user, String text, Post post) {
+    public Comment addCommentToPost(Users user, String text, Post post) {
         return addComment(user, text, post, null);
     }
 
     // Adaugă reply la un comment
-    public Comment addCommentToComment(User user, String text, int parentCommentId) {
+    public Comment addCommentToComment(Users user, String text, int parentCommentId) {
         Comment parent = allComments.get(parentCommentId);
         if (parent == null) {
             throw new IllegalArgumentException("Parent comment not found");
