@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.example.demo.logger.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
@@ -36,6 +37,12 @@ public class PostService {
         this.commentService = commentService;
         this.userRepository = userRepository;
     }
+
+    private PostDto convertToDto(Post post) {
+        return new PostDto(post.getAuthor().getUsername(), post.getSummary(),post.getContent());
+    }
+
+
     public Post addPost(PostDto dto) {
         Users author = userRepository.findByUsername(dto.getAuthorUsername())
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthorUsername()));
@@ -54,13 +61,41 @@ public class PostService {
 //        }
 //    }
 
-    public Post getPostById(int id) {
-        return postRepository.findById((long) id).orElse(null);
+    public PostDto getPostById(int id) {
+        Post post = postRepository.findById((long) id)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
+        return convertToDto(post);
     }
 
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public List<PostDto> getAllPosts() {
+        return postRepository.findAll()
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
+    public boolean deletePost(int id) {
+        if (postRepository.existsById((long) id)) {
+            postRepository.deleteById((long) id);
+            return true;
+        }
+        return false;
+    }
+
+
+    public Post updatePost(int id, PostDto dto) {
+        Post existingPost = postRepository.findById((long) id)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
+
+        existingPost.setSummary(dto.getSummary());
+        existingPost.setContent(dto.getContent());
+        // Dacă vrei și schimbare de autor (atenție: de obicei autorul nu se schimbă)
+        Users author = userRepository.findByUsername(dto.getAuthorUsername())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthorUsername()));
+        existingPost.setAuthor(author);
+
+        return postRepository.save(existingPost);
+    }
+
 
 //    public boolean deletePostById(int postId) {
 //        if (postRepository.findById((long) postId).isEmpty()) {
@@ -88,17 +123,17 @@ public class PostService {
         return commentsMap.getOrDefault(post.getId(), new ArrayList<>());
     }
 
-    public String display(Post post) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        String formattedDateTime = post.getCreatedAt().format(formatter);
-        int votes = voteService.getVoteCount(post);
-
-        String result = "[" + post.getId() + "] " + post.getSummary() + " (by " + post.getAuthor().getUsername() + ") Votes: " + votes + " | Posted on: " + formattedDateTime;
-        if (votes >= MIN_VOTES_FOR_STAR) {
-            result += " ⭐";
-        }
-        return result;
-    }
+//    public String display(Post post) {
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+//        String formattedDateTime = post.getCreatedAt().format(formatter);
+//        int votes = voteService.getVoteCount(post);
+//
+//        String result = "[" + post.getId() + "] " + post.getSummary() + " (by " + post.getAuthor().getUsername() + ") Votes: " + votes + " | Posted on: " + formattedDateTime;
+//        if (votes >= MIN_VOTES_FOR_STAR) {
+//            result += " ⭐";
+//        }
+//        return result;
+//    }
 
 //    public void expand(Post post) {
 //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -125,12 +160,12 @@ public class PostService {
 //        }
 //    }
 
-    public void showAllPosts()
-    {
-        for (Post post : getAllPosts()) {
-            System.out.println(display(post));
-        }
-    }
+//    public void showAllPosts()
+//    {
+//        for (Post post : getAllPosts()) {
+//            System.out.println(display(post));
+//        }
+//    }
 
 //    public void createPostUI() {
 //        Log.log(LogLevel.INFO, "Creating new post for user: " + UserService.getCurrentUser().getUsername());
