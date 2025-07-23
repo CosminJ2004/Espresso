@@ -40,7 +40,7 @@ public class Vote {
     private LocalDateTime updatedAt;
 
 
-    protected Vote() {}
+    public Vote() {}
 
     public Vote(Users user, Post post, VoteType type) {
         this.user = user;

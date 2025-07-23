@@ -19,7 +19,7 @@ public class UserController {
         this.userService = userService;
     }
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Integer id) {
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(userService.getUserById(id));
         } catch (IllegalArgumentException e) {

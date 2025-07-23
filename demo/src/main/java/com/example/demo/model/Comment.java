@@ -42,7 +42,7 @@ public class Comment implements Votable {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    protected Comment() {}
+    public Comment() {}
 
     public Comment(Users author, String text, Post post) {
         this.author = author;
@@ -110,4 +110,7 @@ public class Comment implements Votable {
     public int hashCode() {
         return getClass().hashCode();
     }
+
+
+
 }

@@ -44,7 +44,7 @@ public class Users {
     private List<Vote> votes = new ArrayList<>();
 
 
-    protected Users() {}
+    public Users() {}
 
     public Users(String username, String password) {
         this.username = username;

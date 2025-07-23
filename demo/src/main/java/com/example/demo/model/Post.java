@@ -46,7 +46,7 @@ public class Post implements Votable {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Vote> votes = new ArrayList<>();
 
-    protected Post() {}
+    public Post() {}
 
     public Post(Users author, String summary, String content) {
         this.author = author;

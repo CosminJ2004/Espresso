@@ -29,7 +29,7 @@ public class UserService {
     }
 
 
-    public UserDto getUserById(Integer id) {
+    public UserDto getUserById(Long id) {
         Users user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
         return convertToDto(user);
