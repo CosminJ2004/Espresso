@@ -53,6 +53,7 @@ public class Post implements Votable {
         this.summary = summary;
         this.content = content;
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     public Post(Users author, String summary, String content, String filePath) {
