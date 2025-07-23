@@ -1,26 +1,104 @@
 package com.example.demo.model;
 
-import java.util.Objects;
+import jakarta.persistence.*;
+import lombok.Data;
 
+import java.time.LocalDateTime;
+
+@Data
+@Entity
+@Table(name = "votes", 
+       uniqueConstraints = {
+           @UniqueConstraint(columnNames = {"user_id", "post_id"}),
+           @UniqueConstraint(columnNames = {"user_id", "comment_id"})
+       })
 public class Vote {
-    private Users user;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private VoteType type;
 
-    public Vote(Users user, VoteType type) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Users user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private Post post;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+
+    protected Vote() {}
+
+    public Vote(Users user, Post post, VoteType type) {
         this.user = user;
+        this.post = post;
+        this.comment = null;
         this.type = type;
+        this.createdAt = LocalDateTime.now();
     }
 
-    public Users getUser() {
-        return user;
-    }
-
-    public VoteType getType() {
-        return type;
-    }
-
-    public void setType(VoteType type) {
+    public Vote(Users user, Comment comment, VoteType type) {
+        this.user = user;
+        this.post = null;
+        this.comment = comment;
         this.type = type;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    public boolean isPostVote() {
+        return post != null;
+    }
+
+    public boolean isCommentVote() {
+        return comment != null;
+    }
+
+    public int getVoteValue() {
+        return type == VoteType.UPVOTE ? 1 : -1;
+    }
+
+    public void changeVote(VoteType newType) {
+        this.type = newType;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @Override
+    public String toString() {
+        String target = post != null ? "Post[" + post.getId() + "]" : 
+                       comment != null ? "Comment[" + comment.getId() + "]" : "Unknown";
+        
+        return "Vote{" +
+                "id=" + id +
+                ", type=" + type +
+                ", user=" + (user != null ? user.getUsername() : "null") +
+                ", target=" + target +
+                ", createdAt=" + createdAt +
+                '}';
     }
 
     @Override
@@ -28,19 +106,11 @@ public class Vote {
         if (this == o) return true;
         if (!(o instanceof Vote)) return false;
         Vote vote = (Vote) o;
-        return Objects.equals(user, vote.user) && type == vote.type;
+        return getId() != null && getId().equals(vote.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(user, type);
-    }
-
-    @Override
-    public String toString() {
-        return "Vote{" +
-                "user='" + user.getUsername() + '\'' +
-                ", type=" + type +
-                '}';
+        return getClass().hashCode();
     }
 }

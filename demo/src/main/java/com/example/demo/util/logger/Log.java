@@ -1,4 +1,4 @@
-package com.example.demo.logger;
+package com.example.demo.util.logger;
 
 public class Log {
     public static void RegisterLogger(ILogger logger) {

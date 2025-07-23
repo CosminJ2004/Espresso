@@ -1,13 +1,13 @@
 package com.example.demo.service;
 import com.example.demo.model.*;
-import com.example.demo.logger.*;
-import com.example.demo.utils.*;
+import com.example.demo.util.Console;
+import com.example.demo.util.logger.Log;
+import com.example.demo.util.logger.LogLevel;
 import org.springframework.stereotype.Service;
 //import util.Console;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class VoteService {

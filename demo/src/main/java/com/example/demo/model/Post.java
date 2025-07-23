@@ -1,33 +1,52 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Objects;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
 @Entity
 @Table(name = "posts")
 public class Post implements Votable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment în DB
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @ManyToOne(optional = false) // fiecare post are un autor
-    @JoinColumn(name = "author_id", nullable = false)
-    private Users author;
-
+    @Column(nullable = false, length = 255)
+    @NotBlank(message = "Summary is required")
+    @Size(max = 255, message = "Summary too long")
     private String summary;
 
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private Users author;
+
     private String filePath;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public Post() {
-        // Constructorul gol e necesar pentru JPA
-    }
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OrderBy("createdAt ASC")
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Vote> votes = new ArrayList<>();
+
+    protected Post() {}
 
     public Post(Users author, String summary, String content) {
         this.author = author;
@@ -36,60 +55,90 @@ public class Post implements Votable {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Post(int id, Users author, String summary, String content, LocalDateTime createdAt) {
-        this.id = id;
+    public Post(Users author, String summary, String content, String filePath) {
         this.author = author;
         this.summary = summary;
         this.content = content;
-        this.createdAt = createdAt;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public Users getAuthor() {
-        return author;
-    }
-
-    public String getSummary() {
-        return summary;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getFilePath() {
-        return filePath;
-    }
-
-    public void setFilePath(String filePath) {
         this.filePath = filePath;
+        this.createdAt = LocalDateTime.now();
     }
 
-    public void setAuthor(Users author) {
-        this.author = author;
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
     }
 
-    public void setSummary(String summary) {
-        this.summary = summary;
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void addComment(Comment comment) {
+        comments.add(comment);
+        comment.setPost(this);
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void removeComment(Comment comment) {
+        comments.remove(comment);
+        comment.setPost(null);
+    }
+
+    public void addVote(Vote vote) {
+        votes.add(vote);
+        vote.setPost(this);
+    }
+
+    public void removeVote(Vote vote) {
+        votes.remove(vote);
+        vote.setPost(null);
+    }
+
+    public int getCommentCount() {
+        return comments != null ? comments.size() : 0;
+    }
+
+    public int getVoteCount() {
+        if (votes == null || votes.isEmpty()) {
+            return 0;
+        }
+        return votes.stream()
+                .mapToInt(Vote::getVoteValue)
+                .sum();
+    }
+
+    public boolean hasComments() {
+        return comments != null && !comments.isEmpty();
+    }
+
+    public boolean hasVotes() {
+        return votes != null && !votes.isEmpty();
+    }
+
+    public boolean hasFile() {
+        return filePath != null && !filePath.trim().isEmpty();
+    }
+
+    public boolean isPopular() {
+        return getVoteCount() >= 10 || getCommentCount() >= 5;
+    }
+
+    public String getAuthorUsername() {
+        return author != null ? author.getUsername() : "Unknown";
+    }
+
+    @Override
+    public String toString() {
+        return "Post{" +
+                "id=" + id +
+                ", summary='" + (summary != null && summary.length() > 50 ? 
+                    summary.substring(0, 50) + "..." : summary) + '\'' +
+                ", author=" + getAuthorUsername() +
+                ", commentCount=" + getCommentCount() +
+                ", voteScore=" + getVoteCount() +
+                ", createdAt=" + createdAt +
+                '}';
     }
 
     @Override
@@ -97,25 +146,11 @@ public class Post implements Votable {
         if (this == o) return true;
         if (!(o instanceof Post)) return false;
         Post post = (Post) o;
-        return id == post.id;
+        return getId() != null && getId().equals(post.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "Post{" +
-                "id=" + id +
-                ", author=" + author.getUsername() +
-                ", summary='" + summary + '\'' +
-                ", createdAt=" + createdAt +
-                '}';
-    }
-
-    public String getAuthorUsername() {
-        return author.getUsername();
+        return getClass().hashCode();
     }
 }

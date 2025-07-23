@@ -9,12 +9,11 @@ import com.example.demo.model.Comment;
 
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.utils.Console;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import com.example.demo.logger.*;
+
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -115,7 +114,7 @@ public class PostService {
 
     public void addComment(Post post, Comment comment) {
 
-        commentsMap.computeIfAbsent(post.getId(), k -> new ArrayList<>()).add(comment);
+//        commentsMap.computeIfAbsent(post.getId(), k -> new ArrayList<>()).add(comment);
     }
 
     public List<Comment> getComments(Post post) {

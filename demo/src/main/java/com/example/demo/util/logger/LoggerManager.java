@@ -1,4 +1,4 @@
-package com.example.demo.logger;
+package com.example.demo.util.logger;
 
 
 import java.util.ArrayList;
