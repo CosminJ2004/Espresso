@@ -104,8 +104,7 @@ public class Vote {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Vote)) return false;
-        Vote vote = (Vote) o;
+        if (!(o instanceof Vote vote)) return false;
         return getId() != null && getId().equals(vote.getId());
     }
 

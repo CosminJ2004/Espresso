@@ -18,7 +18,7 @@ public class Post implements Votable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     @NotBlank(message = "Summary is required")
     @Size(max = 255, message = "Summary too long")
     private String summary;
@@ -146,8 +146,7 @@ public class Post implements Votable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Post)) return false;
-        Post post = (Post) o;
+        if (!(o instanceof Post post)) return false;
         return getId() != null && getId().equals(post.getId());
     }
 

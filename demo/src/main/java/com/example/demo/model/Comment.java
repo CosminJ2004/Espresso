@@ -101,8 +101,7 @@ public class Comment implements Votable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Comment)) return false;
-        Comment comment = (Comment) o;
+        if (!(o instanceof Comment comment)) return false;
         return getId() != null && getId().equals(comment.getId());
     }
 
