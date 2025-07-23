@@ -2,17 +2,20 @@ package com.example.demo.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import java.util.Objects;
 
 
 @Entity
+@Table(name = "users")
 public class Users {
 
     @Id
     private int id;
     private String username;
     private String password;
+
 
     public Users(String username, String password) {
         id = 0;
@@ -24,6 +27,10 @@ public class Users {
         this.id = id;
         this.username = username.trim();
         this.password = password;
+    }
+
+    public Users() {
+
     }
 
     public int getId() { return id; }
