@@ -1,38 +1,62 @@
 package com.example.demo.service;
-import com.example.demo.model.*;
-import com.example.demo.util.Console;
-import com.example.demo.util.logger.Log;
-import com.example.demo.util.logger.LogLevel;
-import org.springframework.stereotype.Service;
-//import util.Console;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.example.demo.dto.VoteDto;
+import com.example.demo.model.*;
+import com.example.demo.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VoteService {
 
+    @Autowired
+    private VoteRepository voteRepository;
 
-    private final Map<Votable, Integer> voteCounts = new HashMap<>();
+    @Autowired
+    private UserRepository userRepository;
 
-    // No static instance; Spring manages the bean lifecycle
+    @Autowired
+    private PostRepository postRepository;
 
-    public int getVoteCount(Votable votable) {
-        return voteCounts.getOrDefault(votable, 0);
+    @Autowired
+    private CommentRepository commentRepository;
+
+    public Vote vote(VoteDto dto) {
+        Optional<Users> userOpt = userRepository.findById(dto.getUserId());
+        if (userOpt.isEmpty()) throw new RuntimeException("User not found");
+
+        Users user = userOpt.get();
+
+        Vote vote;
+
+        if (dto.getPostId() != null) {
+            Post post = postRepository.findById(dto.getPostId())
+                    .orElseThrow(() -> new RuntimeException("Post not found"));
+            vote = new Vote(user, post, dto.getType());
+        } else if (dto.getCommentId() != null) {
+            Comment comment = commentRepository.findById(dto.getCommentId())
+                    .orElseThrow(() -> new RuntimeException("Comment not found"));
+            vote = new Vote(user, comment, dto.getType());
+        } else {
+            throw new RuntimeException("Neither postId nor commentId provided");
+        }
+
+        return voteRepository.save(vote);
     }
 
-
-
-
-    private final UserService userService;
-    private final CommentService commentService;
-
-    public VoteService(UserService userService, CommentService commentService) {
-        this.userService = userService;
-        this.commentService = commentService;
+    public List<Vote> getAllVotes() {
+        return voteRepository.findAll();
     }
 
+    public void deleteVote(Long voteId) {
+        voteRepository.deleteById(voteId);
+    }
 
-
-
+    public Vote getVote(Long id) {
+        return voteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vote not found"));
+    }
 }
