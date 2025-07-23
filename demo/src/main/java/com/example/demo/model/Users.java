@@ -50,6 +50,7 @@ public class Users {
         this.username = username;
         this.password = password;
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     @PrePersist

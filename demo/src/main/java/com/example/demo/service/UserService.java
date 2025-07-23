@@ -47,9 +47,9 @@ public class UserService {
             throw new IllegalArgumentException("Username already taken");
         }
 
-        Users newUser = new Users();
-        newUser.setUsername(dto.getUsername());
-        newUser.setPassword(dto.getPassword()); // ideal: encode password
+        Users newUser = new Users(dto.getUsername(), dto.getPassword());
+
+
 
         Users savedUser = userRepository.save(newUser);
         return convertToDto(savedUser);
