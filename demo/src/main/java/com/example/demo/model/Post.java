@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.Value;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ public class Post implements Votable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
-    private Users author;
+    private User author;
 
 
     private String filePath;
@@ -50,7 +49,7 @@ public class Post implements Votable {
 
     public Post() {}
 
-    public Post(Users author, String summary, String content) {
+    public Post(User author, String summary, String content) {
         this.author = author;
         this.summary = summary;
         this.content = content;
@@ -58,7 +57,7 @@ public class Post implements Votable {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Post(Users author, String summary, String content, String filePath) {
+    public Post(User author, String summary, String content, String filePath) {
         this.author = author;
         this.summary = summary;
         this.content = content;

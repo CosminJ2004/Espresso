@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.UserDto;
-import com.example.demo.model.Users;
+import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -14,24 +14,23 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private static Users currentUser;
+    private static User currentUser;
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    private UserDto convertToDto(Users user) {
+    private UserDto convertToDto(User user) {
         return new UserDto(user.getId(), user.getUsername(),user.getPassword());
     }
 
-    public static Users getCurrentUser() {
+    public static User getCurrentUser() {
         return (currentUser);
     }
 
 
     public UserDto getUserById(Long id) {
-        Users user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
         return convertToDto(user);
     }
 
@@ -47,11 +46,11 @@ public class UserService {
             throw new IllegalArgumentException("Username already taken");
         }
 
-        Users newUser = new Users(dto.getUsername(), dto.getPassword());
+        User newUser = new User(dto.getUsername(), dto.getPassword());
 
 
 
-        Users savedUser = userRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
         return convertToDto(savedUser);
     }
     @Transactional
@@ -63,19 +62,14 @@ public class UserService {
         userRepository.deleteByUsername(username);
     }
 
-    public Users updateUser(String username, UserDto dto) {
-        Users user = userRepository.findByUsername(username)
+    public User updateUser(String username, UserDto dto) {
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
 
         user.setUsername(dto.getUsername());
         user.setPassword(dto.getPassword());
         return userRepository.save(user);
     }
-
-
-
-
-
 
     public void logout() {
         this.currentUser = null;
@@ -98,7 +92,7 @@ public class UserService {
             throw new IllegalStateException("Username already exists.");
         }
 
-        Users newUser = new Users(username, password);
+        User newUser = new User(username, password);
         userRepository.save(newUser);
         currentUser = newUser;
         return true;
@@ -113,7 +107,7 @@ public class UserService {
             throw new IllegalArgumentException("Password cannot be empty.");
         }
 
-        Optional<Users> user = userRepository.findByUsernameAndPassword(username, password);
+        Optional<User> user = userRepository.findByUsernameAndPassword(username, password);
         if (user.isPresent()) {
             currentUser = user.get();
             return true;
@@ -146,7 +140,7 @@ public class UserService {
             throw new IllegalStateException("Username already exists.");
         }
 
-        Users user = currentUser;
+        User user = currentUser;
         user.setUsername(newUsername);
 //        userRepository.update(user);
         currentUser = user;
@@ -162,7 +156,7 @@ public class UserService {
             throw new IllegalArgumentException("New password must be at least 6 characters.");
         }
 
-        Users user = currentUser;
+        User user = currentUser;
         user.setPassword(newPassword);
 //        userRepository.update(user);
         return true;

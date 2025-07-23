@@ -22,7 +22,7 @@ public class Comment implements Votable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
-    private Users author;
+    private User author;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
@@ -44,7 +44,7 @@ public class Comment implements Votable {
 
     public Comment() {}
 
-    public Comment(Users author, String text, Post post) {
+    public Comment(User author, String text, Post post) {
         this.author = author;
         this.text = text;
         this.post = post;
@@ -52,7 +52,7 @@ public class Comment implements Votable {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Comment(Users author, String text, Post post, Comment parent) {
+    public Comment(User author, String text, Post post, Comment parent) {
         this.author = author;
         this.text = text;
         this.post = post;

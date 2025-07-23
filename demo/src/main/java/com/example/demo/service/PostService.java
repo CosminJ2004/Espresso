@@ -1,14 +1,12 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.PostDto;
 import com.example.demo.model.Post;
-
-import com.example.demo.model.Users;
-
+import com.example.demo.model.User;
 import com.example.demo.model.Comment;
-
+import com.example.demo.dto.PostDto;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -20,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,7 +46,7 @@ public class PostService {
 
 
     public Post addPost(PostDto dto) {
-        Users author = userRepository.findByUsername(dto.getAuthorUsername())
+        User author = userRepository.findByUsername(dto.getAuthorUsername())
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthorUsername()));
 
         Post post = new Post(author, dto.getSummary(), dto.getContent());
@@ -61,7 +58,7 @@ public class PostService {
 
 
     public Post addPostWithImage(PostDto dto, String imagePath) {
-        Users author = userRepository.findByUsername(dto.getAuthorUsername())
+        User author = userRepository.findByUsername(dto.getAuthorUsername())
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthorUsername()));
 
         Post post = new Post(author, dto.getSummary(), dto.getContent(),imagePath);
@@ -111,7 +108,7 @@ public class PostService {
         existingPost.setSummary(dto.getSummary());
         existingPost.setContent(dto.getContent());
 
-        Users author = userRepository.findByUsername(dto.getAuthorUsername())
+        User author = userRepository.findByUsername(dto.getAuthorUsername())
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthorUsername()));
         existingPost.setAuthor(author);
 

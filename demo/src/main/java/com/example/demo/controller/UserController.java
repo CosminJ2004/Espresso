@@ -1,12 +1,11 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.UserDto;
-import com.example.demo.model.Users;
+import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.List;
 
 @RestController
@@ -54,10 +53,10 @@ public class UserController {
 
 
     @PutMapping("/{username}")
-    public ResponseEntity<Users> updateUser(
+    public ResponseEntity<User> updateUser(
             @PathVariable String username,
             @RequestBody UserDto dto) {
-        Users updatedUser = userService.updateUser(username, dto);
+        User updatedUser = userService.updateUser(username, dto);
         return ResponseEntity.ok(updatedUser);
     }
 

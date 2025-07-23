@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "users")
-public class Users {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,9 +44,9 @@ public class Users {
     private List<Vote> votes = new ArrayList<>();
 
 
-    public Users() {}
+    public User() {}
 
-    public Users(String username, String password) {
+    public User(String username, String password) {
         this.username = username;
         this.password = password;
         this.createdAt = LocalDateTime.now();
@@ -77,9 +77,9 @@ public class Users {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Users)) return false;
-        Users users = (Users) o;
-        return getId() != null && getId().equals(users.getId());
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return getId() != null && getId().equals(user.getId());
     }
 
     @Override

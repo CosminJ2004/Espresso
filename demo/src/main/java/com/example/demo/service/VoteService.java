@@ -25,10 +25,10 @@ public class VoteService {
     private CommentRepository commentRepository;
 
     public Vote vote(VoteDto dto) {
-        Optional<Users> userOpt = userRepository.findById(dto.getUserId());
+        Optional<User> userOpt = userRepository.findById(dto.getUserId());
         if (userOpt.isEmpty()) throw new RuntimeException("User not found");
 
-        Users user = userOpt.get();
+        User user = userOpt.get();
 
         Vote vote;
 

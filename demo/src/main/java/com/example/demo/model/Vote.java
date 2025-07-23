@@ -23,7 +23,7 @@ public class Vote {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
@@ -42,7 +42,7 @@ public class Vote {
 
     public Vote() {}
 
-    public Vote(Users user, Post post, VoteType type) {
+    public Vote(User user, Post post, VoteType type) {
         this.user = user;
         this.post = post;
         this.comment = null;
@@ -50,7 +50,7 @@ public class Vote {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Vote(Users user, Comment comment, VoteType type) {
+    public Vote(User user, Comment comment, VoteType type) {
         this.user = user;
         this.post = null;
         this.comment = comment;

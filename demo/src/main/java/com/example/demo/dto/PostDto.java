@@ -5,12 +5,12 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import com.example.demo.model.Users;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class PostDto {
 
@@ -37,14 +37,11 @@ public class PostDto {
     private MultipartFile file;
 
     // Constructors
-    public PostDto() {}
-
     public PostDto(String authorUsername, String summary, String content) {
         this.authorUsername = authorUsername;
         this.summary = summary;
         this.content = content;
     }
-
 
     public PostDto(String authorUsername, String summary, String content, MultipartFile file) {
         this.authorUsername = authorUsername;
