@@ -13,7 +13,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,9 +53,35 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthorUsername()));
 
         Post post = new Post(author, dto.getSummary(), dto.getContent());
+
         return postRepository.save(post);
     }
 
+
+
+
+    public Post addPostWithImage(PostDto dto, String imagePath) {
+        Users author = userRepository.findByUsername(dto.getAuthorUsername())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthorUsername()));
+
+        Post post = new Post(author, dto.getSummary(), dto.getContent(),imagePath);
+        post.setFilePath(imagePath);
+        return postRepository.save(post);
+    }
+
+
+
+    public String saveImage(MultipartFile file) throws IOException {
+        if (file.isEmpty()) throw new IOException("Empty file.");
+
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path uploadDir = Paths.get("uploads").toAbsolutePath().normalize();
+        Files.createDirectories(uploadDir);
+        Path targetPath = uploadDir.resolve(fileName);
+        Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+        return "/uploads/" + fileName; // sau doar fileName dacă preferi
+    }
 
     public PostDto getPostById(int id) {
         Post post = postRepository.findById((long) id)
