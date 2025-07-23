@@ -3,12 +3,15 @@ package com.example.demo.dto;
 public class UserDto {
     private int id;
     private String username;
+    private String password;
 
     public UserDto() {}
 
-    public UserDto(int id, String username) {
+    public UserDto(int id, String username,String password) {
         this.id = id;
         this.username = username;
+        this.password = password;
+
     }
 
     public int getId() {
@@ -25,5 +28,12 @@ public class UserDto {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

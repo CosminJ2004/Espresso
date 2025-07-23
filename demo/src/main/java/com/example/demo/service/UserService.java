@@ -1,10 +1,14 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.UserDto;
 import com.example.demo.model.Users;
 import com.example.demo.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -16,9 +20,62 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    private UserDto convertToDto(Users user) {
+        return new UserDto(user.getId(), user.getUsername(),user.getPassword());
+    }
+
     public static Users getCurrentUser() {
         return (currentUser);
     }
+
+
+    public UserDto getUserById(Integer id) {
+        Users user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+        return convertToDto(user);
+    }
+
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    public UserDto createUser(UserDto dto) {
+        if (userRepository.existsByUsername(dto.getUsername())) {
+            throw new IllegalArgumentException("Username already taken");
+        }
+
+        Users newUser = new Users();
+        newUser.setUsername(dto.getUsername());
+        newUser.setPassword(dto.getPassword()); // ideal: encode password
+
+        Users savedUser = userRepository.save(newUser);
+        return convertToDto(savedUser);
+    }
+    @Transactional
+    public void deleteUser(String username) {
+        if (!userRepository.existsByUsername(username)) {
+            throw new IllegalArgumentException("User not found: " + username);
+        }
+
+        userRepository.deleteByUsername(username);
+    }
+
+    public Users updateUser(String username, UserDto dto) {
+        Users user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+
+        user.setUsername(dto.getUsername());
+        user.setPassword(dto.getPassword());
+        return userRepository.save(user);
+    }
+
+
+
+
+
 
     public void logout() {
         this.currentUser = null;
