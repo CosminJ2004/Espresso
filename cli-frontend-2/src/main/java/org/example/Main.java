@@ -1,119 +1,152 @@
-import java.net.http.*;
-import java.net.URI;
+package org.example;
+
+import java.net.http.HttpClient;
 import java.util.Scanner;
+
+import org.example.services.*;
 
 public class Main {
 
-    private static final String BASE_URL = "http://localhost:8080/posts";
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
         HttpClient client = HttpClient.newHttpClient();
 
-        System.out.println("Java CLI Client");
-        System.out.println("Comenzi disponibile: get, post, put, delete, exit");
+        PostService postService = new PostService();
+        CommentService commentService = new CommentService();
+        UserService userService = new UserService();
+        VoteService voteService = new VoteService();
+
+        System.out.println("CLI Java Client - Interfață interactivă");
 
         while (true) {
-            System.out.print("> ");
-            String command = scanner.nextLine();
+            System.out.println("""
+                
+                === Meniu Principal ===
+                1. Postări
+                2. Comentarii
+                3. Utilizatori
+                4. Voturi
+                5. Exit
+                Alege o opțiune (1-5):
+                """);
 
-            try {
-                switch (command) {
-                    case "get":
-                        handleGet(client);
-                        break;
+            String option = scanner.nextLine().trim();
 
-                    case "post":
-                        handlePost(scanner, client);
-                        break;
-
-                    case "put":
-                        handlePut(scanner, client);
-                        break;
-
-                    case "delete":
-                        handleDelete(scanner, client);
-                        break;
-
-                    case "exit":
-                        System.out.println("La revedere!");
-                        return;
-
-                    default:
-                        System.out.println("Comandă necunoscută.");
-                }
-            } catch (Exception e) {
-                System.out.println("A apărut o eroare: " + e.getMessage());
+            switch (option) {
+                case "1":
+                    postMenu(scanner, client, postService);
+                    break;
+                case "2":
+                    commentMenu(scanner, client, commentService);
+                    break;
+                case "3":
+                    userMenu(scanner, client, userService);
+                    break;
+                case "4":
+                    voteMenu(scanner, client, voteService);
+                    break;
+                case "5":
+                    System.out.println("La revedere!");
+                    return;
+                default:
+                    System.out.println("Opțiune invalidă. Încearcă din nou.");
             }
         }
     }
 
-    private static void handleGet(HttpClient client) throws Exception {
-        HttpRequest getRequest = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL))
-                .GET()
-                .build();
+    private static void postMenu(Scanner scanner, HttpClient client, PostService postService) throws Exception {
+        while (true) {
+            System.out.println("""
+                === Meniu Postări ===
+                1. Afișează toate postările
+                2. Creează postare
+                3. Editează postare
+                4. Șterge postare
+                5. Înapoi
+                """);
 
-        HttpResponse<String> getResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofString());
-        System.out.println(getResponse.body());
+            String cmd = scanner.nextLine().trim();
+            switch (cmd) {
+                case "1":
+                    postService.handleGet(client);
+                    break;
+                case "2":
+                    postService.handlePost(scanner, client);
+                    break;
+                case "3":
+                    postService.handlePut(scanner, client);
+                    break;
+                case "4":
+                    postService.handleDelete(scanner, client);
+                    break;
+                case "5":
+                    return;
+                default:
+                    System.out.println("Comandă necunoscută.");
+            }
+        }
     }
 
-    private static void handlePost(Scanner scanner, HttpClient client) throws Exception {
-        System.out.print("Author username: ");
-        String username = scanner.nextLine();
-        System.out.print("Summary: ");
-        String summary = scanner.nextLine();
-        System.out.print("Content: ");
-        String content = scanner.nextLine();
+    private static void commentMenu(Scanner scanner, HttpClient client, CommentService commentService) throws Exception {
+        while (true) {
+            System.out.println("""
+                === Meniu Comentarii ===
+                1. Adaugă comentariu
+                2. Înapoi
+                """);
 
-
-        String json = String.format("{\"authorUsername\": \"%s\", \"summary\": \"%s\", \"content\": \"%s\"}", username, summary,content);
-
-        HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
-
-        HttpResponse<String> postResponse = client.send(postRequest, HttpResponse.BodyHandlers.ofString());
-        System.out.println(postResponse.body());
+            String cmd = scanner.nextLine().trim();
+            switch (cmd) {
+                case "1":
+                    commentService.handlePost(scanner, client);
+                    break;
+                case "2":
+                    return;
+                default:
+                    System.out.println("Comandă necunoscută.");
+            }
+        }
     }
 
-    private static void handlePut(Scanner scanner, HttpClient client) throws Exception {
-        System.out.print("ID de actualizat: ");
-        String id = scanner.nextLine();
-        System.out.print("Noul username: ");
-        String username = scanner.nextLine();
+    private static void userMenu(Scanner scanner, HttpClient client, UserService userService) throws Exception {
+        while (true) {
+            System.out.println("""
+                === Meniu Utilizatori ===
+                1. Înregistrează utilizator
+                2. Înapoi
+                """);
 
-        System.out.print("Noul summary: ");
-        String summary = scanner.nextLine();
-
-
-        System.out.print("Noul content: ");
-        String content = scanner.nextLine();
-
-        String json = String.format("{\"authorUsername\": \"%s\", \"summary\": \"%s\", \"content\": \"%s\"}", username, summary,content);
-
-        HttpRequest putRequest = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/" + id))
-                .header("Content-Type", "application/json")
-                .PUT(HttpRequest.BodyPublishers.ofString(json))
-                .build();
-
-        HttpResponse<String> putResponse = client.send(putRequest, HttpResponse.BodyHandlers.ofString());
-        System.out.println(putResponse.body());
+            String cmd = scanner.nextLine().trim();
+            switch (cmd) {
+                case "1":
+                    userService.register(scanner, client);
+                    break;
+                case "2":
+                    return;
+                default:
+                    System.out.println("Comandă necunoscută.");
+            }
+        }
     }
 
-    private static void handleDelete(Scanner scanner, HttpClient client) throws Exception {
-        System.out.print("ID de șters: ");
-        String deleteId = scanner.nextLine();
+    private static void voteMenu(Scanner scanner, HttpClient client, VoteService voteService) throws Exception {
+        while (true) {
+            System.out.println("""
+                === Meniu Voturi ===
+                1. Votează postare
+                2. Înapoi
+                """);
 
-        HttpRequest deleteRequest = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/" + deleteId))
-                .DELETE()
-                .build();
-
-        HttpResponse<String> deleteResponse = client.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
-        System.out.println(deleteResponse.body());
+            String cmd = scanner.nextLine().trim();
+            switch (cmd) {
+                case "1":
+                    voteService.votePost(scanner, client);
+                    break;
+                case "2":
+                    return;
+                default:
+                    System.out.println("Comandă necunoscută.");
+            }
+        }
     }
 }
