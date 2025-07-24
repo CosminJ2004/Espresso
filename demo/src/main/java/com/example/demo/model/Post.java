@@ -19,9 +19,9 @@ public class Post implements Votable {
     private Long id;
 
     @Column(nullable = false)
-    @NotBlank(message = "Summary is required")
-    @Size(max = 255, message = "Summary too long")
-    private String summary;
+    @NotBlank(message = "title is required")
+    @Size(max = 255, message = "title too long")
+    private String title;
 
     @Column(columnDefinition = "TEXT")
     private String content;
@@ -40,6 +40,7 @@ public class Post implements Votable {
     private LocalDateTime updatedAt;
 
 
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OrderBy("createdAt ASC")
     private List<Comment> comments = new ArrayList<>();
@@ -49,18 +50,19 @@ public class Post implements Votable {
 
     public Post() {}
 
-    public Post(User author, String summary, String content) {
+    public Post(User author, String title, String content) {
         this.author = author;
-        this.summary = summary;
+        this.title = title;
         this.content = content;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Post(User author, String summary, String content, String filePath) {
+    public Post(User author, String title, String content, String filePath) {
         this.author = author;
-        this.summary = summary;
+        this.title = title;
         this.content = content;
+        
         this.filePath = filePath;
         this.createdAt = LocalDateTime.now();
     }
@@ -134,8 +136,8 @@ public class Post implements Votable {
     public String toString() {
         return "Post{" +
                 "id=" + id +
-                ", summary='" + (summary != null && summary.length() > 50 ? 
-                    summary.substring(0, 50) + "..." : summary) + '\'' +
+                ", title='" + (title != null && title.length() > 50 ? 
+                    title.substring(0, 50) + "..." : title) + '\'' +
                 ", author=" + getAuthorUsername() +
                 ", commentCount=" + getCommentCount() +
                 ", voteScore=" + getVoteCount() +

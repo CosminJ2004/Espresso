@@ -41,17 +41,18 @@ public class PostService {
     }
 
     private PostDto convertToDto(Post post) {
-        return new PostDto(post.getId(),post.getAuthor().getUsername(), post.getSummary(),post.getContent(),post.getFilePath());
+        return new PostDto(post.getId(),post.getAuthor().getUsername(), post.getTitle(),post.getContent(),post.getFilePath());
     }
 
 
-    public Post addPost(PostDto dto) {
+    public PostDto addPost(PostDto dto) {
         User author = userRepository.findByUsername(dto.getAuthor())
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
 
         Post post = new Post(author, dto.getTitle(), dto.getContent());
 
-        return postRepository.save(post);
+         postRepository.save(post);
+         return convertToDto(post);
     }
 
 
@@ -105,7 +106,7 @@ public class PostService {
         Post existingPost = postRepository.findById((long) id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
 
-        existingPost.setSummary(dto.getTitle());
+        existingPost.setTitle(dto.getTitle());
         existingPost.setContent(dto.getContent());
 
         User author = userRepository.findByUsername(dto.getAuthor())

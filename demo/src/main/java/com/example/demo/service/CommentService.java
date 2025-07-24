@@ -54,7 +54,7 @@ public class CommentService {
         return rootComments;
     }
 
-    public Comment addComment(CommentDto dto) {
+    public CommentDto addComment(CommentDto dto) {
         Post post = postRepository.findById(dto.getPostId())
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
@@ -68,7 +68,8 @@ public class CommentService {
         }
 
         Comment comment = new Comment(author, dto.getContent(), post, parent);
-        return commentRepository.save(comment);
+        commentRepository.save(comment);
+        return dto;
     }
     public void deleteComment(Long commentId) {
         if (!commentRepository.existsById(commentId)) {

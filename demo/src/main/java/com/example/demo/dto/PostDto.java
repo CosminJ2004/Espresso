@@ -48,11 +48,6 @@ public class PostDto {
         this.content = content;
     }
 
-    public PostDto(String author, String title, String content, MultipartFile file) {
-        this.author = author;
-        this.title = title;
-        this.content = content;
-    }
 
     public PostDto(String author, String title, String content) {
         this.author = author;
