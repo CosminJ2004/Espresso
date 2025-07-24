@@ -41,7 +41,7 @@ public class PostService {
     }
 
     private PostDto convertToDto(Post post) {
-        return new PostDto(post.getAuthor().getUsername(), post.getSummary(),post.getContent());
+        return new PostDto(post.getId(),post.getAuthor().getUsername(), post.getSummary(),post.getContent(),post.getFilePath());
     }
 
 

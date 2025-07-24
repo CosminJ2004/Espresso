@@ -37,7 +37,9 @@ public class PostDto {
     private MultipartFile file;
 
     // Constructors
-    public PostDto(String authorUsername, String summary, String content) {
+    public PostDto(Long id,String authorUsername, String summary, String content,String filePath) {
+        this.id=id;
+        this.filePath = filePath;
         this.authorUsername = authorUsername;
         this.summary = summary;
         this.content = content;
