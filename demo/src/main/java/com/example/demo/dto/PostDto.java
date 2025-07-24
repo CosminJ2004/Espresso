@@ -32,8 +32,7 @@ public class PostDto {
     private int commentCount;
 
     private int voteScore;
-
-
+    
     private MultipartFile file;
 
     // Constructors
