@@ -51,6 +51,11 @@ public class PostDto {
         this.content = content;
         this.file = file;
     }
+    public PostDto(String authorUsername, String summary, String content) {
+        this.authorUsername = authorUsername;
+        this.summary = summary;
+        this.content = content;
+    }
     // Getters & Setters
     public String getAuthorUsername() {
         return authorUsername;
