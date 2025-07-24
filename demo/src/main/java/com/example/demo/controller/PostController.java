@@ -34,10 +34,10 @@ public class PostController {
             return ResponseEntity.notFound().build();
         }
     }
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable int id) {
-        boolean deleted = postService.deletePost(id);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+
+    @PostMapping
+    public Post createPost(@RequestBody PostDto dto) {
+        return postService.addPost(dto);
     }
 
     @PutMapping("/{id}")
@@ -50,10 +50,14 @@ public class PostController {
         }
     }
 
-    @PostMapping
-    public Post createPost(@RequestBody PostDto dto) {
-        return postService.addPost(dto);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable int id) {
+        boolean deleted = postService.deletePost(id);
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
+
+    @PutMapping("/{id}/vote")
+    // TODO
 
     @PostMapping("/upload-test")
     public ResponseEntity<String> uploadTest(@RequestParam("file") MultipartFile file) {
