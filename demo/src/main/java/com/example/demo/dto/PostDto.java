@@ -16,76 +16,47 @@ public class PostDto {
 
     private Long id;
 
-    @NotBlank(message = "Author username is required")
-    private String authorUsername;
-
-    @NotBlank(message = "Summary is required")
-    @Size(max = 255, message = "Summary too long")
-    private String summary;
+    @NotBlank(message = "Title is required")
+    @Size(max = 255, message = "Title too long")
+    private String title;
 
     private String content;
 
-    private String filePath;
+    @NotBlank(message = "Author is required")
+    private String author;
 
-    private LocalDateTime createdAt;
+    private String subreddit;
+
+    private int upvotes;
+
+    private int downvotes;
+
+    private int score;
 
     private int commentCount;
 
-    private int voteScore;
-    
-    private MultipartFile file;
+    private int userVote;
 
-    // Constructors
-    public PostDto(Long id,String authorUsername, String summary, String content,String filePath) {
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+    public PostDto(Long id,String author, String title, String content,String filePath) {
         this.id=id;
-        this.filePath = filePath;
-        this.authorUsername = authorUsername;
-        this.summary = summary;
+        this.author = author;
+        this.title = title;
         this.content = content;
     }
 
-    public PostDto(String authorUsername, String summary, String content, MultipartFile file) {
-        this.authorUsername = authorUsername;
-        this.summary = summary;
-        this.content = content;
-        this.file = file;
-    }
-    public PostDto(String authorUsername, String summary, String content) {
-        this.authorUsername = authorUsername;
-        this.summary = summary;
-        this.content = content;
-    }
-    // Getters & Setters
-    public String getAuthorUsername() {
-        return authorUsername;
-    }
-
-    public void setAuthorUsername(String authorUsername) {
-        this.authorUsername = authorUsername;
-    }
-
-    public String getSummary() {
-        return summary;
-    }
-
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
+    public PostDto(String author, String title, String content, MultipartFile file) {
+        this.author = author;
+        this.title = title;
         this.content = content;
     }
 
-
-    public MultipartFile getFile() {
-        return file;
-    }
-
-    public void setFile(MultipartFile file) {
-        this.file = file;
+    public PostDto(String author, String title, String content) {
+        this.author = author;
+        this.title = title;
+        this.content = content;
     }
 }

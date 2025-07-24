@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.CommentDto;
-import com.example.demo.dto.CommentResponseDto;
 import com.example.demo.model.Comment;
 import com.example.demo.model.Post;
 import com.example.demo.model.User;
@@ -26,24 +25,24 @@ public class CommentService {
     private UserRepository usersRepository;
 
 
-    public List<CommentResponseDto> getCommentTreeForPost(Long postId) {
+    public List<CommentDto> getCommentTreeForPost(Long postId) {
         List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
 
         // Mapam toate comentariile la DTO
-        Map<Long, CommentResponseDto> dtoMap = new HashMap<>();
-        List<CommentResponseDto> rootComments = new ArrayList<>();
+        Map<Long, CommentDto> dtoMap = new HashMap<>();
+        List<CommentDto> rootComments = new ArrayList<>();
 
         for (Comment comment : comments) {
-            CommentResponseDto dto = new CommentResponseDto();
+            CommentDto dto = new CommentDto();
             dto.setId(comment.getId());
-            dto.setText(comment.getText());
-            dto.setAuthorUsername(comment.getAuthor().getUsername());
+            dto.setContent(comment.getText());
+            dto.setAuthor(comment.getAuthor().getUsername());
             dto.setCreatedAt(comment.getCreatedAt());
 
             dtoMap.put(comment.getId(), dto);
 
             if (comment.getParent() != null) {
-                CommentResponseDto parentDto = dtoMap.get(comment.getParent().getId());
+                CommentDto parentDto = dtoMap.get(comment.getParent().getId());
                 if (parentDto != null) {
                     parentDto.getReplies().add(dto);
                 }
@@ -59,7 +58,7 @@ public class CommentService {
         Post post = postRepository.findById(dto.getPostId())
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
-        User author = usersRepository.findByUsername(dto.getAuthorUsername())
+        User author = usersRepository.findByUsername(dto.getAuthor())
                 .orElseThrow(() -> new IllegalArgumentException("Author not found"));
 
         Comment parent = null;
@@ -68,7 +67,7 @@ public class CommentService {
                     .orElseThrow(() -> new IllegalArgumentException("Parent comment not found"));
         }
 
-        Comment comment = new Comment(author, dto.getText(), post, parent);
+        Comment comment = new Comment(author, dto.getContent(), post, parent);
         return commentRepository.save(comment);
     }
     public void deleteComment(Long commentId) {

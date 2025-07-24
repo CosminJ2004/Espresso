@@ -21,18 +21,4 @@ public class VoteDto {
     private Long postId;
 
     private Long commentId;
-
-    public VoteDto(VoteType type, String username, Long postId) {
-        this.type = type;
-        this.username = username;
-        this.postId = postId;
-        this.commentId = null;
-    }
-
-    public VoteDto(VoteType type, String username, Long commentId, boolean isComment) {
-        this.type = type;
-        this.username = username;
-        this.postId = null;
-        this.commentId = commentId;
-    }
 }

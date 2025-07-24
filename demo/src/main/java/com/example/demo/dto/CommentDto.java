@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -16,29 +17,31 @@ import java.util.List;
 public class CommentDto {
     
     private Long id;
-    
-    @NotBlank(message = "Comment text is required")
-    @Size(max = 1000, message = "Comment too long")
-    private String text;
-    
-    @NotBlank(message = "Author username is required")
-    private String authorUsername;
-    
+
     @NotNull(message = "Post ID is required")
     private Long postId;
-    
+
     private Long parentId;
+
+    @NotBlank(message = "Comment content is required")
+    @Size(max = 1000, message = "Comment too long")
+    private String content;
     
+    @NotBlank(message = "Author is required")
+    private String author;
+
+    private int upvotes;
+
+    private int downvotes;
+
+    private int score;
+
+    private int userVote;
+
     private LocalDateTime createdAt;
-    
-    private int replyCount;
-    
-    private List<CommentDto> replies;
-    
-    public CommentDto(String text, String authorUsername, Long postId, Long parentId) {
-        this.text = text;
-        this.authorUsername = authorUsername;
-        this.postId = postId;
-        this.parentId = parentId;
-    }
+
+    private LocalDateTime updatedAt;
+
+    private List<CommentDto> replies = new ArrayList<>();
+
 }

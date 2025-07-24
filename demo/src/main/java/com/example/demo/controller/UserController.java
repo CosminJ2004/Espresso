@@ -50,7 +50,6 @@ public class UserController {
         }
     }
 
-
     @PutMapping("/{username}")
     public ResponseEntity<User> updateUser(
             @PathVariable String username,

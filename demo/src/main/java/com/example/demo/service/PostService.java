@@ -46,10 +46,10 @@ public class PostService {
 
 
     public Post addPost(PostDto dto) {
-        User author = userRepository.findByUsername(dto.getAuthorUsername())
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthorUsername()));
+        User author = userRepository.findByUsername(dto.getAuthor())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
 
-        Post post = new Post(author, dto.getSummary(), dto.getContent());
+        Post post = new Post(author, dto.getTitle(), dto.getContent());
 
         return postRepository.save(post);
     }
@@ -58,10 +58,10 @@ public class PostService {
 
 
     public Post addPostWithImage(PostDto dto, String imagePath) {
-        User author = userRepository.findByUsername(dto.getAuthorUsername())
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthorUsername()));
+        User author = userRepository.findByUsername(dto.getAuthor())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
 
-        Post post = new Post(author, dto.getSummary(), dto.getContent(),imagePath);
+        Post post = new Post(author, dto.getTitle(), dto.getContent(),imagePath);
         post.setFilePath(imagePath);
         return postRepository.save(post);
     }
@@ -105,11 +105,11 @@ public class PostService {
         Post existingPost = postRepository.findById((long) id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
 
-        existingPost.setSummary(dto.getSummary());
+        existingPost.setSummary(dto.getTitle());
         existingPost.setContent(dto.getContent());
 
-        User author = userRepository.findByUsername(dto.getAuthorUsername())
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthorUsername()));
+        User author = userRepository.findByUsername(dto.getAuthor())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
         existingPost.setAuthor(author);
 
         return postRepository.save(existingPost);

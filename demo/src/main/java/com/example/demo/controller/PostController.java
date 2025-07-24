@@ -4,7 +4,6 @@ import com.example.demo.dto.PostDto;
 import com.example.demo.model.Post;
 import com.example.demo.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +25,7 @@ public class PostController {
     public List<PostDto> getAllPosts() {
         return postService.getAllPosts();
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<PostDto> getPostById(@PathVariable int id) {
         try {
@@ -61,23 +61,23 @@ public class PostController {
         return ResponseEntity.ok("File received: " + file.getOriginalFilename());
     }
 
-    @PostMapping("/create-with-image")
-    public ResponseEntity<Post> createPostWithImage(@ModelAttribute PostDto dto) {
-        MultipartFile file = dto.getFile();
-        if (file == null) {
-            System.out.println("file is null!");
-        } else {
-            System.out.println("file received: " + file.getOriginalFilename());
-        }
-
-        try {
-            String imagePath = postService.saveImage(dto.getFile());
-            Post post = postService.addPostWithImage(dto, imagePath);
-            return ResponseEntity.ok(post);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
+//    @PostMapping("/create-with-image")
+//    public ResponseEntity<Post> createPostWithImage(@ModelAttribute PostDto dto) {
+//        MultipartFile file = dto.getFile();
+//        if (file == null) {
+//            System.out.println("file is null!");
+//        } else {
+//            System.out.println("file received: " + file.getOriginalFilename());
+//        }
+//
+//        try {
+//            String imagePath = postService.saveImage(dto.getFile());
+//            Post post = postService.addPostWithImage(dto, imagePath);
+//            return ResponseEntity.ok(post);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+//        }
+//    }
 
 }
