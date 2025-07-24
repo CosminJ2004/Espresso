@@ -90,17 +90,29 @@ public class Main {
     private static void commentMenu(Scanner scanner, HttpClient client, CommentService commentService) throws Exception {
         while (true) {
             System.out.println("""
-                === Meniu Comentarii ===
-                1. Adaugă comentariu
-                2. Înapoi
-                """);
+            === Meniu Comentarii ===
+            1. Afișează comentarii
+            2. Adaugă comentariu
+            3. Modifică comentariu
+            4. Șterge comentariu
+            5. Înapoi
+            """);
 
             String cmd = scanner.nextLine().trim();
             switch (cmd) {
                 case "1":
-                    commentService.handlePost(scanner, client);
+                    commentService.handleGet(client);
                     break;
                 case "2":
+                    commentService.handlePost(scanner, client);
+                    break;
+                case "3":
+                    commentService.handlePut(scanner, client);
+                    break;
+                case "4":
+                    commentService.handleDelete(scanner, client);
+                    break;
+                case "5":
                     return;
                 default:
                     System.out.println("Comandă necunoscută.");
@@ -111,17 +123,29 @@ public class Main {
     private static void userMenu(Scanner scanner, HttpClient client, UserService userService) throws Exception {
         while (true) {
             System.out.println("""
-                === Meniu Utilizatori ===
-                1. Înregistrează utilizator
-                2. Înapoi
-                """);
+            === Meniu Utilizatori ===
+            1. Afișează utilizatori
+            2. Înregistrează utilizator
+            3. Modifică utilizator
+            4. Șterge utilizator
+            5. Înapoi
+            """);
 
             String cmd = scanner.nextLine().trim();
             switch (cmd) {
                 case "1":
-                    userService.register(scanner, client);
+                    userService.getAllUsers(client);
                     break;
                 case "2":
+                    userService.register(scanner, client);
+                    break;
+                case "3":
+                    userService.updateUser(scanner, client);
+                    break;
+                case "4":
+                    userService.deleteUser(scanner, client);
+                    break;
+                case "5":
                     return;
                 default:
                     System.out.println("Comandă necunoscută.");
@@ -132,21 +156,34 @@ public class Main {
     private static void voteMenu(Scanner scanner, HttpClient client, VoteService voteService) throws Exception {
         while (true) {
             System.out.println("""
-                === Meniu Voturi ===
-                1. Votează postare
-                2. Înapoi
-                """);
+            === Meniu Voturi ===
+            1. Afișează voturi
+            2. Votează postare
+            3. Modifică vot
+            4. Șterge vot
+            5. Înapoi
+            """);
 
             String cmd = scanner.nextLine().trim();
             switch (cmd) {
                 case "1":
-                    voteService.votePost(scanner, client);
+                    voteService.voteGet(client);
                     break;
                 case "2":
+                    voteService.votePost(scanner, client);
+                    break;
+                case "3":
+                    voteService.votePut(scanner, client);
+                    break;
+                case "4":
+                    voteService.voteDelete(scanner, client);
+                    break;
+                case "5":
                     return;
                 default:
                     System.out.println("Comandă necunoscută.");
             }
         }
     }
+
 }
