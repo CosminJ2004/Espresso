@@ -9,7 +9,7 @@ public class CommentService {
 
     public void handlePost(Scanner scanner, HttpClient client) throws Exception {
         System.out.print("Text comentariu: ");
-        String text = scanner.nextLine();
+        String content = scanner.nextLine();
         System.out.print("Username autor: ");
         String username = scanner.nextLine();
         System.out.print("ID postare: ");
@@ -17,11 +17,11 @@ public class CommentService {
 
         String json = String.format("""
         {
-            "text": "%s",
-            "authorUsername": "%s",
+            "content": "%s",
+            "author": "%s",
             "postId": %d
         }
-        """, text, username, postId);
+        """, content, username, postId);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))

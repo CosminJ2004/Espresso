@@ -19,7 +19,7 @@ public class VoteService {
         {
             "type": "%s",
             "username": "%s",
-            "postId": %d
+            "post_id": %d
         }
         """, voteType, username, postId);
 

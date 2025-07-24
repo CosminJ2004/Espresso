@@ -27,11 +27,12 @@ public class PostService {
 
         String json = String.format("""
         {
+            "author": "%s",
             "title": "%s",
-            "content": "%s",
-            "authorUsername": "%s"
+            "content": "%s"
+            
         }
-        """, title, content, author);
+        """, author,title, content);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
@@ -46,17 +47,20 @@ public class PostService {
     public void handlePut(Scanner scanner, HttpClient client) throws Exception {
         System.out.print("ID postare: ");
         String id = scanner.nextLine();
-        System.out.print("Titlu nou: ");
-        String title = scanner.nextLine();
+        System.out.print("author: ");
+        String author = scanner.nextLine();
+        System.out.print("Summary nou: ");
+        String summary = scanner.nextLine();
         System.out.print("Conținut nou: ");
         String content = scanner.nextLine();
 
         String json = String.format("""
         {
+            "author": "%s",
             "title": "%s",
             "content": "%s"
         }
-        """, title, content);
+        """, author,summary, content);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/" + id))
