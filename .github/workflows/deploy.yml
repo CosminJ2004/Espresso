@@ -7,6 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: envsec
     
     steps:
     - name: Checkout
@@ -15,9 +16,9 @@ jobs:
     - name: Deploy to server
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: ${{ envsec.HOST }}
-        username: ${{ envsec.USERNAME }}
-        key: ${{ envsec.SSH_KEY }}
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
         port: 22
         script: |
           cd /home/ec2-user/Espresso/demo
