@@ -27,16 +27,6 @@ public class PostController {
         return postService.getAllPosts();
     }
 
-    @GetMapping("/filter/wow")
-    public List<PostDto> getAllPostswow() {
-        return postService.getAllPosts();
-    }
-
-    @GetMapping("/test")
-    public List<PostDto> getAllComments() {
-        return postService.getAllPosts();
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<PostDto> getPostById(@PathVariable int id) {
         try {
