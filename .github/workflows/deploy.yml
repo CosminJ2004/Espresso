@@ -1,0 +1,28 @@
+name: Deploy via SSH
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: 22
+        script: |
+          cd /home/ec2-user/Espresso/demo
+          sudo pkill -f java || true
+          git pull origin main
+          mvn clean package
+          nohup java -jar target/*.jar > app.log 2>&1 &
+          echo "Deployment complete"
