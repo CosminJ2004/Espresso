@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
 import com.example.demo.model.Post;
 import com.example.demo.service.PostService;
@@ -28,6 +29,11 @@ public class PostController {
 
     @GetMapping("/filter/wow")
     public List<PostDto> getAllPostswow() {
+        return postService.getAllPosts();
+    }
+
+    @GetMapping("/test")
+    public List<PostDto> getAllComments() {
         return postService.getAllPosts();
     }
 
