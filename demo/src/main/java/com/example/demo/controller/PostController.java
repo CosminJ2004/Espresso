@@ -26,7 +26,7 @@ public class PostController {
         return postService.getAllPosts();
     }
 
-    @GetMapping("/wow")
+    @GetMapping("/filter/wow")
     public List<PostDto> getAllPostswow() {
         return postService.getAllPosts();
     }
