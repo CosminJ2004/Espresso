@@ -1,5 +1,6 @@
 package com.example.demo.dto;
 
+import com.example.demo.model.VoteType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -34,7 +35,7 @@ public class PostDto {
 
     private int commentCount;
 
-    private int userVote;
+    private VoteType userVote;
 
     private LocalDateTime createdAt;
 

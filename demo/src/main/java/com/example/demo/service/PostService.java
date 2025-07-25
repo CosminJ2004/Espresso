@@ -41,7 +41,7 @@ public class PostService {
     }
 
     private PostDto convertToDto(Post post) {
-        return new PostDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount() , post.getDownvoteCount(), post.getScore(), post.getCommentCount(), 0, post.getCreatedAt() ,post.getUpdatedAt());
+        return new PostDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount() , post.getDownvoteCount(), post.getScore(), post.getCommentCount(), null, post.getCreatedAt(), post.getUpdatedAt());
     }
 
     public PostDto addPost(PostDto dto) {
@@ -62,8 +62,6 @@ public class PostService {
         post.setFilePath(imagePath);
         return postRepository.save(post);
     }
-
-
 
     public String saveImage(MultipartFile file) throws IOException {
         if (file.isEmpty()) throw new IOException("Empty file.");
@@ -89,6 +87,7 @@ public class PostService {
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
+
     public boolean deletePost(int id) {
         if (postRepository.existsById((long) id)) {
             postRepository.deleteById((long) id);
@@ -111,9 +110,6 @@ public class PostService {
 
         return postRepository.save(existingPost);
     }
-
-
-
 
     public void addComment(Post post, Comment comment) {
 

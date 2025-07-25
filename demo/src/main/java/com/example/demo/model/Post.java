@@ -30,7 +30,6 @@ public class Post implements Votable {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-
     private String filePath;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -38,8 +37,6 @@ public class Post implements Votable {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OrderBy("createdAt ASC")
@@ -117,7 +114,7 @@ public class Post implements Votable {
             return 0;
         }
         return (int) votes.stream()
-                .filter(vote -> vote.getType() == VoteType.UPVOTE)
+                .filter(vote -> vote.getType() == VoteType.UP)
                 .count();
     }
 
@@ -126,7 +123,7 @@ public class Post implements Votable {
             return 0;
         }
         return (int) votes.stream()
-                .filter(vote -> vote.getType() == VoteType.DOWNVOTE)
+                .filter(vote -> vote.getType() == VoteType.DOWN)
                 .count();
     }
 
