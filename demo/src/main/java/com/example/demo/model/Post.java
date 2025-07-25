@@ -112,6 +112,28 @@ public class Post implements Votable {
                 .sum();
     }
 
+    public int getUpvoteCount() {
+        if (votes == null || votes.isEmpty()) {
+            return 0;
+        }
+        return (int) votes.stream()
+                .filter(vote -> vote.getType() == VoteType.UPVOTE)
+                .count();
+    }
+
+    public int getDownvoteCount() {
+        if (votes == null || votes.isEmpty()) {
+            return 0;
+        }
+        return (int) votes.stream()
+                .filter(vote -> vote.getType() == VoteType.DOWNVOTE)
+                .count();
+    }
+
+    public int getScore() {
+        return getUpvoteCount() - getDownvoteCount();
+    }
+
     public boolean hasComments() {
         return comments != null && !comments.isEmpty();
     }

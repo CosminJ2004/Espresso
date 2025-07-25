@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -41,7 +40,7 @@ public class PostDto {
 
     private LocalDateTime updatedAt;
 
-    public PostDto(Long id,String author, String title, String content,String filePath) {
+    public PostDto(Long id, String author, String title, String content) {
         this.id=id;
         this.author = author;
         this.title = title;

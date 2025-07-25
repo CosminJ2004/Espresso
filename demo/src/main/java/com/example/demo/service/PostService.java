@@ -41,9 +41,8 @@ public class PostService {
     }
 
     private PostDto convertToDto(Post post) {
-        return new PostDto(post.getId(),post.getAuthor().getUsername(), post.getTitle(),post.getContent(),post.getFilePath());
+        return new PostDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount() , post.getDownvoteCount(), post.getScore(), post.getCommentCount(), 0, post.getCreatedAt() ,post.getUpdatedAt());
     }
-
 
     public PostDto addPost(PostDto dto) {
         User author = userRepository.findByUsername(dto.getAuthor())
@@ -54,9 +53,6 @@ public class PostService {
          postRepository.save(post);
          return convertToDto(post);
     }
-
-
-
 
     public Post addPostWithImage(PostDto dto, String imagePath) {
         User author = userRepository.findByUsername(dto.getAuthor())

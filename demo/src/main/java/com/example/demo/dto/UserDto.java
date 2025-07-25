@@ -28,23 +28,10 @@ public class UserDto {
     private int postCount;
     
     private int commentCount;
-    
-    public UserDto(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
 
     public UserDto(Long id, String username, String password) {
         this.id = id;
         this.username = username;
         this.password = password;
-    }
-
-    public UserDto(Long id, String username, LocalDateTime createdAt, int postCount, int commentCount) {
-        this.id = id;
-        this.username = username;
-        this.createdAt = createdAt;
-        this.postCount = postCount;
-        this.commentCount = commentCount;
     }
 }

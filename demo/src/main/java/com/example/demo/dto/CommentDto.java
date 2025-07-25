@@ -43,5 +43,4 @@ public class CommentDto {
     private LocalDateTime updatedAt;
 
     private List<CommentDto> replies = new ArrayList<>();
-
 }
