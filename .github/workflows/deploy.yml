@@ -25,5 +25,5 @@ jobs:
           sudo pkill -f java || true
           git pull origin main
           mvn clean package
-          nohup java -jar target/*.jar > app.log 2>&1 &
+          sudo nohup java -jar target/*.jar > app.log 2>&1 & disown
           echo "Deployment complete"
