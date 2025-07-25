@@ -21,10 +21,4 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: 22
         script: |
-          cd /home/ec2-user/Espresso/demo
-          sudo pkill -f java || true
-          git pull origin main
-          mvn clean package
-          sudo nohup java -jar target/*.jar > app.log 2>&1 & disown
-          echo "Deployment complete"
-          exit
+          bash /home/ec2-user/deploy.sh
