@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/comments")
 public class CommentController {
-
+    //comentariu ca sa vedem ca merge deplpoyul pe bune
     @Autowired
     private CommentService commentService;
 
