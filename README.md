@@ -1,3 +1,5 @@
+IP: 3.65.147.49
+
 # 📰 Java Reddit Clone
 
 Un proiect backend CLI în Java care imită funcționalitățile de bază ale unui forum de discuții similar cu Reddit. Oferă autentificare, gestionarea postărilor și comentariilor, voturi și logare centralizată.
