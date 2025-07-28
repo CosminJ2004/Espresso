@@ -5,7 +5,7 @@ import java.net.URI;
 import java.util.Scanner;
 
 public class PostService {
-    private static final String BASE_URL = "http://localhost:8080/posts";
+    private static final String BASE_URL = "http://3.65.147.49/posts";
 
     public void handleGet(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
