@@ -1,9 +1,9 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
 import com.example.demo.model.Post;
 import com.example.demo.service.PostService;
+import com.example.demo.util.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,47 +23,60 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostDto> getAllPosts() {
-        return postService.getAllPosts();
+    public ResponseEntity<Response<List<PostDto>>> getAllPosts() {
+        List<PostDto> posts = postService.getAllPosts();
+        return Response.ok(posts);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostDto> getPostById(@PathVariable int id) {
+    public ResponseEntity<Response<PostDto>> getPostById(@PathVariable int id) {
         try {
-            return ResponseEntity.ok(postService.getPostById(id));
+            PostDto post = postService.getPostById(id);
+            return Response.ok(post);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
+            return Response.error("Post not found");
         }
     }
 
     @PostMapping
-    public PostDto createPost(@RequestBody PostDto dto) {
-        return postService.addPost(dto);
+    public ResponseEntity<Response<PostDto>> createPost(@RequestBody PostDto dto) {
+        try {
+            PostDto post = postService.addPost(dto);
+            return Response.ok(post);
+        } catch (Exception e) {
+            return Response.error("Failed to create post");
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Post> updatePost(@PathVariable int id, @RequestBody PostDto dto) {
+    public ResponseEntity<Response<Post>> updatePost(@PathVariable int id, @RequestBody PostDto dto) {
         try {
             Post updatedPost = postService.updatePost(id, dto);
-            return ResponseEntity.ok(updatedPost);
+            return Response.ok(updatedPost);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
+            return Response.error("Post not found");
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable int id) {
+    public ResponseEntity<Response<Void>> deletePost(@PathVariable int id) {
         boolean deleted = postService.deletePost(id);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        if (deleted) {
+            return Response.ok("Post has been successfully deleted");
+        } else {
+            return Response.error("Post not found");
+        }
     }
 
     @PutMapping("/{id}/vote")
     // TODO
 
     @PostMapping("/upload-test")
-    public ResponseEntity<String> uploadTest(@RequestParam("file") MultipartFile file) {
-        if (file == null) return ResponseEntity.badRequest().body("File is null");
-        return ResponseEntity.ok("File received: " + file.getOriginalFilename());
+    public ResponseEntity<Response<String>> uploadTest(@RequestParam("file") MultipartFile file) {
+        if (file == null) {
+            return Response.error("File is null");
+        }
+        return Response.ok("File received: " + file.getOriginalFilename());
     }
 
 //    @PostMapping("/create-with-image")
