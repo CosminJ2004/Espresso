@@ -17,7 +17,7 @@ public static class ImageReader
 
         byte[] bytes = File.ReadAllBytes(path);
         using var stream = new MemoryStream(bytes);
-        using var image = Image.Load<Rgba32>(stream);
+        var image = Image.Load<Rgba32>(stream); 
 
         // ToDo: Log.
         return new ImagePackage(bytes, image);
