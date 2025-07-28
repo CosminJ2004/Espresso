@@ -5,7 +5,7 @@ import java.net.URI;
 import java.util.Scanner;
 
 public class VoteService {
-    private static final String BASE_URL = "http://localhost:8080/votes";
+    private static final String BASE_URL = "http://3.65.147.49/votes";
 
     public void votePost(Scanner scanner, HttpClient client) throws Exception {
         System.out.print("ID postare: ");

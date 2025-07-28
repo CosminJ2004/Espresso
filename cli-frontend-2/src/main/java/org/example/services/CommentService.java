@@ -5,7 +5,7 @@ import java.net.URI;
 import java.util.Scanner;
 
 public class CommentService {
-    private static final String BASE_URL = "http://localhost:8080/comments";
+    private static final String BASE_URL = "http://3.65.147.49/comments";
 
     public void handleGet(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()

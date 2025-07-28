@@ -5,7 +5,7 @@ import java.net.URI;
 import java.util.Scanner;
 
 public class UserService {
-    private static final String BASE_URL = "http://localhost:8080/users";
+    private static final String BASE_URL = "http://3.65.147.49/users";
 
     public void register(Scanner scanner, HttpClient client) throws Exception {
         System.out.print("Username: ");
