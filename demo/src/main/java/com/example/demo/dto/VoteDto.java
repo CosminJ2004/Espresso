@@ -21,4 +21,13 @@ public class VoteDto {
     private Long postId;
 
     private Long commentId;
+
+    private Long upvotes;
+
+    private Long downvotes;
+
+    private Long score;
+
+    private Long userVote;
+
 }

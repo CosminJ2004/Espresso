@@ -59,7 +59,6 @@ public class Post implements Votable {
         this.author = author;
         this.title = title;
         this.content = content;
-        
         this.filePath = filePath;
         this.createdAt = LocalDateTime.now();
     }

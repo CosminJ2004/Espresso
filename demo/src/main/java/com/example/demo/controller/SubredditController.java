@@ -11,7 +11,7 @@
 //@RequestMapping("/subreddits")
 //public class SubredditController {
 //
-//    // GET /subreddits
+//    //    GET /subreddits
 //    @GetMapping
 //    public List<SubredditDto> getAllSubreddits() {
 //    }
@@ -22,25 +22,25 @@
 //
 //    }
 //
-//    // POST /subreddits
+//    //    POST /subreddits
 //    @PostMapping
 //    public ResponseEntity<SubredditDto> createSubreddit(@RequestBody SubredditDto subredditDto) {
 //
 //    }
 //
-//    // GET /subreddits/:name/posts
+//    //    GET /subreddits/:name/posts
 //    @GetMapping
 //    public List<PostDto> getSubredditPosts() {
 //
 //    }
 //
-//    // PUT /subreddits/:name
+//    //    PUT /subreddits/:name
 //    @PutMapping
 //    public ResponseEntity<Void> updateSubreddit(@RequestBody SubredditDto dto) {
 //
 //    }
 //
-//    // DELETE /subreddits/:name
+//    //    DELETE /subreddits/:name
 //    @DeleteMapping
 //    public ResponseEntity<Void> deleteSubreddit(@RequestBody SubredditDto dto) {
 //
