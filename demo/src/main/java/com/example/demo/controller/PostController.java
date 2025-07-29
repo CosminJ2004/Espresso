@@ -78,8 +78,12 @@ public class PostController {
     //    PUT /posts/:id/vote TODO
     @PutMapping("/{id}/vote")
     public ResponseEntity<Response<VoteDto>> votePost(@PathVariable Long id, @RequestBody VoteType voteType) {
-        VoteDto dto = new VoteDto();
-        return Response.ok(dto);
+        try{
+//        VoteDto voted = postService.votePost(id, voteType);
+            return Response.ok("");
+        } catch(IllegalArgumentException e){
+            return Response.error("Vote not found");
+        }
     }
 
     //    GET /posts/:postId/comments TODO
@@ -95,8 +99,9 @@ public class PostController {
 
     //    POST /posts/:postId/comments
     @PostMapping("/{id}/comments")
-    public ResponseEntity<Response<CommentDto>> addComment(@RequestBody CommentDto dto) {
+    public ResponseEntity<Response<CommentDto>> addComment(@PathVariable Long id, @RequestBody CommentDto dto) {
         try {
+            dto.setPostId(id);
             CommentDto savedComment = postService.addComment(dto);
             return Response.ok(savedComment);
         } catch (Exception e) {

@@ -1,9 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.CommentDto;
-import com.example.demo.model.Post;
-import com.example.demo.model.User;
-import com.example.demo.model.Comment;
+import com.example.demo.model.*;
 import com.example.demo.dto.PostDto;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostRepository;
