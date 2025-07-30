@@ -22,3 +22,23 @@ jobs:
         port: 22
         script: |
           bash /home/ec2-user/deploy.sh
+          
+  deploy-dotnet:
+    name: Deploy .NET app (C# EC2 instance)
+    runs-on: ubuntu-latest
+    environment: envsec
+    needs: deploy  # pornește doar după ce termină backend-ul (opțional)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2 .NET instance
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST_DOTNET }}
+          username: ${{ secrets.USERNAME_DOTNET }}
+          key: ${{ secrets.SSH_KEY_DOTNET }}
+          port: 22
+          script: |
+            bash /home/ec2-user/deploy_dotnet.sh
