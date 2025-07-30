@@ -1,12 +1,9 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.CommentDto;
 import com.example.demo.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/comments")
@@ -15,22 +12,18 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
-    @PostMapping
-    public ResponseEntity<CommentDto> addComment(@RequestBody CommentDto dto) {
-        CommentDto savedComment = commentService.addComment(dto);
-        return ResponseEntity.ok(savedComment);
-    }
+    //    GET /comments/:id TODO
+    @GetMapping("/{id}")
 
-    @GetMapping("/post/{postId}/tree")
-    public ResponseEntity<List<CommentDto>> getCommentTree(@PathVariable Long postId) {
-        List<CommentDto> commentTree = commentService.getCommentTreeForPost(postId);
-        return ResponseEntity.ok(commentTree);
-    }
+    //    PUT /comments/:id TODO
+    @PutMapping("/{id}")
 
-    @DeleteMapping("/{commentId}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
-        commentService.deleteComment(commentId);
+    //    DELETE /comments/:id
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
+        commentService.deleteComment(id);
         return ResponseEntity.noContent().build();
     }
 
+    //    PUT /comments/:id/vote TODO
 }

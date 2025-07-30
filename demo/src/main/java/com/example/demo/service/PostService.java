@@ -1,15 +1,12 @@
 package com.example.demo.service;
 
-import com.example.demo.model.Post;
-import com.example.demo.model.User;
-import com.example.demo.model.Comment;
+import com.example.demo.dto.CommentDto;
+import com.example.demo.model.*;
 import com.example.demo.dto.PostDto;
+import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,20 +21,14 @@ import java.util.stream.Collectors;
 @Service
 public class PostService {
 
-    private static final int MIN_VOTES_FOR_STAR = 3;
-    private static final Logger logger = LoggerFactory.getLogger(PostService.class);
-
     private final PostRepository postRepository;
-    private final VoteService voteService;
-    private final CommentService commentService;
     private final UserRepository userRepository;
-    private static final Map<Integer, List<Comment>> commentsMap = new HashMap<>();
+    private final CommentRepository commentRepository;
 
-    public PostService(PostRepository postRepository, VoteService voteService, @Lazy CommentService commentService, UserRepository userRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository,  CommentRepository commentRepository) {
         this.postRepository = postRepository;
-        this.voteService = voteService;
-        this.commentService = commentService;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
     }
 
     private PostDto convertToDto(Post post) {
@@ -75,8 +66,8 @@ public class PostService {
         return "/uploads/" + fileName; // sau doar fileName dacă preferi
     }
 
-    public PostDto getPostById(int id) {
-        Post post = postRepository.findById((long) id)
+    public PostDto getPostById(Long id) {
+        Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
         return convertToDto(post);
     }
@@ -88,7 +79,7 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    public boolean deletePost(int id) {
+    public boolean deletePost(Long id) {
         if (postRepository.existsById((long) id)) {
             postRepository.deleteById((long) id);
             return true;
@@ -96,9 +87,8 @@ public class PostService {
         return false;
     }
 
-
-    public Post updatePost(int id, PostDto dto) {
-        Post existingPost = postRepository.findById((long) id)
+    public Post updatePost(Long id, PostDto dto) {
+        Post existingPost = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
 
         existingPost.setTitle(dto.getTitle());
@@ -111,15 +101,50 @@ public class PostService {
         return postRepository.save(existingPost);
     }
 
-    public void addComment(Post post, Comment comment) {
+    public CommentDto addComment(CommentDto dto) {
+        Post post = postRepository.findById(dto.getPostId())
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
-//        commentsMap.computeIfAbsent(post.getId(), k -> new ArrayList<>()).add(comment);
+        User author = userRepository.findByUsername(dto.getAuthor())
+                .orElseThrow(() -> new IllegalArgumentException("Author not found"));
+
+        Comment parent = null;
+        if (dto.getParentId() != null) {
+            parent = commentRepository.findById(dto.getParentId())
+                    .orElseThrow(() -> new IllegalArgumentException("Parent comment not found"));
+        }
+
+        Comment comment = new Comment(author, dto.getContent(), post, parent);
+        commentRepository.save(comment);
+        return dto;
     }
 
-    public List<Comment> getComments(Post post) {
+    public List<CommentDto> getCommentTreeForPost(Long postId) {
+        List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
 
-        return commentsMap.getOrDefault(post.getId(), new ArrayList<>());
+        // Mapam toate comentariile la DTO
+        Map<Long, CommentDto> dtoMap = new HashMap<>();
+        List<CommentDto> rootComments = new ArrayList<>();
+
+        for (Comment comment : comments) {
+            CommentDto dto = new CommentDto();
+            dto.setId(comment.getId());
+            dto.setContent(comment.getText());
+            dto.setAuthor(comment.getAuthor().getUsername());
+            dto.setCreatedAt(comment.getCreatedAt());
+
+            dtoMap.put(comment.getId(), dto);
+
+            if (comment.getParent() != null) {
+                CommentDto parentDto = dtoMap.get(comment.getParent().getId());
+                if (parentDto != null) {
+                    parentDto.getReplies().add(dto);
+                }
+            } else {
+                rootComments.add(dto);
+            }
+        }
+
+        return rootComments;
     }
-
-
 }
