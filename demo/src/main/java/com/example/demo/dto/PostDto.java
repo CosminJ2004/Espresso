@@ -27,13 +27,13 @@ public class PostDto {
 
     private String subreddit;
 
-    private int upvotes;
+    private Long upvotes;
 
-    private int downvotes;
+    private Long downvotes;
 
-    private int score;
+    private Long score;
 
-    private int commentCount;
+    private Long commentCount;
 
     private VoteType userVote;
 
@@ -47,7 +47,6 @@ public class PostDto {
         this.title = title;
         this.content = content;
     }
-
 
     public PostDto(String author, String title, String content) {
         this.author = author;

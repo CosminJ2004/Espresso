@@ -95,11 +95,11 @@ public class Post implements Votable {
         vote.setPost(null);
     }
 
-    public int getCommentCount() {
+    public long getCommentCount() {
         return comments != null ? comments.size() : 0;
     }
 
-    public int getVoteCount() {
+    public long getVoteCount() {
         if (votes == null || votes.isEmpty()) {
             return 0;
         }
@@ -108,25 +108,25 @@ public class Post implements Votable {
                 .sum();
     }
 
-    public int getUpvoteCount() {
+    public long getUpvoteCount() {
         if (votes == null || votes.isEmpty()) {
             return 0;
         }
-        return (int) votes.stream()
-                .filter(vote -> vote.getType() == VoteType.UP)
+        return votes.stream()
+                .filter(vote -> vote.getType() == VoteType.up)
                 .count();
     }
 
-    public int getDownvoteCount() {
+    public long getDownvoteCount() {
         if (votes == null || votes.isEmpty()) {
             return 0;
         }
-        return (int) votes.stream()
-                .filter(vote -> vote.getType() == VoteType.DOWN)
+        return votes.stream()
+                .filter(vote -> vote.getType() == VoteType.down)
                 .count();
     }
 
-    public int getScore() {
+    public long getScore() {
         return getUpvoteCount() - getDownvoteCount();
     }
 
