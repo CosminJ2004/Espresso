@@ -42,4 +42,4 @@ jobs:
           port: 22
           script: |
             bash /home/ec2-user/deploy_dotnet.sh
-        #try3
+        #try4
