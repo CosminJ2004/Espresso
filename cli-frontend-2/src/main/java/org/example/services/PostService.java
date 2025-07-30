@@ -8,8 +8,14 @@ import java.util.Scanner;
 
 public class PostService {
     private static final String BASE_URL = "http://3.65.147.49/posts";
-    private static PostMapper postMapper = PostMapper.getInstance();
-    private static PostView postView = PostView.getInstance();
+    private static PostService instance;
+
+    public static PostService getInstance() {
+        if (instance == null) {
+            instance = new PostService();
+        }
+        return instance;
+    }
 
     public void handleGet(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()

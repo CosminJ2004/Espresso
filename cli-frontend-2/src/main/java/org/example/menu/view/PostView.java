@@ -26,8 +26,17 @@ public class PostView {
                 """);
     }
 
-    public void printInputRequest(int requestedInput) {
-
+    public void printInputRequest(String input) {
+        switch (input) {
+            case "title":
+                System.out.println("Please enter the title to your post: ");
+                break;
+            case "content":
+                System.out.println("Please enter the content of your post: ");
+                break;
+            case "author":
+                System.out.println("Please enter the author of your post: ");
+        }
     }
 
     public void printAllPosts(Subreddit subreddit) {
