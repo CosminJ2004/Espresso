@@ -17,4 +17,12 @@ public struct RgbPixel
     public byte R;
     public byte G;
     public byte B;
+   
+
+    public RgbPixel(byte r, byte g, byte b) : this()
+    {
+        R = r;
+        G = g;
+        B = b;
+    }
 }

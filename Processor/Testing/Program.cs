@@ -1,20 +1,48 @@
-﻿class Program
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
+using Processing.Models;
+using Processing.Filters;
+
+public class Program
 {
-    static void Main()
+    public static void Main(string[] args)
     {
-        var imagePath = @"C:\Users\Cosmin\Desktop\Image.jpg"; 
-        RgbImage image = RgbImageReader.FromFile(imagePath); 
-        var imagePackage = new RgbImagePackage(image);
+        var builder = WebApplication.CreateBuilder(args);
+        var app = builder.Build();
 
-        Console.WriteLine($"Image dimensions: {imagePackage.Width} x {imagePackage.Height}");
+        app.MapPost("/filter", async (HttpRequest request) =>
+        {
+            var filterName = request.Query["filter"].ToString();
+            if (string.IsNullOrEmpty(filterName))
+                return Results.BadRequest("Missing filter name.");
 
-        var filter = new InvertFilter();
-        var processedPackage = filter.Apply(image);
+            var form = await request.ReadFormAsync();
+            var file = form.Files["image"];
+            if (file == null)
+                return Results.BadRequest("Missing image file.");
 
-        Console.WriteLine($"Processed image dimensions: {processedPackage.Width} x {processedPackage.Height}");
+            using var stream = file.OpenReadStream();
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            ms.Position = 0;
 
-        var outputPath = @"C:\Users\Cosmin\Desktop\Image_invert.jpg";
-        RgbImageWriter.Save(processedPackage, outputPath); 
-        Console.WriteLine($"Processed image saved to: {outputPath}");
+            var inputImage = RgbImageReader.FromStream(ms);
+
+
+            var outputImage = filterName.ToLower() switch
+            {
+                "invert" => new InvertFilter().Apply(inputImage),
+                _ => inputImage
+            };
+
+            var outStream = new MemoryStream(); 
+            RgbImageWriter.Save(outputImage, outStream);
+            outStream.Position = 0;
+
+            return Results.File(outStream, "image/jpeg");
+        });
+        app.Run("http://localhost:5000");
+
     }
 }

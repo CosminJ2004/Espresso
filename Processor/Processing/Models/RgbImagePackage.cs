@@ -1,6 +1,6 @@
 ﻿public class RgbImagePackage
 {
-    private readonly byte[] _bytes; // opțional, dacă vrei să păstrezi imaginea brută
+    private readonly byte[] _bytes; 
     private readonly RgbImage _image;
 
     public byte[] Bytes => _bytes;

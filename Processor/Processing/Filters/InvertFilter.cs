@@ -4,7 +4,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
 
-
+namespace Processing.Filters;
 public class InvertFilter : IImageFilter
 {
     public string Name => "Invert";
