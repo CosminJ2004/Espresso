@@ -28,7 +28,7 @@ jobs:
     name: Deploy Processor
     runs-on: ubuntu-latest
     environment: envsec
-    needs: deploy  # pornește doar după ce termină backend-ul (opțional)
+    needs: deploy-backend  # pornește doar după ce termină backend-ul (opțional)
 
     steps:
       - name: Checkout
