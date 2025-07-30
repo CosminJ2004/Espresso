@@ -1,10 +1,7 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.CommentDto;
-import com.example.demo.dto.VoteRequestDto;
-import com.example.demo.dto.VoteResponseDto;
+import com.example.demo.dto.*;
 import com.example.demo.model.*;
-import com.example.demo.dto.PostDto;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
@@ -37,17 +34,19 @@ public class PostService {
     }
 
     private PostDto convertToDto(Post post) {
-        return new PostDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount() , post.getDownvoteCount(), post.getScore(), post.getCommentCount(), null, post.getCreatedAt(), post.getUpdatedAt());
+        return new PostDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount() , post.getDownvoteCount(), post.getScore(), post.getCommentCount(), post.getUserVote(userRepository.findByUsername("current_user").orElseThrow()), post.getCreatedAt(), post.getUpdatedAt());
     }
 
-    public PostDto addPost(PostDto dto) {
+    public PostDto createPost(PostDto dto) {
         User author = userRepository.findByUsername(dto.getAuthor())
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
 
         Post post = new Post(author, dto.getTitle(), dto.getContent());
-
-         postRepository.save(post);
-         return convertToDto(post);
+        postRepository.save(post);
+        
+        Vote authorVote = new Vote(author, post, VoteType.up);
+        voteRepository.save(authorVote);
+        return convertToDto(post);
     }
 
     public Post addPostWithImage(PostDto dto, String imagePath) {
@@ -84,12 +83,11 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    public boolean deletePost(Long id) {
-        if (postRepository.existsById((long) id)) {
-            postRepository.deleteById((long) id);
-            return true;
+    public void deletePost(Long id) {
+        if (!postRepository.existsById(id)) {
+            throw new IllegalArgumentException("Post not found with ID: " + id);
         }
-        return false;
+        postRepository.deleteById(id);
     }
 
     public Post updatePost(Long id, PostDto dto) {
@@ -106,33 +104,56 @@ public class PostService {
         return postRepository.save(existingPost);
     }
 
-    public CommentDto addComment(CommentDto dto) {
-        Post post = postRepository.findById(dto.getPostId())
+    public CommentResponseDto addComment(Long id, CommentRequestDto commentRequest) {
+        Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
-        User author = userRepository.findByUsername(dto.getAuthor())
+        User author = userRepository.findByUsername(commentRequest.getAuthor())
                 .orElseThrow(() -> new IllegalArgumentException("Author not found"));
 
         Comment parent = null;
-        if (dto.getParentId() != null) {
-            parent = commentRepository.findById(dto.getParentId())
+        if (commentRequest.getParentId() != null) {
+            parent = commentRepository.findById(commentRequest.getParentId())
                     .orElseThrow(() -> new IllegalArgumentException("Parent comment not found"));
         }
 
-        Comment comment = new Comment(author, dto.getContent(), post, parent);
-        commentRepository.save(comment);
-        return dto;
+        Comment newComment = new Comment(author, commentRequest.getContent(), post, parent);
+        Comment updatedComment = commentRepository.save(newComment);
+
+        return toCommentReponseDto(updatedComment);
     }
 
-    public List<CommentDto> getCommentTreeForPost(Long postId) {
+    private CommentResponseDto toCommentReponseDto(Comment comment) {
+        CommentResponseDto commentResponse = new CommentResponseDto();
+        commentResponse.setId(comment.getId());
+        commentResponse.setPostId(comment.getPost().getId());
+        commentResponse.setParentId(comment.getParent() != null ? comment.getParent().getId() : null);
+        commentResponse.setContent(comment.getText());
+        commentResponse.setAuthor(comment.getAuthor().getUsername());
+        commentResponse.setUpvotes(comment.getUpvoteCount());
+        commentResponse.setDownvotes(comment.getDownvoteCount());
+        commentResponse.setScore(comment.getScore());
+
+        // hardcoded - current_user
+        User currentUser = userRepository.findByUsername("current_user").orElse(null);
+        commentResponse.setUserVote(currentUser != null ? comment.getUserVote(currentUser) : null);
+        
+        commentResponse.setCreatedAt(comment.getCreatedAt());
+        commentResponse.setUpdatedAt(comment.getUpdatedAt());
+        commentResponse.setReplies(new ArrayList<>());
+        
+        return commentResponse;
+    }
+
+    public List<CommentResponseDto> getCommentsByPostId(Long postId) {
         List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
 
         // Mapam toate comentariile la DTO
-        Map<Long, CommentDto> dtoMap = new HashMap<>();
-        List<CommentDto> rootComments = new ArrayList<>();
+        Map<Long, CommentResponseDto> dtoMap = new HashMap<>();
+        List<CommentResponseDto> rootComments = new ArrayList<>();
 
         for (Comment comment : comments) {
-            CommentDto dto = new CommentDto();
+            CommentResponseDto dto = new CommentResponseDto();
             dto.setId(comment.getId());
             dto.setContent(comment.getText());
             dto.setAuthor(comment.getAuthor().getUsername());
@@ -141,7 +162,7 @@ public class PostService {
             dtoMap.put(comment.getId(), dto);
 
             if (comment.getParent() != null) {
-                CommentDto parentDto = dtoMap.get(comment.getParent().getId());
+                CommentResponseDto parentDto = dtoMap.get(comment.getParent().getId());
                 if (parentDto != null) {
                     parentDto.getReplies().add(dto);
                 }

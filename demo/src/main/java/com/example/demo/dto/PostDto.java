@@ -40,17 +40,4 @@ public class PostDto {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
-
-    public PostDto(Long id, String author, String title, String content) {
-        this.id=id;
-        this.author = author;
-        this.title = title;
-        this.content = content;
-    }
-
-    public PostDto(String author, String title, String content) {
-        this.author = author;
-        this.title = title;
-        this.content = content;
-    }
 }

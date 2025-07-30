@@ -146,6 +146,17 @@ public class Post implements Votable {
         return getVoteCount() >= 10 || getCommentCount() >= 5;
     }
 
+    public VoteType getUserVote(User user) {
+        if (votes == null || votes.isEmpty()) {
+            return null;
+        }
+        return votes.stream()
+                .filter(vote -> vote.getUser().equals(user))
+                .map(Vote::getType)
+                .findFirst()
+                .orElse(null);
+    }
+
     public String getAuthorUsername() {
         return author != null ? author.getUsername() : "Unknown";
     }

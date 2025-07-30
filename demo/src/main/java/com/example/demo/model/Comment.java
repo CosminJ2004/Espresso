@@ -36,6 +36,9 @@ public class Comment implements Votable {
     @OrderBy("createdAt ASC")
     private List<Comment> replies = new ArrayList<>();
 
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Vote> votes = new ArrayList<>();
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -84,6 +87,39 @@ public class Comment implements Votable {
 
     public int getReplyCount() {
         return replies != null ? replies.size() : 0;
+    }
+
+    public long getUpvoteCount() {
+        if (votes == null || votes.isEmpty()) {
+            return 0;
+        }
+        return votes.stream()
+                .filter(vote -> vote.getType() == VoteType.up)
+                .count();
+    }
+
+    public long getDownvoteCount() {
+        if (votes == null || votes.isEmpty()) {
+            return 0;
+        }
+        return votes.stream()
+                .filter(vote -> vote.getType() == VoteType.down)
+                .count();
+    }
+
+    public long getScore() {
+        return getUpvoteCount() - getDownvoteCount();
+    }
+
+    public VoteType getUserVote(User user) {
+        if (votes == null || votes.isEmpty()) {
+            return null;
+        }
+        return votes.stream()
+                .filter(vote -> vote.getUser().equals(user))
+                .map(Vote::getType)
+                .findFirst()
+                .orElse(null);
     }
 
     @Override

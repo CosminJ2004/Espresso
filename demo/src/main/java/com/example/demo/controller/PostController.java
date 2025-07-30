@@ -1,11 +1,7 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.CommentDto;
-import com.example.demo.dto.PostDto;
-import com.example.demo.dto.VoteRequestDto;
-import com.example.demo.dto.VoteResponseDto;
+import com.example.demo.dto.*;
 import com.example.demo.model.Post;
-import com.example.demo.model.VoteType;
 import com.example.demo.service.PostService;
 import com.example.demo.util.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +35,7 @@ public class PostController {
             PostDto post = postService.getPostById(id);
             return Response.ok(post);
         } catch (IllegalArgumentException e) {
-            return Response.error("Post not found");
+            return Response.error("Failed to get post: " + e.getMessage());
         }
     }
 
@@ -47,7 +43,7 @@ public class PostController {
     @PostMapping
     public ResponseEntity<Response<PostDto>> createPost(@RequestBody PostDto dto) {
         try {
-            PostDto post = postService.addPost(dto);
+            PostDto post = postService.createPost(dto);
             return Response.ok(post);
         } catch (Exception e) {
             return Response.error("Failed to create post: " + e.getMessage());
@@ -61,18 +57,18 @@ public class PostController {
             Post updatedPost = postService.updatePost(id, dto);
             return Response.ok(updatedPost);
         } catch (IllegalArgumentException e) {
-            return Response.error("Post not found");
+            return Response.error("Failed to update post: " + e.getMessage());
         }
     }
 
     //    DELETE /posts/:id
     @DeleteMapping("/{id}")
     public ResponseEntity<Response<Void>> deletePost(@PathVariable Long id) {
-        boolean deleted = postService.deletePost(id);
-        if (deleted) {
+        try {
+            postService.deletePost(id);
             return Response.ok("Post has been successfully deleted");
-        } else {
-            return Response.error("Post not found");
+        } catch (IllegalArgumentException e) {
+            return Response.error("Failed to delete post: " + e.getMessage());
         }
     }
 
@@ -83,15 +79,15 @@ public class PostController {
             VoteResponseDto voteResponse = postService.votePost(id, voteRequest);
             return Response.ok(voteResponse);
         } catch(IllegalArgumentException e){
-            return Response.error("Vote failed: " + e.getMessage());
+            return Response.error("Failed to vote post: " + e.getMessage());
         }
     }
 
     //    GET /posts/:postId/comments TODO
     @GetMapping("/{id}/comments")
-    public ResponseEntity<Response<List<CommentDto>>> getCommentTree(@PathVariable Long id) {
+    public ResponseEntity<Response<List<CommentResponseDto>>> getCommentsByPostId(@PathVariable Long id) {
         try {
-            List<CommentDto> commentTree = postService.getCommentTreeForPost(id);
+            List<CommentResponseDto> commentTree = postService.getCommentsByPostId(id);
             return Response.ok(commentTree);
         } catch (Exception e) {
             return Response.error("Failed to get comments: " + e.getMessage());
@@ -100,11 +96,10 @@ public class PostController {
 
     //    POST /posts/:postId/comments
     @PostMapping("/{id}/comments")
-    public ResponseEntity<Response<CommentDto>> addComment(@PathVariable Long id, @RequestBody CommentDto dto) {
+    public ResponseEntity<Response<CommentResponseDto>> addComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequest) {
         try {
-            dto.setPostId(id);
-            CommentDto savedComment = postService.addComment(dto);
-            return Response.ok(savedComment);
+            CommentResponseDto commentResponse = postService.addComment(id, commentRequest);
+            return Response.ok(commentResponse);
         } catch (Exception e) {
             return Response.error("Failed to add comment: " + e.getMessage());
         }
