@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "posts")
-public class Post implements Votable {
+public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -75,26 +75,6 @@ public class Post implements Votable {
         updatedAt = LocalDateTime.now();
     }
 
-    public void addComment(Comment comment) {
-        comments.add(comment);
-        comment.setPost(this);
-    }
-
-    public void removeComment(Comment comment) {
-        comments.remove(comment);
-        comment.setPost(null);
-    }
-
-    public void addVote(Vote vote) {
-        votes.add(vote);
-        vote.setPost(this);
-    }
-
-    public void removeVote(Vote vote) {
-        votes.remove(vote);
-        vote.setPost(null);
-    }
-
     public long getCommentCount() {
         return comments != null ? comments.size() : 0;
     }
@@ -128,22 +108,6 @@ public class Post implements Votable {
 
     public long getScore() {
         return getUpvoteCount() - getDownvoteCount();
-    }
-
-    public boolean hasComments() {
-        return comments != null && !comments.isEmpty();
-    }
-
-    public boolean hasVotes() {
-        return votes != null && !votes.isEmpty();
-    }
-
-    public boolean hasFile() {
-        return filePath != null && !filePath.trim().isEmpty();
-    }
-
-    public boolean isPopular() {
-        return getVoteCount() >= 10 || getCommentCount() >= 5;
     }
 
     public VoteType getUserVote(User user) {

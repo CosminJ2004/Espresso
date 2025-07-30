@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "comments")
-public class Comment implements Votable {
+public class Comment{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -73,16 +73,6 @@ public class Comment implements Votable {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-
-    public void addReply(Comment reply) {
-        replies.add(reply);
-        reply.setParent(this);
-    }
-
-    public void removeReply(Comment reply) {
-        replies.remove(reply);
-        reply.setParent(null);
     }
 
     public int getReplyCount() {

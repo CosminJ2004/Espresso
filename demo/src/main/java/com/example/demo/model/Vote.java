@@ -70,21 +70,8 @@ public class Vote {
         updatedAt = LocalDateTime.now();
     }
 
-    public boolean isPostVote() {
-        return post != null;
-    }
-
-    public boolean isCommentVote() {
-        return comment != null;
-    }
-
     public int getVoteValue() {
         return type == VoteType.up ? 1 : -1;
-    }
-
-    public void changeVote(VoteType newType) {
-        this.type = newType;
-        this.updatedAt = LocalDateTime.now();
     }
 
     @Override

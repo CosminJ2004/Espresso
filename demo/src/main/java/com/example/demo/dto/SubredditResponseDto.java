@@ -1,4 +1,4 @@
-//package com.example.demo.dto;
-//
-//public class SubredditResponseDto {
-//}
+package com.example.demo.dto;
+
+public class SubredditResponseDto {
+}
