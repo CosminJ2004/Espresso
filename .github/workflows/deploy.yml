@@ -5,7 +5,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  deploy:
+  deploy-backend:
+    name: Deploy Backend
     runs-on: ubuntu-latest
     environment: envsec
     
@@ -22,3 +23,23 @@ jobs:
         port: 22
         script: |
           bash /home/ec2-user/deploy.sh
+          
+  deploy-processor:
+    name: Deploy Processor
+    runs-on: ubuntu-latest
+    environment: envsec
+    needs: deploy-backend  # pornește doar după ce termină backend-ul (opțional)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2 .NET instance
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST_DOTNET }}
+          username: ${{ secrets.USERNAME_DOTNET }}
+          key: ${{ secrets.SSH_KEY_DOTNET }}
+          port: 22
+          script: |
+            bash /home/ec2-user/deploy_dotnet.sh
