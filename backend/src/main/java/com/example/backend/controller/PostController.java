@@ -31,78 +31,50 @@ public class PostController {
     //    GET /posts/:id
     @GetMapping("/{id}")
     public ResponseEntity<Response<PostDto>> getPostById(@PathVariable Long id) {
-        try {
-            PostDto post = postService.getPostById(id);
-            return Response.ok(post);
-        } catch (IllegalArgumentException e) {
-            return Response.error("Failed to get post: " + e.getMessage());
-        }
+        PostDto post = postService.getPostById(id);
+        return Response.ok(post);
     }
 
     //    POST /posts
     @PostMapping
     public ResponseEntity<Response<PostDto>> createPost(@RequestBody PostDto dto) {
-        try {
-            PostDto post = postService.createPost(dto);
-            return Response.ok(post);
-        } catch (Exception e) {
-            return Response.error("Failed to create post: " + e.getMessage());
-        }
+        PostDto post = postService.createPost(dto);
+        return Response.ok(post);
     }
 
     //    PUT /posts/:id
     @PutMapping("/{id}")
     public ResponseEntity<Response<Post>> updatePost(@PathVariable Long id, @RequestBody PostDto dto) {
-        try {
-            Post updatedPost = postService.updatePost(id, dto);
-            return Response.ok(updatedPost);
-        } catch (IllegalArgumentException e) {
-            return Response.error("Failed to update post: " + e.getMessage());
-        }
+        Post updatedPost = postService.updatePost(id, dto);
+        return Response.ok(updatedPost);
     }
 
     //    DELETE /posts/:id
     @DeleteMapping("/{id}")
     public ResponseEntity<Response<Void>> deletePost(@PathVariable Long id) {
-        try {
-            postService.deletePost(id);
-            return Response.ok("Post has been successfully deleted");
-        } catch (IllegalArgumentException e) {
-            return Response.error("Failed to delete post: " + e.getMessage());
-        }
+        postService.deletePost(id);
+        return Response.ok("Post deleted successfully");
     }
 
     //    PUT /posts/:id/vote
     @PutMapping("/{id}/vote")
     public ResponseEntity<Response<VoteResponseDto>> votePost(@PathVariable Long id, @RequestBody VoteRequestDto voteRequest) {
-        try{
-            VoteResponseDto voteResponse = postService.votePost(id, voteRequest);
-            return Response.ok(voteResponse);
-        } catch(IllegalArgumentException e){
-            return Response.error("Failed to vote post: " + e.getMessage());
-        }
+        VoteResponseDto voteResponse = postService.votePost(id, voteRequest);
+        return Response.ok(voteResponse);
     }
 
-    //    GET /posts/:postId/comments TODO
+    //    GET /posts/:postId/comments
     @GetMapping("/{id}/comments")
     public ResponseEntity<Response<List<CommentResponseDto>>> getCommentsByPostId(@PathVariable Long id) {
-        try {
-            List<CommentResponseDto> commentTree = postService.getCommentsByPostId(id);
-            return Response.ok(commentTree);
-        } catch (Exception e) {
-            return Response.error("Failed to get comments: " + e.getMessage());
-        }
+        List<CommentResponseDto> commentTree = postService.getCommentsByPostId(id);
+        return Response.ok(commentTree);
     }
 
     //    POST /posts/:postId/comments
     @PostMapping("/{id}/comments")
     public ResponseEntity<Response<CommentResponseDto>> addComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequest) {
-        try {
-            CommentResponseDto commentResponse = postService.addComment(id, commentRequest);
-            return Response.ok(commentResponse);
-        } catch (Exception e) {
-            return Response.error("Failed to add comment: " + e.getMessage());
-        }
+        CommentResponseDto commentResponse = postService.addComment(id, commentRequest);
+        return Response.ok(commentResponse);
     }
 }
 

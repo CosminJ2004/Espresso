@@ -14,50 +14,38 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/comments")
 public class CommentController {
 
-    @Autowired
     private CommentService commentService;
+
+    @Autowired
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
+    }
 
     //    GET /comments/:id
     @GetMapping("/{id}")
     public ResponseEntity<Response<CommentResponseDto>> getCommentById(@PathVariable Long id) {
-        try {
-            CommentResponseDto commentResponse = commentService.getCommentById(id);
-            return Response.ok(commentResponse);
-        } catch (IllegalArgumentException e) {
-            return Response.error("Failed to get comment: " + e.getMessage());
-        }
+        CommentResponseDto commentResponse = commentService.getCommentById(id);
+        return Response.ok(commentResponse);
     }
 
     //    PUT /comments/:id
     @PutMapping("/{id}")
     public ResponseEntity<Response<CommentResponseDto>> updateComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequest) {
-        try {
-            CommentResponseDto commentResponse = commentService.updateComment(id, commentRequest);
-            return Response.ok(commentResponse);
-        } catch (IllegalArgumentException e) {
-            return Response.error("Failed to update comment: " + e.getMessage());
-        }
+        CommentResponseDto commentResponse = commentService.updateComment(id, commentRequest);
+        return Response.ok(commentResponse);
     }
 
     //    DELETE /comments/:id
     @DeleteMapping("/{id}")
     public ResponseEntity<Response<Void>> deleteComment(@PathVariable Long id) {
-        try {
-            commentService.deleteComment(id);
-            return Response.ok("Comment has been deleted successfully");
-        } catch (IllegalArgumentException e) {
-            return Response.error("Failed to delete comment: " + e.getMessage());
-        }
+        commentService.deleteComment(id);
+        return Response.ok("Comment deleted successfully");
     }
 
     //    PUT /comments/:id/vote
     @PutMapping("/{id}/vote")
     public ResponseEntity<Response<VoteResponseDto>> voteComment(@PathVariable Long id, @RequestBody VoteRequestDto voteRequest) {
-        try {
-            VoteResponseDto voteResponse = commentService.voteComment(id, voteRequest);
-            return Response.ok(voteResponse);
-        } catch (IllegalArgumentException e) {
-            return Response.error("Failed to vote comment: " + e.getMessage());
-        }
+        VoteResponseDto voteResponse = commentService.voteComment(id, voteRequest);
+        return Response.ok(voteResponse);
     }
 }

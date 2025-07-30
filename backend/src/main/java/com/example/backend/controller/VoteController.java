@@ -8,8 +8,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/votes")
 public class VoteController {
 
-    @Autowired
     private VoteService voteService;
+
+    @Autowired
+    public VoteController(VoteService voteService) {
+        this.voteService = voteService;
+    }
 
 //    @PostMapping
 //    public Vote createVote(@RequestBody VoteRequestDto voteDto) {
@@ -22,7 +26,7 @@ public class VoteController {
 //    }
 //
 //    @GetMapping("/{id}")
-//    public Vote getVote(@PathVariable Long id) {
+//    public Vote getVoteById(@PathVariable Long id) {
 //        return voteService.getVote(id);
 //    }
 //

@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.dto.UserDto;
 import com.example.backend.model.User;
 import com.example.backend.service.UserService;
+import com.example.backend.util.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,43 +20,32 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(userService.getUserById(id));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Response<UserDto>> getUserById(@PathVariable Long id) {
+        UserDto user = userService.getUserById(id);
+        return Response.ok(user);
     }
 
     @GetMapping
-    public List<UserDto> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<Response<List<UserDto>>> getAllUsers() {
+        List<UserDto> users = userService.getAllUsers();
+        return Response.ok(users);
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto dto) {
-        try {
-            return ResponseEntity.ok(userService.createUser(dto));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Response<UserDto>> createUser(@RequestBody UserDto dto) {
+        UserDto user = userService.createUser(dto);
+        return Response.ok(user);
     }
 
     @DeleteMapping("/{username}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String username) {
-        try {
-            userService.deleteUser(username);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Response<Void>> deleteUser(@PathVariable String username) {
+        userService.deleteUser(username);
+        return Response.ok("User deleted successfully");
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<User> updateUser(
-            @PathVariable String username,
-            @RequestBody UserDto dto) {
+    public ResponseEntity<Response<User>> updateUser(@PathVariable String username, @RequestBody UserDto dto) {
         User updatedUser = userService.updateUser(username, dto);
-        return ResponseEntity.ok(updatedUser);
+        return Response.ok(updatedUser);
     }
 }
