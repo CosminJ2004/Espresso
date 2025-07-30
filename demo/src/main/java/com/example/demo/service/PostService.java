@@ -1,11 +1,14 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.CommentDto;
+import com.example.demo.dto.VoteRequestDto;
+import com.example.demo.dto.VoteResponseDto;
 import com.example.demo.model.*;
 import com.example.demo.dto.PostDto;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.VoteRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,11 +27,13 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final VoteRepository voteRepository;
 
-    public PostService(PostRepository postRepository, UserRepository userRepository,  CommentRepository commentRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository,  CommentRepository commentRepository, VoteRepository voteRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
+        this.voteRepository = voteRepository;
     }
 
     private PostDto convertToDto(Post post) {
@@ -146,5 +151,41 @@ public class PostService {
         }
 
         return rootComments;
+    }
+
+    public VoteResponseDto votePost(Long postId, VoteRequestDto voteRequest) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        User user = userRepository.findByUsername("current_user")
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Optional<Vote> existingVote = voteRepository.findByUserAndPost(user, post);
+
+        if (voteRequest.getVoteType() == null || voteRequest.getVoteType() == VoteType.none) {
+            existingVote.ifPresent(voteRepository::delete);
+        } else {
+            if (existingVote.isPresent()) {
+                Vote vote = existingVote.get();
+                vote.setType(voteRequest.getVoteType());
+                voteRepository.save(vote);
+            } else {
+                Vote newVote = new Vote(user, post, voteRequest.getVoteType());
+                voteRepository.save(newVote);
+            }
+        }
+
+        post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        VoteResponseDto voteResponse = new VoteResponseDto();
+        voteResponse.setUpvotes(post.getUpvoteCount());
+        voteResponse.setDownvotes(post.getDownvoteCount());
+        voteResponse.setScore(post.getScore());
+
+        Optional<Vote> currentVote = voteRepository.findByUserAndPost(user, post);
+        voteResponse.setUserVote(currentVote.map(Vote::getType).orElse(VoteType.none));
+
+        return voteResponse;
     }
 }

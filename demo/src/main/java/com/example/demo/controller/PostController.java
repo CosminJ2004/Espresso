@@ -2,7 +2,8 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
-import com.example.demo.dto.VoteDto;
+import com.example.demo.dto.VoteRequestDto;
+import com.example.demo.dto.VoteResponseDto;
 import com.example.demo.model.Post;
 import com.example.demo.model.VoteType;
 import com.example.demo.service.PostService;
@@ -75,14 +76,14 @@ public class PostController {
         }
     }
 
-    //    PUT /posts/:id/vote TODO
+    //    PUT /posts/:id/vote
     @PutMapping("/{id}/vote")
-    public ResponseEntity<Response<VoteDto>> votePost(@PathVariable Long id, @RequestBody VoteType voteType) {
+    public ResponseEntity<Response<VoteResponseDto>> votePost(@PathVariable Long id, @RequestBody VoteRequestDto voteRequest) {
         try{
-//        VoteDto voted = postService.votePost(id, voteType);
-            return Response.ok("");
+            VoteResponseDto voteResponse = postService.votePost(id, voteRequest);
+            return Response.ok(voteResponse);
         } catch(IllegalArgumentException e){
-            return Response.error("Vote not found");
+            return Response.error("Vote failed: " + e.getMessage());
         }
     }
 
