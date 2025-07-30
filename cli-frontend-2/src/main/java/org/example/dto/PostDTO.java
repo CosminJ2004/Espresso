@@ -13,8 +13,8 @@ public class PostDTO {
     private int upvotes;
     private int downvotes;
     private int score;
-    private VoteType userVote;
     private int commentCount;
+    private VoteType userVote;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

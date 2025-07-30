@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class Subreddit {
     private int id;
+    private static int idCounter = 0;
     private String name;
     private String displayName;
     private String description;
@@ -14,6 +15,18 @@ public class Subreddit {
     private LocalDateTime createdAt;
     private ArrayList<Post> posts;
     //private TreeSet<User> users;
+
+    public Subreddit() {
+        this.id = idCounter++;
+        this.name = "Hardcoded Sub";
+        this.displayName = "Hardcoded Sub";
+        this.description = "Hardcoded Sub by Matei Boss";
+        this.membercount = 1;
+        this.postCount = 0;
+        this.iconUrl = "nada";
+        this.createdAt = LocalDateTime.now();
+        this.posts = new ArrayList<>();
+    }
 
     public void setPostCount(int postCount) {
         this.postCount = postCount;
