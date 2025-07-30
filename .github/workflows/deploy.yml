@@ -5,7 +5,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  deploy:
+  deploy-backend:
+    name: Deploy Backend
     runs-on: ubuntu-latest
     environment: envsec
     
@@ -23,8 +24,8 @@ jobs:
         script: |
           bash /home/ec2-user/deploy.sh
           
-  deploy-dotnet:
-    name: Deploy .NET app (C# EC2 instance)
+  deploy-processor:
+    name: Deploy Processor
     runs-on: ubuntu-latest
     environment: envsec
     needs: deploy  # pornește doar după ce termină backend-ul (opțional)
@@ -42,4 +43,3 @@ jobs:
           port: 22
           script: |
             bash /home/ec2-user/deploy_dotnet.sh
-        #try4
