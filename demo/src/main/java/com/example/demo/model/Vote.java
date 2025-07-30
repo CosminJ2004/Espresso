@@ -79,7 +79,7 @@ public class Vote {
     }
 
     public int getVoteValue() {
-        return type == VoteType.UP ? 1 : -1;
+        return type == VoteType.up ? 1 : -1;
     }
 
     public void changeVote(VoteType newType) {
