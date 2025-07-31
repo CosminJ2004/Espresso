@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.UserDto;
+import com.example.backend.dto.UserRequestDto;
+import com.example.backend.dto.UserResponseDto;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -32,13 +33,13 @@ public class UserService {
         this.modelMapper = modelMapper;
     }
 
-    private UserDto convertToDto(User user) {
+    private UserResponseDto convertToDto(User user) {
 //        return modelMapper.map(user, UserDto.class);
-        return new UserDto(user.getId(), user.getUsername(), user.getPassword());
+        return new UserResponseDto(user.getId(), user.getUsername(), user.getPassword());
     }
 
     // conversie din UserDto in User
-    public User convertToEntity(UserDto dto) {
+    public User convertToEntity(UserRequestDto dto) {
         return modelMapper.map(dto, User.class);
     }
 
@@ -47,23 +48,23 @@ public class UserService {
     }
 
 
-    public UserDto getUserById(Long id) {
+    public UserResponseDto getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
         return convertToDto(user);
     }
 
-    public List<UserDto> getAllUsers() {
+    public List<UserResponseDto> getAllUsers() {
         return userRepository.findAll()
                 .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    public UserDto createUser(UserDto dto) {
-        if (userRepository.existsByUsername(dto.getUsername())) {
+    public UserResponseDto createUser(UserRequestDto userRequest) {
+        if (userRepository.existsByUsername(userRequest.getUsername())) {
             throw new IllegalArgumentException("Username already taken");
         }
-        User user = new User(dto.getUsername(), dto.getPassword());
+        User user = new User(userRequest.getUsername(), userRequest.getPassword());
 
         // exemplu de criptare parolă (folosind bean-ul passwordEncoder)
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -80,13 +81,13 @@ public class UserService {
         userRepository.deleteByUsername(username);
     }
 
-    public User updateUser(String username, UserDto dto) {
+    public UserResponseDto updateUser(String username, UserRequestDto dto) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
 
         user.setUsername(dto.getUsername());
         user.setPassword(dto.getPassword());
-        return userRepository.save(user);
+        return convertToDto(userRepository.save(user));
     }
 
     public void logout() {

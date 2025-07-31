@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+public class UserResponseDto {
     
     private Long id;
     
@@ -29,7 +29,7 @@ public class UserDto {
     
     private int commentCount;
 
-    public UserDto(Long id, String username, String password) {
+    public UserResponseDto(Long id, String username, String password) {
         this.id = id;
         this.username = username;
         this.password = password;
