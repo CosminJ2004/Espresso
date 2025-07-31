@@ -11,5 +11,4 @@ import lombok.AllArgsConstructor;
 public class VoteRequestDto {
 
     private VoteType voteType;
-
 }

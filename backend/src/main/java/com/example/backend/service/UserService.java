@@ -5,7 +5,6 @@ import com.example.backend.dto.UserResponseDto;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,30 +22,15 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-
-    private final ModelMapper modelMapper;
-
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.modelMapper = modelMapper;
     }
 
     private UserResponseDto convertToDto(User user) {
-//        return modelMapper.map(user, UserDto.class);
         return new UserResponseDto(user.getId(), user.getUsername(), user.getPassword());
     }
-
-    // conversie din UserDto in User
-    public User convertToEntity(UserRequestDto dto) {
-        return modelMapper.map(dto, User.class);
-    }
-
-    public static User getCurrentUser() {
-        return (currentUser);
-    }
-
 
     public UserResponseDto getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
@@ -91,11 +75,11 @@ public class UserService {
     }
 
     public void logout() {
-        this.currentUser = null;
+        currentUser = null;
     }
 
     public boolean isLoggedIn() {
-        return currentUser != null;
+        return currentUser == null;
     }
 
     public boolean register(String username, String password) {
@@ -136,7 +120,7 @@ public class UserService {
     }
 
     public boolean deleteCurrentUser() {
-        if (!isLoggedIn()) {
+        if (isLoggedIn()) {
             throw new IllegalStateException("User is not logged in.");
         }
 
@@ -147,7 +131,7 @@ public class UserService {
     }
 
     public boolean changeUsername(String newUsername) {
-        if (!isLoggedIn()) {
+        if (isLoggedIn()) {
             throw new IllegalStateException("User is not logged in.");
         }
 
@@ -167,7 +151,7 @@ public class UserService {
     }
 
     public boolean changePassword(String newPassword) {
-        if (!isLoggedIn()) {
+        if (isLoggedIn()) {
             throw new IllegalStateException("User is not logged in.");
         }
 
