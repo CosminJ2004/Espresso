@@ -1,7 +1,6 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.*;
-import com.example.backend.model.Post;
 import com.example.backend.service.PostService;
 import com.example.backend.util.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,30 +22,26 @@ public class PostController {
 
     //    GET /posts
     @GetMapping
-    public ResponseEntity<Response<List<PostDto>>> getAllPosts() {
-            List<PostDto> posts = postService.getAllPosts();
-            return Response.ok(posts);
+    public ResponseEntity<Response<List<PostResponseDto>>> getAllPosts() {
+            return Response.ok(postService.getAllPosts());
     }
 
     //    GET /posts/:id
     @GetMapping("/{id}")
-    public ResponseEntity<Response<PostDto>> getPostById(@PathVariable Long id) {
-        PostDto post = postService.getPostById(id);
-        return Response.ok(post);
+    public ResponseEntity<Response<PostResponseDto>> getPostById(@PathVariable Long id) {
+        return Response.ok(postService.getPostById(id));
     }
 
     //    POST /posts
     @PostMapping
-    public ResponseEntity<Response<PostDto>> createPost(@RequestBody PostDto dto) {
-        PostDto post = postService.createPost(dto);
-        return Response.ok(post);
+    public ResponseEntity<Response<PostResponseDto>> createPost(@RequestBody PostRequestDto postRequest) {
+        return Response.ok(postService.createPost(postRequest));
     }
 
     //    PUT /posts/:id
     @PutMapping("/{id}")
-    public ResponseEntity<Response<Post>> updatePost(@PathVariable Long id, @RequestBody PostDto dto) {
-        Post updatedPost = postService.updatePost(id, dto);
-        return Response.ok(updatedPost);
+    public ResponseEntity<Response<PostResponseDto>> updatePost(@PathVariable Long id, @RequestBody PostRequestDto postRequest) {
+        return Response.ok(postService.updatePost(id, postRequest));
     }
 
     //    DELETE /posts/:id
@@ -59,22 +54,19 @@ public class PostController {
     //    PUT /posts/:id/vote
     @PutMapping("/{id}/vote")
     public ResponseEntity<Response<VoteResponseDto>> votePost(@PathVariable Long id, @RequestBody VoteRequestDto voteRequest) {
-        VoteResponseDto voteResponse = postService.votePost(id, voteRequest);
-        return Response.ok(voteResponse);
+        return Response.ok(postService.votePost(id, voteRequest));
     }
 
     //    GET /posts/:postId/comments
     @GetMapping("/{id}/comments")
     public ResponseEntity<Response<List<CommentResponseDto>>> getCommentsByPostId(@PathVariable Long id) {
-        List<CommentResponseDto> commentTree = postService.getCommentsByPostId(id);
-        return Response.ok(commentTree);
+        return Response.ok(postService.getCommentsByPostId(id));
     }
 
     //    POST /posts/:postId/comments
     @PostMapping("/{id}/comments")
     public ResponseEntity<Response<CommentResponseDto>> addComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequest) {
-        CommentResponseDto commentResponse = postService.addComment(id, commentRequest);
-        return Response.ok(commentResponse);
+        return Response.ok(postService.addComment(id, commentRequest));
     }
 }
 
