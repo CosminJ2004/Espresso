@@ -4,6 +4,7 @@ import com.example.backend.dto.UserDto;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,14 +21,25 @@ public class UserService {
     private static User currentUser;
 
     private final PasswordEncoder passwordEncoder;
+
+
+    private final ModelMapper modelMapper;
+
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.modelMapper = modelMapper;
     }
 
     private UserDto convertToDto(User user) {
-        return new UserDto(user.getId(), user.getUsername(),user.getPassword());
+//        return modelMapper.map(user, UserDto.class);
+        return new UserDto(user.getId(), user.getUsername(), user.getPassword());
+    }
+
+    // conversie din UserDto in User
+    public User convertToEntity(UserDto dto) {
+        return modelMapper.map(dto, User.class);
     }
 
     public static User getCurrentUser() {
@@ -51,13 +63,12 @@ public class UserService {
         if (userRepository.existsByUsername(dto.getUsername())) {
             throw new IllegalArgumentException("Username already taken");
         }
-        String encoded = passwordEncoder.encode(dto.getPassword());
+        User user = new User(dto.getUsername(), dto.getPassword());
 
-        User newUser = new User(dto.getUsername(), encoded);
+        // exemplu de criptare parolă (folosind bean-ul passwordEncoder)
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-
-
-        User savedUser = userRepository.save(newUser);
+        User savedUser = userRepository.save(user);
         return convertToDto(savedUser);
     }
     @Transactional
