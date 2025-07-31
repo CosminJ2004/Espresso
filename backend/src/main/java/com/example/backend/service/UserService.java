@@ -4,6 +4,8 @@ import com.example.backend.dto.UserDto;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,10 +16,14 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+
     private static User currentUser;
 
-    public UserService(UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     private UserDto convertToDto(User user) {
@@ -45,8 +51,9 @@ public class UserService {
         if (userRepository.existsByUsername(dto.getUsername())) {
             throw new IllegalArgumentException("Username already taken");
         }
+        String encoded = passwordEncoder.encode(dto.getPassword());
 
-        User newUser = new User(dto.getUsername(), dto.getPassword());
+        User newUser = new User(dto.getUsername(), encoded);
 
 
 
