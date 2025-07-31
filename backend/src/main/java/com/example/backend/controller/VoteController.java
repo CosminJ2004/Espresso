@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/votes")
 public class VoteController {
 
-    private VoteService voteService;
+    private final VoteService voteService;
 
     @Autowired
     public VoteController(VoteService voteService) {

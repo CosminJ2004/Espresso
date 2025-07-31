@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/comments")
 public class CommentController {
 
-    private CommentService commentService;
+    private final CommentService commentService;
 
     @Autowired
     public CommentController(CommentService commentService) {
@@ -24,15 +24,13 @@ public class CommentController {
     //    GET /comments/:id
     @GetMapping("/{id}")
     public ResponseEntity<Response<CommentResponseDto>> getCommentById(@PathVariable Long id) {
-        CommentResponseDto commentResponse = commentService.getCommentById(id);
-        return Response.ok(commentResponse);
+        return Response.ok(commentService.getCommentById(id));
     }
 
     //    PUT /comments/:id
     @PutMapping("/{id}")
     public ResponseEntity<Response<CommentResponseDto>> updateComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequest) {
-        CommentResponseDto commentResponse = commentService.updateComment(id, commentRequest);
-        return Response.ok(commentResponse);
+        return Response.ok(commentService.updateComment(id, commentRequest));
     }
 
     //    DELETE /comments/:id
@@ -45,7 +43,6 @@ public class CommentController {
     //    PUT /comments/:id/vote
     @PutMapping("/{id}/vote")
     public ResponseEntity<Response<VoteResponseDto>> voteComment(@PathVariable Long id, @RequestBody VoteRequestDto voteRequest) {
-        VoteResponseDto voteResponse = commentService.voteComment(id, voteRequest);
-        return Response.ok(voteResponse);
+        return Response.ok(commentService.voteComment(id, voteRequest));
     }
 }

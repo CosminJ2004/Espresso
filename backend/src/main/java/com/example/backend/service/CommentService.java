@@ -29,6 +29,7 @@ public class CommentService {
         this.userRepository = userRepository;
         this.voteRepository = voteRepository;
     }
+
     public CommentResponseDto getCommentById(Long id) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found with ID: " + id));

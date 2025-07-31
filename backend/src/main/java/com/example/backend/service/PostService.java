@@ -33,11 +33,11 @@ public class PostService {
         this.voteRepository = voteRepository;
     }
 
-    private PostDto convertToDto(Post post) {
-        return new PostDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount() , post.getDownvoteCount(), post.getScore(), post.getCommentCount(), post.getUserVote(userRepository.findByUsername("current_user").orElseThrow()), post.getCreatedAt(), post.getUpdatedAt());
+    private PostResponseDto convertToResponseDto(Post post) {
+        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount() , post.getDownvoteCount(), post.getScore(), post.getCommentCount(), post.getUserVote(userRepository.findByUsername("current_user").orElseThrow()), post.getCreatedAt(), post.getUpdatedAt());
     }
 
-    public PostDto createPost(PostDto dto) {
+    public PostResponseDto createPost(PostRequestDto dto) {
         User author = userRepository.findByUsername(dto.getAuthor())
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
 
@@ -46,10 +46,10 @@ public class PostService {
         
         Vote authorVote = new Vote(author, post, VoteType.up);
         voteRepository.save(authorVote);
-        return convertToDto(post);
+        return convertToResponseDto(post);
     }
 
-    public Post addPostWithImage(PostDto dto, String imagePath) {
+    public Post addPostWithImage(PostRequestDto dto, String imagePath) {
         User author = userRepository.findByUsername(dto.getAuthor())
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
 
@@ -70,16 +70,16 @@ public class PostService {
         return "/uploads/" + fileName; // sau doar fileName dacă preferi
     }
 
-    public PostDto getPostById(Long id) {
+    public PostResponseDto getPostById(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
-        return convertToDto(post);
+        return convertToResponseDto(post);
     }
 
-    public List<PostDto> getAllPosts() {
+    public List<PostResponseDto> getAllPosts() {
         return postRepository.findAll()
                 .stream()
-                .map(this::convertToDto)
+                .map(this::convertToResponseDto)
                 .collect(Collectors.toList());
     }
 
@@ -90,7 +90,7 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
-    public Post updatePost(Long id, PostDto dto) {
+    public PostResponseDto updatePost(Long id, PostRequestDto dto) {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
 
@@ -101,7 +101,7 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
         existingPost.setAuthor(author);
 
-        return postRepository.save(existingPost);
+        return convertToResponseDto(postRepository.save(existingPost));
     }
 
     public CommentResponseDto addComment(Long id, CommentRequestDto commentRequest) {
@@ -120,10 +120,13 @@ public class PostService {
         Comment newComment = new Comment(author, commentRequest.getContent(), post, parent);
         Comment updatedComment = commentRepository.save(newComment);
 
-        return toCommentReponseDto(updatedComment);
+        Vote authorVote = new Vote(author, updatedComment, VoteType.up);
+        voteRepository.save(authorVote);
+
+        return toCommentResponseDto(updatedComment);
     }
 
-    private CommentResponseDto toCommentReponseDto(Comment comment) {
+    private CommentResponseDto toCommentResponseDto(Comment comment) {
         CommentResponseDto commentResponse = new CommentResponseDto();
         commentResponse.setId(comment.getId());
         commentResponse.setPostId(comment.getPost().getId());
@@ -146,6 +149,10 @@ public class PostService {
     }
 
     public List<CommentResponseDto> getCommentsByPostId(Long postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new IllegalArgumentException("Post not found with ID: " + postId);
+        }
+
         List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
 
         // Mapam toate comentariile la DTO
@@ -153,12 +160,7 @@ public class PostService {
         List<CommentResponseDto> rootComments = new ArrayList<>();
 
         for (Comment comment : comments) {
-            CommentResponseDto dto = new CommentResponseDto();
-            dto.setId(comment.getId());
-            dto.setContent(comment.getText());
-            dto.setAuthor(comment.getAuthor().getUsername());
-            dto.setCreatedAt(comment.getCreatedAt());
-
+            CommentResponseDto dto = toCommentResponseDto(comment);
             dtoMap.put(comment.getId(), dto);
 
             if (comment.getParent() != null) {
