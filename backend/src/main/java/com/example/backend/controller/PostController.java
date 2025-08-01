@@ -20,50 +20,42 @@ public class PostController {
         this.postService = postService;
     }
 
-    //    GET /posts
     @GetMapping
     public ResponseEntity<Response<List<PostResponseDto>>> getAllPosts() {
             return Response.ok(postService.getAllPosts());
     }
 
-    //    GET /posts/:id
     @GetMapping("/{id}")
     public ResponseEntity<Response<PostResponseDto>> getPostById(@PathVariable Long id) {
         return Response.ok(postService.getPostById(id));
     }
 
-    //    POST /posts
     @PostMapping
     public ResponseEntity<Response<PostResponseDto>> createPost(@RequestBody PostRequestDto postRequest) {
         return Response.ok(postService.createPost(postRequest));
     }
 
-    //    PUT /posts/:id
     @PutMapping("/{id}")
     public ResponseEntity<Response<PostResponseDto>> updatePost(@PathVariable Long id, @RequestBody PostRequestDto postRequest) {
         return Response.ok(postService.updatePost(id, postRequest));
     }
 
-    //    DELETE /posts/:id
     @DeleteMapping("/{id}")
     public ResponseEntity<Response<Void>> deletePost(@PathVariable Long id) {
         postService.deletePost(id);
         return Response.ok("Post deleted successfully");
     }
 
-    //    PUT /posts/:id/vote
     @PutMapping("/{id}/vote")
     public ResponseEntity<Response<VoteResponseDto>> votePost(@PathVariable Long id, @RequestBody VoteRequestDto voteRequest) {
         return Response.ok(postService.votePost(id, voteRequest));
     }
 
-    //    GET /posts/:postId/comments
     @GetMapping("/{id}/comments")
     public ResponseEntity<Response<List<CommentResponseDto>>> getCommentsByPostId(@PathVariable Long id) {
         return Response.ok(postService.getCommentsByPostId(id));
     }
 
-    //    POST /posts/:postId/comments
     @PostMapping("/{id}/comments")
     public ResponseEntity<Response<CommentResponseDto>> addComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequest) {
         return Response.ok(postService.addComment(id, commentRequest));

@@ -21,26 +21,22 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    //    GET /comments/:id
     @GetMapping("/{id}")
     public ResponseEntity<Response<CommentResponseDto>> getCommentById(@PathVariable Long id) {
         return Response.ok(commentService.getCommentById(id));
     }
 
-    //    PUT /comments/:id
     @PutMapping("/{id}")
     public ResponseEntity<Response<CommentResponseDto>> updateComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequest) {
         return Response.ok(commentService.updateComment(id, commentRequest));
     }
 
-    //    DELETE /comments/:id
     @DeleteMapping("/{id}")
     public ResponseEntity<Response<Void>> deleteComment(@PathVariable Long id) {
         commentService.deleteComment(id);
         return Response.ok("Comment deleted successfully");
     }
 
-    //    PUT /comments/:id/vote
     @PutMapping("/{id}/vote")
     public ResponseEntity<Response<VoteResponseDto>> voteComment(@PathVariable Long id, @RequestBody VoteRequestDto voteRequest) {
         return Response.ok(commentService.voteComment(id, voteRequest));
