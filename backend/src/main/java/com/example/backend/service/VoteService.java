@@ -1,63 +1,49 @@
 package com.example.backend.service;
 
-import com.example.backend.model.Vote;
-import com.example.backend.repository.CommentRepository;
-import com.example.backend.repository.PostRepository;
-import com.example.backend.repository.UserRepository;
-import com.example.backend.repository.VoteRepository;
+import com.example.backend.model.*;
+import com.example.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VoteService {
 
-    @Autowired
-    private VoteRepository voteRepository;
+    private final VoteRepository voteRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PostRepository postRepository;
-
-    @Autowired
-    private CommentRepository commentRepository;
-
-//    public Vote vote(VoteRequestDto dto) {
-//        Optional<User> userOpt = userRepository.findById(dto.getUserId());
-//        if (userOpt.isEmpty()) throw new RuntimeException("User not found");
-//
-//        User user = userOpt.get();
-//
-//        Vote vote;
-//
-//        if (dto.getPostId() != null) {
-//            Post post = postRepository.findById(dto.getPostId())
-//                    .orElseThrow(() -> new RuntimeException("Post not found"));
-//            vote = new Vote(user, post, dto.getType());
-//        } else if (dto.getCommentId() != null) {
-//            Comment comment = commentRepository.findById(dto.getCommentId())
-//                    .orElseThrow(() -> new RuntimeException("Comment not found"));
-//            vote = new Vote(user, comment, dto.getType());
-//        } else {
-//            throw new RuntimeException("Neither postId nor commentId provided");
-//        }
-//
-//        return voteRepository.save(vote);
-//    }
-
-    public List<Vote> getAllVotes() {
-        return voteRepository.findAll();
+    public VoteService(VoteRepository voteRepository) {
+        this.voteRepository = voteRepository;
     }
 
-    public void deleteVote(Long voteId) {
-        voteRepository.deleteById(voteId);
-    }
+    public void vote(User user, Post post, Comment comment, VoteType voteType) {
+        Optional<Vote> existingVote;
 
-    public Vote getVote(Long id) {
-        return voteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Vote not found"));
+        if (post != null) {
+            existingVote = voteRepository.findByUserAndPost(user, post);
+        } else if (comment != null) {
+            existingVote = voteRepository.findByUserAndComment(user, comment);
+        } else {
+            throw new IllegalArgumentException("Either post or comment must be provided");
+        }
+
+        if (voteType == null || VoteType.none == voteType) {
+            existingVote.ifPresent(voteRepository::delete);
+        } else {
+            if (existingVote.isPresent()) {
+                Vote vote = existingVote.get();
+                vote.setType(voteType);
+                voteRepository.save(vote);
+            } else {
+                Vote newVote;
+                if (post != null) {
+                    newVote = new Vote(user, post, voteType);
+                } else {
+                    newVote = new Vote(user, comment, voteType);
+                }
+                voteRepository.save(newVote);
+            }
+        }
     }
 }
