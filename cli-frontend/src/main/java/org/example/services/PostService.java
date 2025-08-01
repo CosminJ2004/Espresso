@@ -1,14 +1,22 @@
 package org.example.services;
 
-import org.example.mappers.PostMapper;
-import org.example.menu.view.PostView;
-import java.net.http.*;
-import java.net.URI;
-import java.util.Scanner;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.reflect.TypeToken;
+import org.example.apiservices.ApiPostService;
+import org.example.models.Post;
+import org.example.models.Subreddit;
+import org.example.ui.PostUI;
+
+import java.lang.reflect.Type;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
 
 public class PostService {
-    private static final String BASE_URL = "http://3.65.147.49/posts";
     private static PostService instance;
+    private ApiPostService apiPostService;
+    private PostUI postUI = PostUI.getInstance();
 
     public static PostService getInstance() {
         if (instance == null) {
@@ -17,93 +25,22 @@ public class PostService {
         return instance;
     }
 
-    public void handleGet(HttpClient client) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL))
-                .GET()
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        /*
-        Gson gson = new GsonBuilder().registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
-        String json = response.body();
-        ApiPostResponse apiPostResponse = gson.fromJson(json, ApiPostResponse.class);
-        Subreddit myDemoSub = new Subreddit();
-        ArrayList<Post> posts = new ArrayList<Post>();
-        for(PostDTO postDTO : apiPostResponse.getData()) {
-            posts.add(postMapper.mapDTOToPost(postDTO));
+    public void showPosts(Subreddit subreddit) {
+        for (Post post : subreddit.getSubPosts()) {
+            postUI.renderPost(post);
         }
-        myDemoSub.setPosts(posts);
-        postView.printAllPosts(myDemoSub);
-        */
-        System.out.println("Postări:\n" + response.body());
     }
 
-    public void handlePost(Scanner scanner, HttpClient client) throws Exception {
-        System.out.print("Titlu: ");
-        String title = scanner.nextLine();
-        System.out.print("Conținut: ");
-        String content = scanner.nextLine();
-        System.out.print("Username autor: ");
-        String author = scanner.nextLine();
-
-        String json = String.format("""
-        {
-            "author": "%s",
-            "title": "%s",
-            "content": "%s"
-            
+    public HashMap<String, Subreddit> populateSubreddits(HashMap<String, Subreddit> subreddits, JsonArray jsonArray) {
+        Gson gson = new Gson();
+        Type postArray = new TypeToken<List<Post>>() {}.getType();
+        List<Post> posts = gson.fromJson(jsonArray, postArray);
+        for (Post post : posts) {
+            if (!subreddits.containsKey(post.getSubreddit())) {
+                subreddits.put(post.getSubreddit(), new Subreddit(post.getSubreddit(), post.getSubreddit(), "WIP", 1, 1, "WIP", LocalDateTime.now().toString()));
+            }
+            subreddits.get(post.getSubreddit()).addPost(post);
         }
-        """, author,title, content);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("Postare creată:\n" + response.body());
-    }
-
-    public void handlePut(Scanner scanner, HttpClient client) throws Exception {
-        System.out.print("ID postare: ");
-        String id = scanner.nextLine();
-        System.out.print("author: ");
-        String author = scanner.nextLine();
-        System.out.print("Summary nou: ");
-        String summary = scanner.nextLine();
-        System.out.print("Conținut nou: ");
-        String content = scanner.nextLine();
-
-        String json = String.format("""
-        {
-            "author": "%s",
-            "title": "%s",
-            "content": "%s"
-        }
-        """, author,summary, content);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/" + id))
-                .header("Content-Type", "application/json")
-                .PUT(HttpRequest.BodyPublishers.ofString(json))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("Postare actualizată:\n" + response.body());
-    }
-
-    public void handleDelete(Scanner scanner, HttpClient client) throws Exception {
-        System.out.print("ID postare de șters: ");
-        String id = scanner.nextLine();
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL + "/" + id))
-                .DELETE()
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("Postare ștearsă:\n" + response.body());
+        return subreddits;
     }
 }

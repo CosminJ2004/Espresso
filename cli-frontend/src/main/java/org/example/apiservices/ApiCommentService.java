@@ -1,22 +1,27 @@
-package org.example.services;
+package org.example.apiservices;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.net.http.*;
 import java.net.URI;
 import java.util.Scanner;
 
-public class CommentService {
+public class ApiCommentService implements IApiService {
     private static final String BASE_URL = "http://3.65.147.49/comments";
 
-    public void handleGet(HttpClient client) throws Exception {
+    public JsonArray handleGet(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
                 .GET()
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("Comentarii:\n" + response.body());
+        JsonObject responseObject = JsonParser.parseString(response.body()).getAsJsonObject();
+        return responseObject.getAsJsonArray("data");
+        //System.out.println("Comentarii:\n" + response.body());
     }
-
 
     public void handlePost(Scanner scanner, HttpClient client) throws Exception {
         System.out.print("Text comentariu: ");

@@ -1,13 +1,29 @@
-package org.example.services;
+package org.example.apiservices;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.net.http.*;
 import java.net.URI;
 import java.util.Scanner;
 
-public class UserService {
+public class ApiUserService implements IApiService {
     private static final String BASE_URL = "http://3.65.147.49/users";
 
-    public void register(Scanner scanner, HttpClient client) throws Exception {
+    public JsonArray handleGet(HttpClient client) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonObject responseObject = JsonParser.parseString(response.body()).getAsJsonObject();
+        return responseObject.getAsJsonArray("data");
+        //System.out.println("Utilizatori:\n" + response.body());
+    }
+
+    public void handlePost(Scanner scanner, HttpClient client) throws Exception {
         System.out.print("Username: ");
         String username = scanner.nextLine();
         System.out.print("Parolă: ");
@@ -30,17 +46,7 @@ public class UserService {
         System.out.println("Utilizator creat:\n" + response.body());
     }
 
-    public void getAllUsers(HttpClient client) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL))
-                .GET()
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("Utilizatori:\n" + response.body());
-    }
-
-    public void updateUser(Scanner scanner, HttpClient client) throws Exception {
+    public void handlePut(Scanner scanner, HttpClient client) throws Exception {
         System.out.print("ID utilizator: ");
         Long id = Long.parseLong(scanner.nextLine());
 
@@ -67,8 +73,7 @@ public class UserService {
         System.out.println("Utilizator actualizat:\n" + response.body());
     }
 
-
-    public void deleteUser(Scanner scanner, HttpClient client) throws Exception {
+    public void handleDelete(Scanner scanner, HttpClient client) throws Exception {
         System.out.print("ID utilizator de șters: ");
         Long id = Long.parseLong(scanner.nextLine());
 

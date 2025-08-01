@@ -1,13 +1,29 @@
-package org.example.services;
+package org.example.apiservices;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.net.http.*;
 import java.net.URI;
 import java.util.Scanner;
 
-public class VoteService {
+public class ApiVoteService implements IApiService {
     private static final String BASE_URL = "http://3.65.147.49/votes";
 
-    public void votePost(Scanner scanner, HttpClient client) throws Exception {
+    public JsonArray handleGet(HttpClient client) throws Exception {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonObject responseObject = JsonParser.parseString(response.body()).getAsJsonObject();
+        return responseObject.getAsJsonArray("data");
+        //System.out.println("Voturi:\n" + response.body());
+    }
+
+    public void handlePost(Scanner scanner, HttpClient client) throws Exception {
         System.out.print("ID postare: ");
         Long postId = Long.parseLong(scanner.nextLine());
         System.out.print("Username: ");
@@ -33,19 +49,7 @@ public class VoteService {
         System.out.println("Vot trimis:\n" + response.body());
     }
 
-
-    public void voteGet(HttpClient client) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL))
-                .GET()
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("Voturi:\n" + response.body());
-    }
-
-
-    public void votePut(Scanner scanner, HttpClient client) throws Exception {
+    public void handlePut(Scanner scanner, HttpClient client) throws Exception {
         System.out.print("ID vot de modificat: ");
         Long id = Long.parseLong(scanner.nextLine());
         System.out.print("Tip vot nou (UPVOTE/DOWNVOTE): ");
@@ -73,7 +77,7 @@ public class VoteService {
         System.out.println("Vot actualizat:\n" + response.body());
     }
 
-    public void voteDelete(Scanner scanner, HttpClient client) throws Exception {
+    public void handleDelete(Scanner scanner, HttpClient client) throws Exception {
         System.out.print("ID vot de șters: ");
         Long id = Long.parseLong(scanner.nextLine());
 
