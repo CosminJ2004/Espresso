@@ -1,6 +1,9 @@
-# Ignoră build artifacts
+# Build results
 bin/
 obj/
+Debug/
+Release/
+
 
 # Ignoră fișiere temporare și de index
 *.user
@@ -12,6 +15,8 @@ obj/
 *.dbmdl
 *.pdb
 *.mdb
+*.visdx
+
 
 # Ignoră fișiere Copilot
 .copilot/
@@ -20,6 +25,7 @@ obj/
 # Rider / VS Code
 .idea/
 .vscode/
+.vs/
 # Ignoră fișiere de configurare specifice IDE-ului
 *.sln.ide   
 *.sln.ide.*
