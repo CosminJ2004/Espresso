@@ -1,4 +1,4 @@
 # Espresso ☕
 
-![Workflow](images/Reddit_Workflow.png)
+![Workflow](personal/images/Reddit_Workflow.png)
 
