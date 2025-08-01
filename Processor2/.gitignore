@@ -1,0 +1,39 @@
+#.gitignore pentru proiecte C# și .NET
+# Build results
+bin/
+obj/
+Debug/
+Release/
+
+**.vs/
+**.sln.ide/
+***Debug/
+**Release/
+# Ignoră fișiere de configurare specifice platformei
+*.userprefs
+
+# Ignoră fișiere temporare și de index
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.ncb
+*.cache
+*.dbmdl
+*.pdb
+*.mdb
+*.visdx
+
+
+# Ignoră fișiere Copilot
+.copilot/
+*.copilot*
+
+# Rider / VS Code
+.idea/
+.vscode/
+.vs/    
+# Ignoră fișiere de configurare specifice IDE-ului
+*.sln.ide   
+*.sln.ide.*
+

@@ -2,11 +2,13 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using static System.Net.Mime.MediaTypeNames;
+using Processing.Interfaces;
+using System.IO;
 
 namespace Processing.Utils;
-public static class RgbImageReader
+public  class RgbImageReader: IImageReader
 {
-    public static RgbImage FromFile(string path)
+    public RgbImage ReadFromFile(string path)
     {
         using var image = SixLabors.ImageSharp.Image.Load<Rgb24>(path);
         var result = new RgbImage(image.Width, image.Height);
@@ -27,7 +29,7 @@ public static class RgbImageReader
 
         return result;
     }
-    public static RgbImage FromStream(Stream stream)
+    public RgbImage ReadFromStream(Stream stream)
     {
         using var image = SixLabors.ImageSharp.Image.Load<Rgb24>(stream);
         var rgbImage = new RgbImage(image.Width, image.Height);
@@ -41,5 +43,9 @@ public static class RgbImageReader
             }
         }
         return rgbImage;
+    }
+    public string GetFileExtension(string path)
+    {
+        return System.IO.Path.GetExtension(path).ToLowerInvariant();
     }
 }
