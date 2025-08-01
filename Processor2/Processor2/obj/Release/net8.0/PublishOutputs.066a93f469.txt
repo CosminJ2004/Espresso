@@ -1,0 +1,11 @@
+C:\Users\Cosmin\IdeaProjects\Espresso\Processor2\publish\Processing.exe
+C:\Users\Cosmin\IdeaProjects\Espresso\Processor2\publish\Processor2.exe
+C:\Users\Cosmin\IdeaProjects\Espresso\Processor2\publish\Processing.deps.json
+C:\Users\Cosmin\IdeaProjects\Espresso\Processor2\publish\Processing.runtimeconfig.json
+C:\Users\Cosmin\IdeaProjects\Espresso\Processor2\publish\Processor2.dll
+C:\Users\Cosmin\IdeaProjects\Espresso\Processor2\publish\Processor2.deps.json
+C:\Users\Cosmin\IdeaProjects\Espresso\Processor2\publish\Processor2.runtimeconfig.json
+C:\Users\Cosmin\IdeaProjects\Espresso\Processor2\publish\Processor2.pdb
+C:\Users\Cosmin\IdeaProjects\Espresso\Processor2\publish\SixLabors.ImageSharp.dll
+C:\Users\Cosmin\IdeaProjects\Espresso\Processor2\publish\Processing.dll
+C:\Users\Cosmin\IdeaProjects\Espresso\Processor2\publish\Processing.pdb
