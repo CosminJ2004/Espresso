@@ -1,24 +1,17 @@
 package com.example.backend.util.logger;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-
-public class ConsoleLogger implements ILogger {
-    private final LogLevel minLevel;
-    private final DateTimeFormatter formatter;
+public class AsyncLogger {
 
     private final BlockingQueue<String> logQueue = new LinkedBlockingQueue<>();
     private final Thread loggerThread;
 
     private volatile boolean running = true;
 
+    public AsyncLogger() {
 
-    public ConsoleLogger(LogLevel minLevel) {
-        this.minLevel = minLevel;
-        this.formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         loggerThread = new Thread(() -> {
             while (running || !logQueue.isEmpty()) {
                 try {
@@ -35,14 +28,24 @@ public class ConsoleLogger implements ILogger {
         loggerThread.start();
     }
 
-    @Override
-    public void log(LogLevel level, String message) {
-        String timestamp = LocalDateTime.now().format(formatter);
-        String logEntry = timestamp + " - " + "[" + level + "] " + message + "\n";
+    public void log(String message) {
 
-        if (level.ordinal() >= minLevel.ordinal()) {
-//            System.out.println(logEntry);
-            logQueue.offer(logEntry);
+        logQueue.offer(message);
+    }
+
+    public void stop() {
+        running = false;
+        loggerThread.interrupt();
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        AsyncLogger logger = new AsyncLogger();
+
+        for (int i = 0; i < 10; i++) {
+            logger.log("Mesajul " + i);
+            Thread.sleep(500);
         }
+
+        logger.stop();
     }
 }

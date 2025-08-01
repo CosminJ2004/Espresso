@@ -68,6 +68,12 @@ public class CommentService {
 
         Optional<Vote> existingVote = voteRepository.findByUserAndComment(user, comment);
 
+
+        //inversare if else aici
+        //enumuri ->separat
+        //spargere in voteservice ce e logica de votes
+        //
+
         if (voteRequest.getVoteType() == null || voteRequest.getVoteType() == VoteType.none) {
             existingVote.ifPresent(voteRepository::delete);
         } else {

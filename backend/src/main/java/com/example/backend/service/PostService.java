@@ -7,6 +7,9 @@ import com.example.backend.repository.PostRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.VoteRepository;
 
+import com.example.backend.util.logger.ConsoleLogger;
+import com.example.backend.util.logger.LogLevel;
+import com.example.backend.util.logger.LoggerManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +28,10 @@ public class PostService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final VoteRepository voteRepository;
+    private final LoggerManager loggerManager=LoggerManager.getInstance();
+    private final ConsoleLogger consoleLogger=new ConsoleLogger(LogLevel.DEBUG);
+
+
 
     public PostService(PostRepository postRepository, UserRepository userRepository,  CommentRepository commentRepository, VoteRepository voteRepository) {
         this.postRepository = postRepository;
@@ -46,7 +53,11 @@ public class PostService {
         
         Vote authorVote = new Vote(author, post, VoteType.up);
         voteRepository.save(authorVote);
+        loggerManager.addLogger(consoleLogger);
+        loggerManager.log(LogLevel.INFO, "post created");
         return convertToResponseDto(post);
+
+
     }
 
     public Post addPostWithImage(PostRequestDto dto, String imagePath) {
@@ -77,6 +88,8 @@ public class PostService {
     }
 
     public List<PostResponseDto> getAllPosts() {
+        loggerManager.addLogger(consoleLogger);
+        loggerManager.log(LogLevel.INFO,"GET for all posts");
         return postRepository.findAll()
                 .stream()
                 .map(this::convertToResponseDto)
