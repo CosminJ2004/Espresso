@@ -9,6 +9,8 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        RgbImageReader rgbImageReader = new RgbImageReader();
+        RgbImageWriter rgbImageWriter = new RgbImageWriter();
         var builder = WebApplication.CreateBuilder(args);
         var app = builder.Build();
         app.MapGet("/test", () => "OK");
@@ -30,7 +32,7 @@ public class Program
             await stream.CopyToAsync(ms);
             ms.Position = 0;
 
-            var inputImage = RgbImageReader.FromStream(ms);
+            var inputImage = rgbImageReader.ReadFromStream(ms);
 
 
             var outputImage = filterName.ToLower() switch
@@ -43,7 +45,7 @@ public class Program
             };
 
             var outStream = new MemoryStream();
-            RgbImageWriter.Save(outputImage, outStream);
+            rgbImageWriter.WriteToStream(outStream,outputImage);
             outStream.Position = 0;
 
             return Results.File(outStream, "image/jpeg");

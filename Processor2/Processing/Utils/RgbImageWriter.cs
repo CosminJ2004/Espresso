@@ -5,12 +5,12 @@ using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Drawing;
 using System.Drawing.Imaging;
-
+using Processing.Interfaces;
 
 namespace Processing.Utils;
-public static class RgbImageWriter
+public class RgbImageWriter: IImageWriter
 {
-    public static void Save(RgbImage image, string path)
+    public void WriteToFile(string path, RgbImage image)
     {
         using var img = new Image<Rgba32>(image.Width, image.Height);
         for (int y = 0; y < image.Height; y++)
@@ -24,19 +24,9 @@ public static class RgbImageWriter
         img.Save(path, new JpegEncoder());
     }
 
-    public static void Save(object image, string outputPath)
-    {
-        if (image is RgbImage rgbImage)
-        {
-            Save(rgbImage, outputPath);
-        }
-        else
-        {
-            throw new ArgumentException("Object must be of type RgbImage.", nameof(image));
-        }
-    }
+  
 
-    public static void Save(RgbImage image, Stream outputStream)
+    public void WriteToStream( Stream outputStream, RgbImage image)
     {
         using var img = new Image<Rgba32>(image.Width, image.Height);
         for (int y = 0; y < image.Height; y++)
@@ -50,4 +40,9 @@ public static class RgbImageWriter
 
         img.Save(outputStream, new PngEncoder());
     }
+    public string GetFileExtension(string filePath)
+    {
+        return System.IO.Path.GetExtension(filePath).ToLowerInvariant();
+    }
+
 }
