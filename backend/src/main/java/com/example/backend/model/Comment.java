@@ -135,7 +135,4 @@ public class Comment{
     public int hashCode() {
         return getClass().hashCode();
     }
-
-
-
 }
