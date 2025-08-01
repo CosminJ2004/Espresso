@@ -1,9 +1,16 @@
+#.gitignore pentru proiecte C# și .NET
 # Build results
 bin/
 obj/
 Debug/
 Release/
 
+**.vs/
+**.sln.ide/
+**Debug/
+**Release/
+# Ignoră fișiere de configurare specifice platformei
+*.userprefs
 
 # Ignoră fișiere temporare și de index
 *.user
@@ -25,7 +32,8 @@ Release/
 # Rider / VS Code
 .idea/
 .vscode/
-.vs/
+.vs/    
 # Ignoră fișiere de configurare specifice IDE-ului
 *.sln.ide   
 *.sln.ide.*
+
