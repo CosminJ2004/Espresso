@@ -37,11 +37,14 @@ public class Program
         // register components
         builder.Services.AddScoped<RgbImageReader>();
         builder.Services.AddScoped<RgbImageWriter>();
+
         builder.Services.AddScoped<FilterHandler>();
 
 
         builder.Services.AddScoped<IImageFilter, GrayscaleFilter>();
         builder.Services.AddScoped<IImageFilter, InvertFilter>();
+        builder.Services.AddScoped<IImageFilter, GaussianFilter>();
+        builder.Services.AddScoped<IImageFilter, DoNothingFilter>();
 
 
         var app = builder.Build();
