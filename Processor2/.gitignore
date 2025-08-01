@@ -7,7 +7,7 @@ Release/
 
 **.vs/
 **.sln.ide/
-**Debug/
+***Debug/
 **Release/
 # Ignoră fișiere de configurare specifice platformei
 *.userprefs
