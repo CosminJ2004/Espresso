@@ -44,7 +44,7 @@ public class PostService {
 
     public List<PostResponseDto> getAllPosts() {
 
-        loggerManager.log("fileLogger",LogLevel.INFO,"getting all posts");
+        loggerManager.log("file",LogLevel.INFO,"getting all posts");
         loggerManager.log("console", LogLevel.INFO, "getting all posts");
         loggerManager.log("console",LogLevel.ERROR, "getting all comments");
 
