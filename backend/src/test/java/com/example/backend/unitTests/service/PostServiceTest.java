@@ -18,9 +18,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.example.backend.util.logger.LogLevel;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +64,7 @@ public class PostServiceTest {
     private Comment anotherMockComment;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {//fara throws ca nu arunc nimic
         // Setup loggerii pentru test
         //in PostService, avem camp static final pt loggerManager, iar testele unitare nu incarca LoggerConfig,
         //deci loggerii console si file nu sunt inregsitrati
@@ -407,5 +414,69 @@ public class PostServiceTest {
         assertThat(result.getFirst().getReplies().size()).isEqualTo(1);
         assertThat(result.getFirst().getReplies().getFirst().getId()).isEqualTo(mockComment.getId());
         verify(commentService, times(2)).commentToCommentResponseDto(any(Comment.class));
+    }
+
+    //image
+    @Test
+    void shouldThrowExceptionWhenSavingEmptyImage() {
+        MockMultipartFile emptyFile = new MockMultipartFile(
+                "file",
+                "empty.png",
+                "image/png",
+                new byte[0]
+        );
+
+        assertThatThrownBy(() -> postService.saveImage(emptyFile))
+                .isInstanceOf(IOException.class)
+                .hasMessage("Empty file.");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUserNotFoundInAddPostWithImage() {
+        String imagePath = "uploads/test.png";
+        when(userRepository.findByUsername(mockPostRequest.getAuthor())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> postService.addPostWithImage(mockPostRequest, imagePath))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("User not found: " + mockPostRequest.getAuthor());
+    }
+
+    @Test
+    void shouldAddPostWithImageSuccessfully() {
+        String imagePath = "uploads/test.png";
+        when(userRepository.findByUsername(mockUser.getUsername())).thenReturn(Optional.of(mockUser));
+        when(postRepository.save(any(Post.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Post result = postService.addPostWithImage(mockPostRequest, imagePath);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getFilePath()).isEqualTo(imagePath);
+        verify(userRepository).findByUsername(mockPostRequest.getAuthor());
+        verify(postRepository).save(any(Post.class));
+    }
+
+    @Test
+    void shouldSaveImageSuccessfully() throws IOException {
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "file",
+                "test.png",
+                "image/png",
+                "dummy content".getBytes()
+        );
+
+        try (MockedStatic<Files> filesMock = mockStatic(Files.class)) {
+            Path mockDir = Path.of("uploads");
+
+            filesMock.when(() -> Files.createDirectories(any(Path.class))).thenReturn(mockDir);
+            filesMock.when(() -> Files.copy(any(InputStream.class), any(Path.class), eq(StandardCopyOption.REPLACE_EXISTING)))
+                    .thenReturn(1L);
+
+            String result = postService.saveImage(mockFile);
+
+            assertThat(result).startsWith("/uploads/");
+            assertThat(result).endsWith("test.png");
+            filesMock.verify(() -> Files.createDirectories(any(Path.class)));
+            filesMock.verify(() -> Files.copy(any(InputStream.class), any(Path.class), eq(StandardCopyOption.REPLACE_EXISTING)));
+        }
     }
 }

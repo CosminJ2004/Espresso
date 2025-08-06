@@ -4,8 +4,6 @@ import com.example.backend.dto.VoteRequestDto;
 import com.example.backend.model.*;
 import net.datafaker.Faker;
 
-import java.util.List;
-
 public class TestDataUtility {
     private static final Faker faker = new Faker();
 
