@@ -9,10 +9,9 @@ import java.util.Set;
 
 public class LoggerManager {
     private final Map<String, ILogger> loggers = new HashMap<>();
+
     @Getter
     private static final LoggerManager instance = new LoggerManager();
-
-
 
     public void addLogger(String name, ILogger logger) {
         if (loggers.containsKey(name)) {

@@ -10,11 +10,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Response<Object>> handleIllegalArgumentException(IllegalArgumentException e) {
-        return Response.error(e.getMessage());
+        return Response.error(400, e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Response<Object>> handleGenericException(Exception e) {
-        return Response.error("An unexpected error occurred: " + e.getMessage());
+        return Response.error(500, "An unexpected error occurred: " + e.getMessage());
     }
 }
