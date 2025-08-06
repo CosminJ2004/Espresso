@@ -7,3 +7,5 @@ User Interactions:
 
 ![User Interactions](personal/images/Users_interactions.png)
 
+Image Flow:
+![Image Flow](personal/images/image_flow.png)
