@@ -21,16 +21,19 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final CommentService commentService;
     private final VoteRepository voteRepository;
     private final VoteService voteService;
+
     private final LoggerManager loggerManager = LoggerManager.getInstance();
     private final ConsoleLogger consoleLogger = new ConsoleLogger(LogLevel.DEBUG);
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository,  CommentRepository commentRepository, VoteRepository voteRepository, VoteService voteService) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, CommentService commentService, VoteRepository voteRepository, VoteService voteService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
+        this.commentService = commentService;
         this.voteRepository = voteRepository;
         this.voteService = voteService;
     }
@@ -40,14 +43,14 @@ public class PostService {
         loggerManager.log(LogLevel.INFO,"GET for all posts");
         return postRepository.findAll()
                 .stream()
-                .map(this::convertToResponseDto)
+                .map(this::postToPostResponseDto)
                 .collect(Collectors.toList());
     }
 
     public PostResponseDto getPostById(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
-        return convertToResponseDto(post);
+        return postToPostResponseDto(post);
     }
 
     public PostResponseDto createPost(PostRequestDto dto) {
@@ -61,7 +64,7 @@ public class PostService {
         voteRepository.save(authorVote);
         loggerManager.addLogger(consoleLogger);
         loggerManager.log(LogLevel.INFO, "post created");
-        return convertToResponseDto(post);
+        return postToPostResponseDto(post);
     }
 
     public PostResponseDto updatePost(Long id, PostRequestDto dto) {
@@ -75,7 +78,7 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
         existingPost.setAuthor(author);
 
-        return convertToResponseDto(postRepository.save(existingPost));
+        return postToPostResponseDto(postRepository.save(existingPost));
     }
 
     public void deletePost(Long id) {
@@ -119,7 +122,7 @@ public class PostService {
         List<CommentResponseDto> rootComments = new ArrayList<>();
 
         for (Comment comment : comments) {
-            CommentResponseDto dto = commentToCommentResponseDto(comment);
+            CommentResponseDto dto = commentService.commentToCommentResponseDto(comment);
             dtoMap.put(comment.getId(), dto);
 
             if (comment.getParent() != null) {
@@ -154,32 +157,10 @@ public class PostService {
         Vote authorVote = new Vote(author, updatedComment, VoteType.up);
         voteRepository.save(authorVote);
 
-        return commentToCommentResponseDto(updatedComment);
+        return commentService.commentToCommentResponseDto(updatedComment);
     }
 
-    private CommentResponseDto commentToCommentResponseDto(Comment comment) {
-        CommentResponseDto commentResponse = new CommentResponseDto();
-        commentResponse.setId(comment.getId());
-        commentResponse.setPostId(comment.getPost().getId());
-        commentResponse.setParentId(comment.getParent() != null ? comment.getParent().getId() : null);
-        commentResponse.setContent(comment.getText());
-        commentResponse.setAuthor(comment.getAuthor().getUsername());
-        commentResponse.setUpvotes(comment.getUpvoteCount());
-        commentResponse.setDownvotes(comment.getDownvoteCount());
-        commentResponse.setScore(comment.getScore());
-
-        // hardcoded - current_user
-        User currentUser = userRepository.findByUsername("current_user").orElse(null);
-        commentResponse.setUserVote(currentUser != null ? comment.getUserVote(currentUser) : null);
-
-        commentResponse.setCreatedAt(comment.getCreatedAt());
-        commentResponse.setUpdatedAt(comment.getUpdatedAt());
-        commentResponse.setReplies(new ArrayList<>());
-
-        return commentResponse;
-    }
-
-    private PostResponseDto convertToResponseDto(Post post) {
+    private PostResponseDto postToPostResponseDto(Post post) {
         return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount() , post.getDownvoteCount(), post.getScore(), post.getCommentCount(), post.getUserVote(userRepository.findByUsername("current_user").orElseThrow()), post.getCreatedAt(), post.getUpdatedAt());
     }
 }

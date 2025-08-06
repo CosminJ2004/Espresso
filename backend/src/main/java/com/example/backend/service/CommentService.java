@@ -36,7 +36,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found with ID: " + id));
 
-        return convertToResponseDto(comment);
+        return commentToCommentResponseDto(comment);
     }
 
     public CommentResponseDto updateComment(Long id, CommentRequestDto commentRequest) {
@@ -46,7 +46,7 @@ public class CommentService {
         comment.setText(commentRequest.getContent());
         Comment updatedComment = commentRepository.save(comment);
 
-        return convertToResponseDto(updatedComment);
+        return commentToCommentResponseDto(updatedComment);
     }
 
     public void deleteComment(Long commentId) {
@@ -80,7 +80,7 @@ public class CommentService {
         return voteResponse;
     }
 
-    private CommentResponseDto convertToResponseDto(Comment comment) {
+    public CommentResponseDto commentToCommentResponseDto(Comment comment) {
         CommentResponseDto commentResponse = new CommentResponseDto();
         commentResponse.setId(comment.getId());
         commentResponse.setPostId(comment.getPost().getId());
@@ -97,6 +97,9 @@ public class CommentService {
 
         commentResponse.setCreatedAt(comment.getCreatedAt());
         commentResponse.setUpdatedAt(comment.getUpdatedAt());
+        commentResponse.setReplies(comment.getReplies().stream()
+                .map(this::commentToCommentResponseDto)
+                .collect(java.util.stream.Collectors.toList()));
 
         return commentResponse;
     }
