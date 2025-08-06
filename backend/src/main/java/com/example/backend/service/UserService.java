@@ -28,19 +28,15 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    private UserResponseDto convertToDto(User user) {
-        return new UserResponseDto(user.getId(), user.getUsername(), user.getPassword());
-    }
-
     public UserResponseDto getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
-        return convertToDto(user);
+        return UserToUserResponseDto(user);
     }
 
     public List<UserResponseDto> getAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(this::convertToDto)
+                .map(this::UserToUserResponseDto)
                 .collect(Collectors.toList());
     }
 
@@ -54,7 +50,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         User savedUser = userRepository.save(user);
-        return convertToDto(savedUser);
+        return UserToUserResponseDto(savedUser);
     }
 
     @Transactional
@@ -72,7 +68,7 @@ public class UserService {
 
         user.setUsername(dto.getUsername());
         user.setPassword(dto.getPassword());
-        return convertToDto(userRepository.save(user));
+        return UserToUserResponseDto(userRepository.save(user));
     }
 
     public void logout() {
@@ -164,5 +160,9 @@ public class UserService {
         user.setPassword(newPassword);
 //        userRepository.update(user);
         return true;
+    }
+
+    private UserResponseDto UserToUserResponseDto(User user) {
+        return new UserResponseDto(user.getId(), user.getUsername(), user.getPassword());
     }
 }

@@ -44,11 +44,11 @@ public class PostService {
 
         loggerManager.log("file",LogLevel.INFO,"getting all posts");
         loggerManager.log("console", LogLevel.INFO, "getting all posts");
-        loggerManager.log("console",LogLevel.ERROR, "getting all comments");
+        loggerManager.log("console", LogLevel.ERROR, "getting all comments");
 
         return postRepository.findAll()
                 .stream()
-                .map(this::convertToResponseDto)
+                .map(this::postToPostResponseDto)
                 .collect(Collectors.toList());
     }
 
@@ -67,8 +67,7 @@ public class PostService {
 
         Vote authorVote = new Vote(author, post, VoteType.up);
         voteRepository.save(authorVote);
-        loggerManager.addLogger(consoleLogger);
-        loggerManager.log(LogLevel.INFO, "post created");
+        loggerManager.log("console", LogLevel.INFO, "post created");
         return postToPostResponseDto(post);
 
     }
@@ -169,7 +168,6 @@ public class PostService {
     private PostResponseDto postToPostResponseDto(Post post) {
         return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount() , post.getDownvoteCount(), post.getScore(), post.getCommentCount(), post.getUserVote(userRepository.findByUsername("current_user").orElseThrow()), post.getCreatedAt(), post.getUpdatedAt());
     }
-
 
     public Post addPostWithImage(PostRequestDto dto, String imagePath) {
 
