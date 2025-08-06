@@ -56,6 +56,7 @@ public class UserService {
         User savedUser = userRepository.save(user);
         return convertToDto(savedUser);
     }
+
     @Transactional
     public void deleteUser(String username) {
         if (!userRepository.existsByUsername(username)) {
