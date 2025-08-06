@@ -23,7 +23,7 @@ public class ProfanityFilter {
                 badWords.add(line.trim().toLowerCase());
             }
         } catch (IOException e) {
-            Log.log(LogLevel.ERROR, "Unable to open file." + e.getMessage());
+            System.err.println("Could not load bad words from " + filePath);
         }
     }
 

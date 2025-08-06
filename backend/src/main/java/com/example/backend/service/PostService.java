@@ -6,12 +6,16 @@ import com.example.backend.repository.CommentRepository;
 import com.example.backend.repository.PostRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.VoteRepository;
-import com.example.backend.util.logger.ConsoleLogger;
-import com.example.backend.util.logger.LogLevel;
-import com.example.backend.util.logger.LoggerManager;
+import com.example.backend.util.logger.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,11 +27,14 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final VoteRepository voteRepository;
     private final VoteService voteService;
-    private final LoggerManager loggerManager = LoggerManager.getInstance();
-    private final ConsoleLogger consoleLogger = new ConsoleLogger(LogLevel.DEBUG);
+    private static final LoggerManager loggerManager = LoggerManager.getInstance();
+
+//    private final Log logger=new Log();
+//    private final ConsoleLogger consoleLogger = new ConsoleLogger(LogLevel.DEBUG);
+
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository,  CommentRepository commentRepository, VoteRepository voteRepository, VoteService voteService) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, VoteRepository voteRepository, VoteService voteService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
@@ -36,8 +43,11 @@ public class PostService {
     }
 
     public List<PostResponseDto> getAllPosts() {
-        loggerManager.addLogger(consoleLogger);
-        loggerManager.log(LogLevel.INFO,"GET for all posts");
+
+        loggerManager.log("fileLogger",LogLevel.INFO,"getting all posts");
+        loggerManager.log("console", LogLevel.INFO, "getting all posts");
+        loggerManager.log("console",LogLevel.ERROR, "getting all comments");
+
         return postRepository.findAll()
                 .stream()
                 .map(this::convertToResponseDto)
@@ -56,11 +66,10 @@ public class PostService {
 
         Post post = new Post(author, dto.getTitle(), dto.getContent());
         postRepository.save(post);
-        
+
         Vote authorVote = new Vote(author, post, VoteType.up);
         voteRepository.save(authorVote);
-        loggerManager.addLogger(consoleLogger);
-        loggerManager.log(LogLevel.INFO, "post created");
+
         return convertToResponseDto(post);
     }
 
@@ -180,27 +189,29 @@ public class PostService {
     }
 
     private PostResponseDto convertToResponseDto(Post post) {
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount() , post.getDownvoteCount(), post.getScore(), post.getCommentCount(), post.getUserVote(userRepository.findByUsername("current_user").orElseThrow()), post.getCreatedAt(), post.getUpdatedAt());
+        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount(), post.getDownvoteCount(), post.getScore(), post.getCommentCount(), post.getUserVote(userRepository.findByUsername("current_user").orElseThrow()), post.getCreatedAt(), post.getUpdatedAt());
+    }
+
+
+    public Post addPostWithImage(PostRequestDto dto, String imagePath) {
+
+        User author = userRepository.findByUsername(dto.getAuthor())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
+
+        Post post = new Post(author, dto.getTitle(), dto.getContent(), imagePath);
+        post.setFilePath(imagePath);
+        return postRepository.save(post);
+    }
+
+    public String saveImage(MultipartFile file) throws IOException {
+        if (file.isEmpty()) throw new IOException("Empty file.");
+
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path uploadDir = Paths.get("uploads").toAbsolutePath().normalize();
+        Files.createDirectories(uploadDir);
+        Path targetPath = uploadDir.resolve(fileName);
+        Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+
+        return "/uploads/" + fileName; // sau doar fileName dacă preferi
     }
 }
-
-//public Post addPostWithImage(PostRequestDto dto, String imagePath) {
-//    User author = userRepository.findByUsername(dto.getAuthor())
-//            .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
-//
-//    Post post = new Post(author, dto.getTitle(), dto.getContent(),imagePath);
-//    post.setFilePath(imagePath);
-//    return postRepository.save(post);
-//}
-//
-//public String saveImage(MultipartFile file) throws IOException {
-//    if (file.isEmpty()) throw new IOException("Empty file.");
-//
-//    String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-//    Path uploadDir = Paths.get("uploads").toAbsolutePath().normalize();
-//    Files.createDirectories(uploadDir);
-//    Path targetPath = uploadDir.resolve(fileName);
-//    Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-//
-//    return "/uploads/" + fileName; // sau doar fileName dacă preferi
-//}
