@@ -47,7 +47,6 @@ public class PostService {
 
         loggerManager.log("file",LogLevel.INFO,"getting all posts");
         loggerManager.log("console", LogLevel.INFO, "getting all posts");
-        loggerManager.log("console", LogLevel.ERROR, "getting all comments");
 
         return postRepository.findAll()
                 .stream()
