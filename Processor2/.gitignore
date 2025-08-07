@@ -11,6 +11,13 @@ Release/
 **Release/
 # Ignoră fișiere de configurare specifice platformei
 *.userprefs
+.vs/
+publish/
+# Ignoră fișiere de configurare specifice platformei
+
+
+config/
+
 
 # Ignoră fișiere temporare și de index
 *.user
