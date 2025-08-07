@@ -6,12 +6,16 @@ import com.example.backend.repository.CommentRepository;
 import com.example.backend.repository.PostRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.VoteRepository;
-import com.example.backend.util.logger.ConsoleLogger;
-import com.example.backend.util.logger.LogLevel;
-import com.example.backend.util.logger.LoggerManager;
+import com.example.backend.util.logger.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,33 +25,39 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final CommentService commentService;
     private final VoteRepository voteRepository;
     private final VoteService voteService;
-    private final LoggerManager loggerManager = LoggerManager.getInstance();
-    private final ConsoleLogger consoleLogger = new ConsoleLogger(LogLevel.DEBUG);
+
+    private final Path uploadDir = Paths.get("uploads/images");
+
+    private static final LoggerManager loggerManager = LoggerManager.getInstance();
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository,  CommentRepository commentRepository, VoteRepository voteRepository, VoteService voteService) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, CommentService commentService, VoteRepository voteRepository, VoteService voteService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
+        this.commentService = commentService;
         this.voteRepository = voteRepository;
         this.voteService = voteService;
     }
 
     public List<PostResponseDto> getAllPosts() {
-        loggerManager.addLogger(consoleLogger);
-        loggerManager.log(LogLevel.INFO,"GET for all posts");
+
+        loggerManager.log("file",LogLevel.INFO,"getting all posts");
+        loggerManager.log("console", LogLevel.INFO, "getting all posts");
+
         return postRepository.findAll()
                 .stream()
-                .map(this::convertToResponseDto)
+                .map(this::postToPostResponseDto)
                 .collect(Collectors.toList());
     }
 
     public PostResponseDto getPostById(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
-        return convertToResponseDto(post);
+        return postToPostResponseDto(post);
     }
 
     public PostResponseDto createPost(PostRequestDto dto) {
@@ -56,12 +66,33 @@ public class PostService {
 
         Post post = new Post(author, dto.getTitle(), dto.getContent());
         postRepository.save(post);
-        
+
         Vote authorVote = new Vote(author, post, VoteType.up);
         voteRepository.save(authorVote);
-        loggerManager.addLogger(consoleLogger);
-        loggerManager.log(LogLevel.INFO, "post created");
-        return convertToResponseDto(post);
+        loggerManager.log("console", LogLevel.INFO, "post created");
+        return postToPostResponseDto(post);
+
+    }
+    public PostResponseDto createPostWithImage(PostRequestImageDto dto) throws IOException {
+        Post post = new Post();
+        post.setTitle(dto.getTitle());
+        post.setContent(dto.getContent());
+
+        User author = userRepository.findByUsername(dto.getAuthor())
+                .orElseThrow(() -> new RuntimeException("Author not found"));
+        post.setAuthor(author);
+
+        if (dto.getImage() != null && !dto.getImage().isEmpty()) {
+            String filename = UUID.randomUUID() + "_" + dto.getImage().getOriginalFilename();
+            Path uploadPath = Paths.get("uploads/" + filename);
+            Files.createDirectories(uploadPath.getParent());
+            Files.copy(dto.getImage().getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
+            post.setFilePath("/uploads/" + filename);
+        }
+
+
+        postRepository.save(post);
+        return postToPostResponseDto(post);
     }
 
     public PostResponseDto updatePost(Long id, PostRequestDto dto) {
@@ -75,7 +106,7 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
         existingPost.setAuthor(author);
 
-        return convertToResponseDto(postRepository.save(existingPost));
+        return postToPostResponseDto(postRepository.save(existingPost));
     }
 
     public void deletePost(Long id) {
@@ -119,7 +150,7 @@ public class PostService {
         List<CommentResponseDto> rootComments = new ArrayList<>();
 
         for (Comment comment : comments) {
-            CommentResponseDto dto = commentToCommentResponseDto(comment);
+            CommentResponseDto dto = commentService.commentToCommentResponseDto(comment);
             dtoMap.put(comment.getId(), dto);
 
             if (comment.getParent() != null) {
@@ -154,53 +185,10 @@ public class PostService {
         Vote authorVote = new Vote(author, updatedComment, VoteType.up);
         voteRepository.save(authorVote);
 
-        return commentToCommentResponseDto(updatedComment);
+        return commentService.commentToCommentResponseDto(updatedComment);
     }
 
-    private CommentResponseDto commentToCommentResponseDto(Comment comment) {
-        CommentResponseDto commentResponse = new CommentResponseDto();
-        commentResponse.setId(comment.getId());
-        commentResponse.setPostId(comment.getPost().getId());
-        commentResponse.setParentId(comment.getParent() != null ? comment.getParent().getId() : null);
-        commentResponse.setContent(comment.getText());
-        commentResponse.setAuthor(comment.getAuthor().getUsername());
-        commentResponse.setUpvotes(comment.getUpvoteCount());
-        commentResponse.setDownvotes(comment.getDownvoteCount());
-        commentResponse.setScore(comment.getScore());
-
-        // hardcoded - current_user
-        User currentUser = userRepository.findByUsername("current_user").orElse(null);
-        commentResponse.setUserVote(currentUser != null ? comment.getUserVote(currentUser) : null);
-
-        commentResponse.setCreatedAt(comment.getCreatedAt());
-        commentResponse.setUpdatedAt(comment.getUpdatedAt());
-        commentResponse.setReplies(new ArrayList<>());
-
-        return commentResponse;
-    }
-
-    private PostResponseDto convertToResponseDto(Post post) {
+    private PostResponseDto postToPostResponseDto(Post post) {
         return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount() , post.getDownvoteCount(), post.getScore(), post.getCommentCount(), post.getUserVote(userRepository.findByUsername("current_user").orElseThrow()), post.getCreatedAt(), post.getUpdatedAt());
     }
 }
-
-//public Post addPostWithImage(PostRequestDto dto, String imagePath) {
-//    User author = userRepository.findByUsername(dto.getAuthor())
-//            .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
-//
-//    Post post = new Post(author, dto.getTitle(), dto.getContent(),imagePath);
-//    post.setFilePath(imagePath);
-//    return postRepository.save(post);
-//}
-//
-//public String saveImage(MultipartFile file) throws IOException {
-//    if (file.isEmpty()) throw new IOException("Empty file.");
-//
-//    String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-//    Path uploadDir = Paths.get("uploads").toAbsolutePath().normalize();
-//    Files.createDirectories(uploadDir);
-//    Path targetPath = uploadDir.resolve(fileName);
-//    Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-//
-//    return "/uploads/" + fileName; // sau doar fileName dacă preferi
-//}

@@ -1,20 +1,16 @@
 package com.example.backend.dto;
 
-import com.example.backend.model.VoteType;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostResponseDto {
-
-    private Long id;
+public class PostRequestImageDto {
 
     @NotBlank(message = "Title is required")
     @Size(max = 300, message = "Title too long")
@@ -28,17 +24,8 @@ public class PostResponseDto {
 
     private String subreddit;
 
-    private Long upvotes;
 
-    private Long downvotes;
+    private MultipartFile image;
 
-    private Long score;
 
-    private Long commentCount;
-
-    private VoteType userVote;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
 }

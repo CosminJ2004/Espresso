@@ -4,9 +4,12 @@ import com.example.backend.dto.*;
 import com.example.backend.service.PostService;
 import com.example.backend.util.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -60,40 +63,14 @@ public class PostController {
     public ResponseEntity<Response<CommentResponseDto>> addComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequest) {
         return Response.ok(postService.addComment(id, commentRequest));
     }
+
+
+    @PostMapping(value = "/with-image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PostResponseDto> createPostWithImage(PostRequestImageDto postRequestDto) throws IOException
+    {
+        return ResponseEntity.ok(postService.createPostWithImage(postRequestDto));
+    }
 }
 
 
-//    @PostMapping("/upload-test")
-//    public ResponseEntity<Response<String>> uploadTest(@RequestParam("file") MultipartFile file) {
-//        if (file == null) {
-//            return Response.error("File is null");
-//        }
-//        return Response.ok("File received: " + file.getOriginalFilename());
-//    }
 
-//    @PostMapping("/upload-test")
-//    public ResponseEntity<Response<String>> uploadTest(@RequestParam("file") MultipartFile file) {
-//        if (file == null) {
-//            return Response.error("File is null");
-//        }
-//        return Response.ok("File received: " + file.getOriginalFilename());
-//    }
-
-//    @PostMapping("/create-with-image")
-//    public ResponseEntity<Post> createPostWithImage(@ModelAttribute PostDto dto) {
-//        MultipartFile file = dto.getFile();
-//        if (file == null) {
-//            System.out.println("file is null!");
-//        } else {
-//            System.out.println("file received: " + file.getOriginalFilename());
-//        }
-//
-//        try {
-//            String imagePath = postService.saveImage(dto.getFile());
-//            Post post = postService.addPostWithImage(dto, imagePath);
-//            return ResponseEntity.ok(post);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-//        }
-//    }

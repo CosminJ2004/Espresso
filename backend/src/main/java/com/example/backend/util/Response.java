@@ -30,10 +30,10 @@ public class Response<T> {
         return ResponseEntity.ok(response);
     }
 
-    public static <T> ResponseEntity<Response<T>> error(String message) {
+    public static <T> ResponseEntity<Response<T>> error(int code, String message) {
         Response<T> response = new Response<>();
         response.success = false;
         response.error = message;
-        return ResponseEntity.status(400).body(response);
+        return ResponseEntity.status(code).body(response);
     }
 }
