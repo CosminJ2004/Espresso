@@ -20,10 +20,11 @@ public class Post {
 
     @Column(nullable = false)
     @NotBlank(message = "title is required")
-    @Size(max = 255, message = "title too long")
+    @Size(max = 300, message = "title too long")
     private String title;
 
     @Column(columnDefinition = "TEXT")
+    @Size(max = 10000, message = "content too long")
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
