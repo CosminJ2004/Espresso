@@ -4,22 +4,27 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.io.IOException;
 import java.net.http.*;
 import java.net.URI;
-import java.util.Scanner;
 
-public class ApiPostService implements IApiService {
+public class ApiPostService {
     private static final String BASE_URL = "http://3.65.147.49/posts";
+    private final HttpClient client;
     private static ApiPostService instance;
 
-    public static ApiPostService getInstance() {
+    private ApiPostService(HttpClient client) {
+        this.client = client;
+    }
+
+    public static ApiPostService getInstance(HttpClient client) {
         if (instance == null) {
-            instance = new ApiPostService();
+            instance = new ApiPostService(client);
         }
         return instance;
     }
 
-    public JsonArray handleGet(HttpClient client) throws Exception {
+    public JsonArray handleGet() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
                 .GET()
@@ -29,26 +34,9 @@ public class ApiPostService implements IApiService {
 
         JsonObject responseObject = JsonParser.parseString(response.body()).getAsJsonObject();
         return responseObject.getAsJsonArray("data");
-        //System.out.println("Postări:\n" + response.body());
     }
 
-    public void handlePost(Scanner scanner, HttpClient client) throws Exception {
-        System.out.print("Titlu: ");
-        String title = scanner.nextLine();
-        System.out.print("Conținut: ");
-        String content = scanner.nextLine();
-        System.out.print("Username autor: ");
-        String author = scanner.nextLine();
-
-        String json = String.format("""
-        {
-            "author": "%s",
-            "title": "%s",
-            "content": "%s"
-            
-        }
-        """, author,title, content);
-
+    public JsonObject handlePost(String json) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
                 .header("Content-Type", "application/json")
@@ -56,27 +44,12 @@ public class ApiPostService implements IApiService {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("Postare creată:\n" + response.body());
+
+        JsonObject responseObject = JsonParser.parseString(response.body()).getAsJsonObject();
+        return responseObject.getAsJsonObject("data");
     }
 
-    public void handlePut(Scanner scanner, HttpClient client) throws Exception {
-        System.out.print("ID postare: ");
-        String id = scanner.nextLine();
-        System.out.print("author: ");
-        String author = scanner.nextLine();
-        System.out.print("Summary nou: ");
-        String summary = scanner.nextLine();
-        System.out.print("Conținut nou: ");
-        String content = scanner.nextLine();
-
-        String json = String.format("""
-        {
-            "author": "%s",
-            "title": "%s",
-            "content": "%s"
-        }
-        """, author,summary, content);
-
+    public JsonObject handlePut(String json, long id) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/" + id))
                 .header("Content-Type", "application/json")
@@ -84,19 +57,16 @@ public class ApiPostService implements IApiService {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("Postare actualizată:\n" + response.body());
+        JsonObject responseObject = JsonParser.parseString(response.body()).getAsJsonObject();
+        return responseObject.getAsJsonObject("data");
     }
 
-    public void handleDelete(Scanner scanner, HttpClient client) throws Exception {
-        System.out.print("ID postare de șters: ");
-        String id = scanner.nextLine();
-
+    public void handleDelete(long id) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/" + id))
                 .DELETE()
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("Postare ștearsă:\n" + response.body());
     }
 }

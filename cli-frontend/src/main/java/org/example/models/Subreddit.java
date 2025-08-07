@@ -1,6 +1,6 @@
 package org.example.models;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Subreddit {
     private long id;
@@ -12,29 +12,30 @@ public class Subreddit {
     private int postCount;
     private String iconUrl;
     private String createdAt;
-    private ArrayList<Post> subPosts;
+    private HashMap<String, Post> subPosts;
 
-    public Subreddit(String name, String displayName, String description, int memberCount, int postCount, String iconUrl, String createdAt) {
+    public Subreddit(String name, String displayName, String description, int memberCount, String iconUrl, String createdAt) {
         this.id = idCount++;
         this.name = name;
         this.displayName = displayName;
         this.description = description;
         this.memberCount = memberCount;
-        this.postCount = postCount;
+        this.postCount = 0;
         this.iconUrl = iconUrl;
         this.createdAt = createdAt;
-        this.subPosts = new ArrayList<>();
+        this.subPosts = new HashMap<>();
     }
 
     public void addPost(Post post) {
-        subPosts.add(post);
+        subPosts.put(Long.toString(post.getId()), post);
+        postCount++;
     }
 
-    public ArrayList<Post> getSubPosts() {
+    public HashMap<String, Post> getSubPosts() {
         return subPosts;
     }
 
-    public void setSubPosts(ArrayList<Post> subPosts) {
+    public void setSubPosts(HashMap<String, Post> subPosts) {
         this.subPosts = subPosts;
     }
 }

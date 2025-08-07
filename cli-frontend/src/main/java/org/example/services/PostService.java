@@ -1,17 +1,14 @@
 package org.example.services;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.reflect.TypeToken;
 import org.example.apiservices.ApiPostService;
 import org.example.models.Post;
 import org.example.models.Subreddit;
 import org.example.ui.PostUI;
 
-import java.lang.reflect.Type;
-import java.time.LocalDateTime;
+import java.net.http.HttpClient;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class PostService {
     private static PostService instance;
@@ -25,22 +22,50 @@ public class PostService {
         return instance;
     }
 
-    public void showPosts(Subreddit subreddit) {
-        for (Post post : subreddit.getSubPosts()) {
-            postUI.renderPost(post);
+    //POST
+    public void createPost(HashMap<String, Subreddit> subreddits, Gson gson) throws Exception {
+        ArrayList<String> postDetails = postUI.getPostDetailsFromUser();
+        String title = postDetails.get(0);
+        String content = postDetails.get(1);
+        String author = postDetails.get(2);
+        String subreddit = postDetails.get(3);
+        String json = String.format("""
+        {
+            "title": "%s",
+            "content": "%s",
+            "author": "%s",
+            "subreddit": "%s"
+            
         }
-    }
+        """, title, content, author, subreddit);
 
-    public HashMap<String, Subreddit> populateSubreddits(HashMap<String, Subreddit> subreddits, JsonArray jsonArray) {
-        Gson gson = new Gson();
-        Type postArray = new TypeToken<List<Post>>() {}.getType();
-        List<Post> posts = gson.fromJson(jsonArray, postArray);
-        for (Post post : posts) {
-            if (!subreddits.containsKey(post.getSubreddit())) {
-                subreddits.put(post.getSubreddit(), new Subreddit(post.getSubreddit(), post.getSubreddit(), "WIP", 1, 1, "WIP", LocalDateTime.now().toString()));
-            }
-            subreddits.get(post.getSubreddit()).addPost(post);
+        Post post = gson.fromJson(apiPostService.handlePost(json), Post.class);
+        subreddits.get(post.getSubreddit()).addPost(post);
+    }
+    //PUT
+    public void editPost(HashMap<String, Subreddit> subreddits, Gson gson) throws Exception {
+        ArrayList<String> updatedDetails = postUI.getUpdatedPostDetailsFromUser();
+        long id = Long.parseLong(updatedDetails.get(0));
+        String title = updatedDetails.get(1);
+        String content = updatedDetails.get(2);
+        String json = String.format("""
+        {
+            "title": "%s",
+            "content": "%s",
         }
-        return subreddits;
+        """, title, content);
+        Post post = gson.fromJson(apiPostService.handlePut(json, id), Post.class);
+        subreddits.get(post.getSubreddit()).addPost(post);
+    }
+    //DELETE
+    public void deletePost(HashMap<String, Subreddit> subreddits) throws Exception {
+        long id = postUI.getPostIDFromUser();
+        apiPostService.handleDelete(id);
+        for(Subreddit subreddit : subreddits.values()) {
+            if(subreddit.getSubPosts().containsKey(id)) {
+                subreddit.getSubPosts().remove(id);
+                break;
+            }
+        }
     }
 }
