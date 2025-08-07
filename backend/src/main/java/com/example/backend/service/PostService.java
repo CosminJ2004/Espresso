@@ -28,6 +28,9 @@ public class PostService {
     private final CommentService commentService;
     private final VoteRepository voteRepository;
     private final VoteService voteService;
+
+    private final Path uploadDir = Paths.get("uploads/images");
+
     private static final LoggerManager loggerManager = LoggerManager.getInstance();
 
     @Autowired
@@ -70,6 +73,27 @@ public class PostService {
         loggerManager.log("console", LogLevel.INFO, "post created");
         return postToPostResponseDto(post);
 
+    }
+    public PostResponseDto createPostwithImage(PostRequestDto dto) throws IOException {
+        Post post = new Post();
+        post.setTitle(dto.getTitle());
+        post.setContent(dto.getContent());
+
+        User author = userRepository.findByUsername(dto.getAuthor())
+                .orElseThrow(() -> new RuntimeException("Author not found"));
+        post.setAuthor(author);
+
+        if (dto.getImage() != null && !dto.getImage().isEmpty()) {
+            String filename = UUID.randomUUID() + "_" + dto.getImage().getOriginalFilename();
+            Path uploadPath = Paths.get("uploads/" + filename);
+            Files.createDirectories(uploadPath.getParent());
+            Files.copy(dto.getImage().getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
+            post.setFilePath("/uploads/" + filename); // linkul public
+        }
+
+
+        postRepository.save(post);
+        return postToPostResponseDto(post);
     }
 
     public PostResponseDto updatePost(Long id, PostRequestDto dto) {
@@ -167,27 +191,5 @@ public class PostService {
 
     private PostResponseDto postToPostResponseDto(Post post) {
         return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount() , post.getDownvoteCount(), post.getScore(), post.getCommentCount(), post.getUserVote(userRepository.findByUsername("current_user").orElseThrow()), post.getCreatedAt(), post.getUpdatedAt());
-    }
-
-    public Post addPostWithImage(PostRequestDto dto, String imagePath) {
-
-        User author = userRepository.findByUsername(dto.getAuthor())
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
-
-        Post post = new Post(author, dto.getTitle(), dto.getContent(), imagePath);
-        post.setFilePath(imagePath);
-        return postRepository.save(post);
-    }
-
-    public String saveImage(MultipartFile file) throws IOException {
-        if (file.isEmpty()) throw new IOException("Empty file.");
-
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path uploadDir = Paths.get("uploads").toAbsolutePath().normalize();
-        Files.createDirectories(uploadDir);
-        Path targetPath = uploadDir.resolve(fileName);
-        Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-
-        return "/uploads/" + fileName; // sau doar fileName dacă preferi
     }
 }
