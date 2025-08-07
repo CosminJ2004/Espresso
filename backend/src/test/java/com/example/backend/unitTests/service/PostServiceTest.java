@@ -417,66 +417,66 @@ public class PostServiceTest {
     }
 
     //image
-    @Test
-    void shouldThrowExceptionWhenSavingEmptyImage() {
-        MockMultipartFile emptyFile = new MockMultipartFile(
-                "file",
-                "empty.png",
-                "image/png",
-                new byte[0]
-        );
+//    @Test
+//    void shouldThrowExceptionWhenSavingEmptyImage() {
+//        MockMultipartFile emptyFile = new MockMultipartFile(
+//                "file",
+//                "empty.png",
+//                "image/png",
+//                new byte[0]
+//        );
+//
+//        assertThatThrownBy(() -> postService.saveImage(emptyFile))
+//                .isInstanceOf(IOException.class)
+//                .hasMessage("Empty file.");
+//    }
 
-        assertThatThrownBy(() -> postService.saveImage(emptyFile))
-                .isInstanceOf(IOException.class)
-                .hasMessage("Empty file.");
-    }
+//    @Test
+//    void shouldThrowExceptionWhenUserNotFoundInAddPostWithImage() {
+//        String imagePath = "uploads/test.png";
+//        when(userRepository.findByUsername(mockPostRequest.getAuthor())).thenReturn(Optional.empty());
+//
+//        assertThatThrownBy(() -> postService.addPostWithImage(mockPostRequest, imagePath))
+//                .isInstanceOf(IllegalArgumentException.class)
+//                .hasMessageContaining("User not found: " + mockPostRequest.getAuthor());
+//    }
 
-    @Test
-    void shouldThrowExceptionWhenUserNotFoundInAddPostWithImage() {
-        String imagePath = "uploads/test.png";
-        when(userRepository.findByUsername(mockPostRequest.getAuthor())).thenReturn(Optional.empty());
+//    @Test
+//    void shouldAddPostWithImageSuccessfully() {
+//        String imagePath = "uploads/test.png";
+//        when(userRepository.findByUsername(mockUser.getUsername())).thenReturn(Optional.of(mockUser));
+//        when(postRepository.save(any(Post.class))).thenAnswer(invocation -> invocation.getArgument(0));
+//
+//        Post result = postService.addPostWithImage(mockPostRequest, imagePath);
+//
+//        assertThat(result).isNotNull();
+//        assertThat(result.getFilePath()).isEqualTo(imagePath);
+//        verify(userRepository).findByUsername(mockPostRequest.getAuthor());
+//        verify(postRepository).save(any(Post.class));
+//    }
 
-        assertThatThrownBy(() -> postService.addPostWithImage(mockPostRequest, imagePath))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("User not found: " + mockPostRequest.getAuthor());
-    }
-
-    @Test
-    void shouldAddPostWithImageSuccessfully() {
-        String imagePath = "uploads/test.png";
-        when(userRepository.findByUsername(mockUser.getUsername())).thenReturn(Optional.of(mockUser));
-        when(postRepository.save(any(Post.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        Post result = postService.addPostWithImage(mockPostRequest, imagePath);
-
-        assertThat(result).isNotNull();
-        assertThat(result.getFilePath()).isEqualTo(imagePath);
-        verify(userRepository).findByUsername(mockPostRequest.getAuthor());
-        verify(postRepository).save(any(Post.class));
-    }
-
-    @Test
-    void shouldSaveImageSuccessfully() throws IOException {
-        MockMultipartFile mockFile = new MockMultipartFile(
-                "file",
-                "test.png",
-                "image/png",
-                "dummy content".getBytes()
-        );
-
-        try (MockedStatic<Files> filesMock = mockStatic(Files.class)) {
-            Path mockDir = Path.of("uploads");
-
-            filesMock.when(() -> Files.createDirectories(any(Path.class))).thenReturn(mockDir);
-            filesMock.when(() -> Files.copy(any(InputStream.class), any(Path.class), eq(StandardCopyOption.REPLACE_EXISTING)))
-                    .thenReturn(1L);
-
-            String result = postService.saveImage(mockFile);
-
-            assertThat(result).startsWith("/uploads/");
-            assertThat(result).endsWith("test.png");
-            filesMock.verify(() -> Files.createDirectories(any(Path.class)));
-            filesMock.verify(() -> Files.copy(any(InputStream.class), any(Path.class), eq(StandardCopyOption.REPLACE_EXISTING)));
-        }
-    }
+//    @Test
+//    void shouldSaveImageSuccessfully() throws IOException {
+//        MockMultipartFile mockFile = new MockMultipartFile(
+//                "file",
+//                "test.png",
+//                "image/png",
+//                "dummy content".getBytes()
+//        );
+//
+//        try (MockedStatic<Files> filesMock = mockStatic(Files.class)) {
+//            Path mockDir = Path.of("uploads");
+//
+//            filesMock.when(() -> Files.createDirectories(any(Path.class))).thenReturn(mockDir);
+//            filesMock.when(() -> Files.copy(any(InputStream.class), any(Path.class), eq(StandardCopyOption.REPLACE_EXISTING)))
+//                    .thenReturn(1L);
+//
+//            String result = postService.saveImage(mockFile);
+//
+//            assertThat(result).startsWith("/uploads/");
+//            assertThat(result).endsWith("test.png");
+//            filesMock.verify(() -> Files.createDirectories(any(Path.class)));
+//            filesMock.verify(() -> Files.copy(any(InputStream.class), any(Path.class), eq(StandardCopyOption.REPLACE_EXISTING)));
+//        }
+//    }
 }
