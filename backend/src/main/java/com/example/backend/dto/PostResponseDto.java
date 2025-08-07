@@ -17,7 +17,7 @@ public class PostResponseDto {
     private Long id;
 
     @NotBlank(message = "Title is required")
-    @Size(min = 3, max = 300, message = "Title too long")
+    @Size(max = 300, message = "Title too long")
     private String title;
 
     @Size(max = 10000, message = "Content too long")
