@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostRequestDto {
+public class PostRequestImageDto {
 
     @NotBlank(message = "Title is required")
     @Size(max = 300, message = "Title too long")
@@ -24,6 +24,8 @@ public class PostRequestDto {
 
     private String subreddit;
 
+
+    private MultipartFile image;
 
 
 }

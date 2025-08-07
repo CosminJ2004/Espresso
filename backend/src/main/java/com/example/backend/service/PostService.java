@@ -74,7 +74,7 @@ public class PostService {
         return postToPostResponseDto(post);
 
     }
-    public PostResponseDto createPostwithImage(PostRequestDto dto) throws IOException {
+    public PostResponseDto createPostWithImage(PostRequestImageDto dto) throws IOException {
         Post post = new Post();
         post.setTitle(dto.getTitle());
         post.setContent(dto.getContent());
@@ -88,7 +88,7 @@ public class PostService {
             Path uploadPath = Paths.get("uploads/" + filename);
             Files.createDirectories(uploadPath.getParent());
             Files.copy(dto.getImage().getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
-            post.setFilePath("/uploads/" + filename); // linkul public
+            post.setFilePath("/uploads/" + filename);
         }
 
 

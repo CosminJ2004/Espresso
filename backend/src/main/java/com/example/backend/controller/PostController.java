@@ -66,9 +66,9 @@ public class PostController {
 
 
     @PostMapping(value = "/with-image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<PostResponseDto> createPostwithImage(PostRequestDto postRequestDto) throws IOException
+    public ResponseEntity<PostResponseDto> createPostWithImage(PostRequestImageDto postRequestDto) throws IOException
     {
-        return ResponseEntity.ok(postService.createPostwithImage(postRequestDto));
+        return ResponseEntity.ok(postService.createPostWithImage(postRequestDto));
     }
 }
 
