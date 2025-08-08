@@ -4,6 +4,7 @@ import com.example.backend.dto.UserRequestDto;
 import com.example.backend.dto.UserResponseDto;
 import com.example.backend.service.UserService;
 import com.example.backend.util.Response;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,13 +33,13 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<Response<UserResponseDto>> createUser(@RequestBody UserRequestDto userRequest) {
+    public ResponseEntity<Response<UserResponseDto>> createUser(@RequestBody @Valid UserRequestDto userRequest) {
         return Response.ok(userService.createUser(userRequest));
     }
 
     //endpoint pentru cli-frontend
     @PostMapping("/login")
-    public ResponseEntity<Response<UserResponseDto>> loginUser(@RequestBody UserRequestDto userRequest) {
+    public ResponseEntity<Response<UserResponseDto>> loginUser(@RequestBody @Valid UserRequestDto userRequest) {
         return Response.ok(userService.loginUser(userRequest));
     }
 
@@ -55,7 +56,7 @@ public class UserController {
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<Response<UserResponseDto>> updateUser(@PathVariable String username, @RequestBody UserRequestDto userRequest) {
+    public ResponseEntity<Response<UserResponseDto>> updateUser(@PathVariable String username, @RequestBody @Valid UserRequestDto userRequest) {
         return Response.ok(userService.updateUser(username, userRequest));
     }
 }
