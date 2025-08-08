@@ -53,7 +53,8 @@ public class PostService {
         String content = updatedDetails.get(2);
         String json = String.format("""
         {
-            "user": "current_user",
+            "author": "current_user",
+            "subreddit": "echipa3_general",
             "title": "%s",
             "content": "%s"
         }
