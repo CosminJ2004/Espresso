@@ -9,9 +9,14 @@ import com.example.backend.repository.VoteRepository;
 import com.example.backend.util.logger.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,19 +33,21 @@ public class PostService {
     private final CommentService commentService;
     private final VoteRepository voteRepository;
     private final VoteService voteService;
+    private final MinioService minioService;
 
     private final Path uploadDir = Paths.get("uploads/images");
 
     private static final LoggerManager loggerManager = LoggerManager.getInstance();
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, CommentService commentService, VoteRepository voteRepository, VoteService voteService) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, CommentService commentService, VoteRepository voteRepository, VoteService voteService,MinioService minioService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.commentService = commentService;
         this.voteRepository = voteRepository;
         this.voteService = voteService;
+        this.minioService = minioService;
     }
 
     public List<PostResponseDto> getAllPosts() {
@@ -73,6 +80,7 @@ public class PostService {
         return postToPostResponseDto(post);
 
     }
+
     public PostResponseDto createPostWithImage(PostRequestImageDto dto) throws IOException {
         Post post = new Post();
         post.setTitle(dto.getTitle());
@@ -83,17 +91,96 @@ public class PostService {
         post.setAuthor(author);
 
         if (dto.getImage() != null && !dto.getImage().isEmpty()) {
-            String filename = UUID.randomUUID() + "_" + dto.getImage().getOriginalFilename();
-            Path uploadPath = Paths.get("uploads/" + filename);
-            Files.createDirectories(uploadPath.getParent());
-            Files.copy(dto.getImage().getInputStream(), uploadPath, StandardCopyOption.REPLACE_EXISTING);
-            post.setFilePath("/uploads/" + filename);
+            String imageUrl = minioService.uploadImage(dto.getImage());
+            post.setFilePath(imageUrl);
         }
-
 
         postRepository.save(post);
         return postToPostResponseDto(post);
     }
+
+        public PostResponseDto getPostWithGrayscale(PostRequestImageDto dto) throws IOException{
+            if (dto.getImage() == null || dto.getImage().isEmpty()) {
+                loggerManager.log("file",LogLevel.INFO,"getting post with image");
+            }
+
+            try {
+                // Pregateste requestul
+                HttpClient client = HttpClient.newHttpClient();
+
+                HttpRequest.BodyPublisher imageBodyPublisher;
+
+                try {
+                    imageBodyPublisher = HttpRequest.BodyPublishers.ofInputStream(() -> {
+                        try {
+                            return dto.getImage().getInputStream();
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e); // convertim excepția verificată într-una neverificată
+                        }
+                    });
+                } catch (UncheckedIOException e) {
+                    loggerManager.log("exception", LogLevel.ERROR, e.getMessage());
+                    imageBodyPublisher = HttpRequest.BodyPublishers.noBody(); // fallback în caz de eroare
+                }
+
+                String boundary = "----WebKitFormBoundary" + UUID.randomUUID();
+                String CRLF = "\r\n";
+
+                // Construcție multipart manuală
+                var multipart = new StringBuilder();
+                multipart.append("--").append(boundary).append(CRLF);
+                multipart.append("Content-Disposition: form-data; name=\"image\"; filename=\"")
+                        .append(dto.getImage().getOriginalFilename()).append("\"").append(CRLF);
+                multipart.append("Content-Type: ").append(dto.getImage().getContentType()).append(CRLF);
+                multipart.append(CRLF);
+
+                byte[] imageBytes = dto.getImage().getBytes();
+                byte[] multipartHeader = multipart.toString().getBytes(StandardCharsets.UTF_8);
+                byte[] multipartFooter = (CRLF + "--" + boundary + "--" + CRLF).getBytes(StandardCharsets.UTF_8);
+
+                byte[] fullBody = new byte[multipartHeader.length + imageBytes.length + multipartFooter.length];
+                System.arraycopy(multipartHeader, 0, fullBody, 0, multipartHeader.length);
+                System.arraycopy(imageBytes, 0, fullBody, multipartHeader.length, imageBytes.length);
+                System.arraycopy(multipartFooter, 0, fullBody, multipartHeader.length + imageBytes.length, multipartFooter.length);
+
+                // Construiește requestul
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("http://16.171.148.84/filter?filter=grayscale")) // sau IP EC2
+                        .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                        .POST(HttpRequest.BodyPublishers.ofByteArray(fullBody))
+                        .build();
+
+                HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+
+                if (response.statusCode() != 200) {
+                    throw new RuntimeException("Image processing failed");
+                }
+
+                // Salvează imaginea procesată (ex: local sau pe MinIO)
+                String filename = UUID.randomUUID() + "_grayscale.png";
+                Path outputPath = Paths.get("uploads/" + filename);
+                Files.createDirectories(outputPath.getParent());
+                Files.write(outputPath, response.body());
+
+                // Construiește Post-ul
+                Post post = new Post();
+                post.setTitle(dto.getTitle());
+                post.setContent(dto.getContent());
+                post.setFilePath("/uploads/" + filename);
+
+                User author = userRepository.findByUsername(dto.getAuthor())
+                        .orElseThrow(() -> new RuntimeException("Author not found"));
+                post.setAuthor(author);
+
+                postRepository.save(post);
+
+                return postToPostResponseDto(post);
+
+            } catch (Exception e) {
+                throw new RuntimeException("Error processing grayscale post", e);
+            }
+        }
+
 
     public PostResponseDto updatePost(Long id, PostRequestDto dto) {
         Post existingPost = postRepository.findById(id)
