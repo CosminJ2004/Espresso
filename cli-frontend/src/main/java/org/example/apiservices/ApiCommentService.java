@@ -8,8 +8,21 @@ import java.net.http.*;
 import java.net.URI;
 import java.util.Scanner;
 
-public class ApiCommentService implements IApiService {
+public class ApiCommentService {
     private static final String BASE_URL = "http://3.65.147.49/comments";
+    private static ApiCommentService instance;
+    private final HttpClient client;
+
+    private ApiCommentService(HttpClient client) {
+        this.client = client;
+    }
+
+    public static ApiCommentService getInstance(HttpClient client) {
+        if (instance == null) {
+            instance = new ApiCommentService(client);
+        }
+        return instance;
+    }
 
     public JsonArray handleGet(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
@@ -20,7 +33,6 @@ public class ApiCommentService implements IApiService {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         JsonObject responseObject = JsonParser.parseString(response.body()).getAsJsonObject();
         return responseObject.getAsJsonArray("data");
-        //System.out.println("Comentarii:\n" + response.body());
     }
 
     public void handlePost(Scanner scanner, HttpClient client) throws Exception {

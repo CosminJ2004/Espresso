@@ -4,12 +4,36 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.io.IOException;
 import java.net.http.*;
 import java.net.URI;
 import java.util.Scanner;
 
-public class ApiUserService implements IApiService {
+public class ApiUserService {
     private static final String BASE_URL = "http://3.65.147.49/users";
+    private final HttpClient client;
+    private static ApiUserService instance;
+
+    private ApiUserService(HttpClient client) {
+        this.client = client;
+    }
+
+    public static ApiUserService getInstance(HttpClient client) {
+        if (instance == null) {
+            instance = new ApiUserService(client);
+        }
+        return instance;
+    }
+    public JsonObject handleLogin(String json) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/login"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonObject responseObject = JsonParser.parseString(response.body()).getAsJsonObject();
+        return responseObject.getAsJsonObject("data");
+    }
 
     public JsonArray handleGet(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
@@ -23,7 +47,7 @@ public class ApiUserService implements IApiService {
         //System.out.println("Utilizatori:\n" + response.body());
     }
 
-    public void handlePost(Scanner scanner, HttpClient client) throws Exception {
+    public JsonObject handlePost(Scanner scanner, HttpClient client) throws Exception {
         System.out.print("Username: ");
         String username = scanner.nextLine();
         System.out.print("Parolă: ");
@@ -44,9 +68,10 @@ public class ApiUserService implements IApiService {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println("Utilizator creat:\n" + response.body());
+        return null;
     }
 
-    public void handlePut(Scanner scanner, HttpClient client) throws Exception {
+    public JsonObject handlePut(Scanner scanner, HttpClient client) throws Exception {
         System.out.print("ID utilizator: ");
         Long id = Long.parseLong(scanner.nextLine());
 
@@ -71,6 +96,7 @@ public class ApiUserService implements IApiService {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println("Utilizator actualizat:\n" + response.body());
+        return null;
     }
 
     public void handleDelete(Scanner scanner, HttpClient client) throws Exception {

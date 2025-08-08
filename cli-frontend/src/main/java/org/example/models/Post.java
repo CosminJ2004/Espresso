@@ -1,5 +1,7 @@
 package org.example.models;
 
+import java.util.HashMap;
+
 public class Post {
     private long id;
     private String title;
@@ -13,7 +15,7 @@ public class Post {
     private VoteType userVote;
     private String createdAt;
     private String updateAt;
-    //private ArrayList<Comment> postComments;
+    private HashMap<String, Comment> postComments;
 
     public long getId() {
         return id;
@@ -53,5 +55,14 @@ public class Post {
 
     public String getUpdateAt() {
         return updateAt;
+    }
+
+    public HashMap<String, Comment> getPostComments() {
+        return postComments;
+    }
+
+    public void addComment(Comment comment) {
+
+        this.postComments.put(Long.toString(comment.getId()), comment);
     }
 }

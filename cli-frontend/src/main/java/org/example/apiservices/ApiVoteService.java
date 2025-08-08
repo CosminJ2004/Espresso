@@ -8,8 +8,21 @@ import java.net.http.*;
 import java.net.URI;
 import java.util.Scanner;
 
-public class ApiVoteService implements IApiService {
+public class ApiVoteService {
     private static final String BASE_URL = "http://3.65.147.49/votes";
+    private final HttpClient client;
+    private static ApiVoteService instance;
+
+    private ApiVoteService(HttpClient client) {
+        this.client = client;
+    }
+
+    public static ApiVoteService getInstance(HttpClient client) {
+        if (instance == null) {
+            instance = new ApiVoteService(client);
+        }
+        return instance;
+    }
 
     public JsonArray handleGet(HttpClient client) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()

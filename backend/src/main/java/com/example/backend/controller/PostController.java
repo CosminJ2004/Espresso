@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -66,9 +65,14 @@ public class PostController {
 
 
     @PostMapping(value = "/with-image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<PostResponseDto> createPostWithImage(PostRequestImageDto postRequestDto) throws IOException
+    public ResponseEntity<Response<PostResponseDto>> createPostWithImage(PostRequestImageDto postRequestDto) throws IOException
     {
-        return ResponseEntity.ok(postService.createPostWithImage(postRequestDto));
+        return Response.ok(postService.createPostWithImage(postRequestDto));
+    }
+
+    @GetMapping(value = "/get-grayscale-filter")
+    public ResponseEntity<Response<PostResponseDto>> getGrayscaleFilter(PostRequestImageDto postRequestDto)throws  IOException {
+        return Response.ok(postService.getPostWithGrayscale(postRequestDto));
     }
 }
 
