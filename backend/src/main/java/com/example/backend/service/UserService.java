@@ -4,6 +4,7 @@ import com.example.backend.dto.UserRequestDto;
 import com.example.backend.dto.UserResponseDto;
 import com.example.backend.exception.login.InvalidCredentialsException;
 import com.example.backend.exception.user.UserNotFoundException;
+import com.example.backend.mapper.UserMapper;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -32,13 +33,13 @@ public class UserService {
 
     public UserResponseDto getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
-        return UserToUserResponseDto(user);
+        return UserMapper.toDto(user);
     }
 
     public List<UserResponseDto> getAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(this::UserToUserResponseDto)
+                .map(UserMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -52,7 +53,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         User savedUser = userRepository.save(user);
-        return UserToUserResponseDto(savedUser);
+        return UserMapper.toDto(savedUser);
     }
 
     //metoda folosita in frontend-cli pentru a loga un user ca sa faca postari/comentarii
@@ -65,14 +66,15 @@ public class UserService {
         if (!passwordEncoder.matches(userRequest.getPassword(), user.getPassword())) {
             throw new InvalidCredentialsException(); //Invalid username or password
         }
-        return UserToUserResponseDto(user);
+        return UserMapper.toDto(user);
     }
+
     //metoda folosita in frontend-cli pentru a cauta useri dupa username
     public UserResponseDto getUserByUsername(String username) {
         User user = userRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("No user has been found with username: " + username));
-        return UserToUserResponseDto(user);
+        return UserMapper.toDto(user);
     }
 
     @Transactional
@@ -90,7 +92,7 @@ public class UserService {
 
         user.setUsername(dto.getUsername());
         user.setPassword(dto.getPassword());
-        return UserToUserResponseDto(userRepository.save(user));
+        return UserMapper.toDto(userRepository.save(user));
     }
 
     public void logout() {
@@ -182,9 +184,5 @@ public class UserService {
         user.setPassword(newPassword);
 //        userRepository.update(user);
         return true;
-    }
-
-    private UserResponseDto UserToUserResponseDto(User user) {
-        return new UserResponseDto(user.getId(), user.getUsername(), user.getPassword());
     }
 }

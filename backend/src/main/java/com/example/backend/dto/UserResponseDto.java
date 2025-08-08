@@ -12,26 +12,20 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserResponseDto {
-    
+
     private Long id;
-    
-    @NotBlank(message = "Username is required")
-    @Size(min = 3, max = 30, message = "Username must be 3-30 characters")
+
     private String username;
-    
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters")
-    private String password;
-    
+
     private LocalDateTime createdAt;
-    
+
     private int postCount;
-    
+
     private int commentCount;
 
-    public UserResponseDto(Long id, String username, String password) {
+    public UserResponseDto(Long id, String username, LocalDateTime createdAt) {
         this.id = id;
         this.username = username;
-        this.password = password;
+        this.createdAt = createdAt;
     }
 }
