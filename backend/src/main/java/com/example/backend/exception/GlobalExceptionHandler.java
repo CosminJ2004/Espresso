@@ -1,5 +1,6 @@
 package com.example.backend.exception;
 
+import com.example.backend.exception.login.InvalidCredentialsException;
 import com.example.backend.util.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,5 +17,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Response<Object>> handleGenericException(Exception e) {
         return Response.error(500, "An unexpected error occurred: " + e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Response<Object>> handleInvalidCredentialsException(InvalidCredentialsException e) {
+        return Response.error(401, e.getMessage());
     }
 }

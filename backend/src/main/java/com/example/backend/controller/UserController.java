@@ -35,6 +35,11 @@ public class UserController {
     public ResponseEntity<Response<UserResponseDto>> createUser(@RequestBody UserRequestDto userRequest) {
         return Response.ok(userService.createUser(userRequest));
     }
+    //endpoint pentru cli-frontend
+    @PostMapping("/login")
+    public ResponseEntity<Response<UserResponseDto>> loginUser(@RequestBody UserRequestDto userRequest) {
+        return Response.ok(userService.loginUser(userRequest));
+    }
 
     @DeleteMapping("/{username}")
     public ResponseEntity<Response<Void>> deleteUser(@PathVariable String username) {

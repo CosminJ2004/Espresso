@@ -2,6 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.dto.UserRequestDto;
 import com.example.backend.dto.UserResponseDto;
+import com.example.backend.exception.login.InvalidCredentialsException;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -51,6 +52,19 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
         return UserToUserResponseDto(savedUser);
+    }
+
+    //metoda folosita in frontend-cli pentru a loga un user ca sa faca postari/comentarii
+    public UserResponseDto loginUser(UserRequestDto userRequest) {
+        String username = userRequest.getUsername().trim();
+        User user = userRepository
+                .findByUsername(username)
+                .orElseThrow(InvalidCredentialsException::new);//nu arunc userNotFound ca sa nu expun ca exista un user cu acel username
+
+        if (!passwordEncoder.matches(userRequest.getPassword(), user.getPassword())) {
+            throw new InvalidCredentialsException(); //Invalid username or password
+        }
+        return UserToUserResponseDto(user);
     }
 
     @Transactional
