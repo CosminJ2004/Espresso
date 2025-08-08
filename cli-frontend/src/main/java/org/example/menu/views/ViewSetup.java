@@ -34,6 +34,10 @@ public class ViewSetup {
         LinkedHashMap<MenuOption, IMenuCommand> menu = new LinkedHashMap<>();
         menu.put(MenuOption.SHOW_FEED, new ShowFeedCommand());
         menu.put(MenuOption.CREATE_POST, new CreatePostCommand());
+        menu.put(MenuOption.ADD_COMMENT, null);
+        menu.put(MenuOption.EDIT_POST, new EditPostCommand());
+        menu.put(MenuOption.DELETE_POST, new DeletePostCommand());
+        menu.put(MenuOption.QUIT, new QuitCommand());
 
         postMenu.setMenu(menu);
 

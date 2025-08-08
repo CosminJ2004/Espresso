@@ -38,7 +38,7 @@ public class PostService {
             "content": "%s",
             "author": "%s",
             "subreddit": "%s"
-            
+        
         }
         """, title, content, author, subreddit);
 
@@ -53,8 +53,9 @@ public class PostService {
         String content = updatedDetails.get(2);
         String json = String.format("""
         {
+            "user": "current_user",
             "title": "%s",
-            "content": "%s",
+            "content": "%s"
         }
         """, title, content);
         Post post = gson.fromJson(apiPostService.handlePut(json, id), Post.class);
@@ -65,8 +66,8 @@ public class PostService {
         long id = postUI.getPostIDFromUser();
         apiPostService.handleDelete(id);
         for(Subreddit subreddit : subreddits.values()) {
-            if(subreddit.getSubPosts().containsKey(id)) {
-                subreddit.getSubPosts().remove(id);
+            if(subreddit.getSubPosts().containsKey(Long.toString(id))) {
+                subreddit.getSubPosts().remove(Long.toString(id));
                 break;
             }
         }

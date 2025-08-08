@@ -12,6 +12,9 @@ public class InputTranslator {
             case "user menu" -> MenuOption.OPEN_USER_MENU;
             case "show feed" -> MenuOption.SHOW_FEED;
             case "create post" -> MenuOption.CREATE_POST;
+            case "add comment" -> MenuOption.ADD_COMMENT;
+            case "edit post" -> MenuOption.EDIT_POST;
+            case  "delete post" -> MenuOption.DELETE_POST;
             case "quit" -> MenuOption.QUIT;
 
             default -> null;
@@ -41,10 +44,14 @@ public class InputTranslator {
     }
 
     private static String translatePostMenuInput(String input) {
-        //1. Show feed, 2. Create post, 3. Add comment to post, 4 Update post, 5. Delete post
+        //1. Show feed, 2. Create post, 3. Add comment to post, 4 Edit post, 5. Delete post
         return switch (input) {
             case "1" -> "show feed";
             case "2" -> "create post";
+            case "3" -> "add comment";
+            case "4" -> "edit post";
+            case "5" -> "delete post";
+            case "6" -> "quit";
             default -> input;
         };
     }
