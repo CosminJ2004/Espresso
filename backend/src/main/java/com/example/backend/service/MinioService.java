@@ -26,7 +26,7 @@ public class MinioService {
                 .endpointOverride(URI.create(baseUrl))
                 .region(Region.US_EAST_1)
                 .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create("storage", "aici vine parola de la s3")
+                        AwsBasicCredentials.create("storage", "aRv4VtRsAXwfNPFd6xJHpvUU3P5XBNvF")
                 ))
                 .build();
     }
