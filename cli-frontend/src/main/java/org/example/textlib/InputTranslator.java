@@ -8,6 +8,7 @@ public class InputTranslator {
         String stringInput = translateInputToString(input, viewID);
 
         return switch (stringInput) {
+            case "login" -> MenuOption.LOGIN;
             case "post menu" -> MenuOption.OPEN_POST_MENU;
             case "user menu" -> MenuOption.OPEN_USER_MENU;
             case "show feed" -> MenuOption.SHOW_FEED;
@@ -20,6 +21,9 @@ public class InputTranslator {
 
     private static String translateInputToString(String input, ViewID viewID) {
         switch (viewID) {
+            case LOGIN_MENU:
+                return translateLoginMenuInput(input);
+
             case MAIN_MENU:
                 return translateMenuInput(input);
 
@@ -36,6 +40,16 @@ public class InputTranslator {
             case "1" -> "post menu";
             case "2" -> "user menu";
             case "3" -> "quit";
+            default -> input;
+        };
+    }
+
+    private static String translateLoginMenuInput(String input) {
+        // 1. Login, 2. Register, 3. Continue as guest
+        return switch (input) {
+            case "1" -> "login";
+            case "2" -> "register";
+            case "3" -> "continue as guest";
             default -> input;
         };
     }

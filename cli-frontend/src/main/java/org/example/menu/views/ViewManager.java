@@ -1,10 +1,15 @@
 package org.example.menu.views;
 
 import com.google.gson.Gson;
-import org.example.apiservices.*;
+import org.example.apiservices.ApiCommentService;
+import org.example.apiservices.ApiPostService;
+import org.example.apiservices.ApiUserService;
+import org.example.apiservices.ApiVoteService;
 import org.example.models.Subreddit;
+import org.example.models.User;
 import org.example.services.*;
 import org.example.ui.PostUI;
+import org.example.ui.UserUI;
 
 import java.net.http.HttpClient;
 import java.util.HashMap;
@@ -16,12 +21,14 @@ public class ViewManager {
     private HashMap<String, Subreddit> subreddits;
     private HashMap<ViewID, View> views;
     private ViewID currentViewID;
+    public static User user;//user al aplicatiei
 
     private final PostUI postUI = PostUI.getInstance();
+    private final UserUI userUI = UserUI.getInstance();
 
     private final PostService postService = PostService.getInstance(gson);
     private final CommentService commentService = CommentService.getInstance();
-    private final UserService userService = UserService.getInstance();
+    private final UserService userService = UserService.getInstance(gson);
     private final VoteService voteService = VoteService.getInstance();
     private final SubredditService subredditService = SubredditService.getInstance();
 
@@ -33,7 +40,7 @@ public class ViewManager {
     private ViewManager() {
         this.views = new HashMap<>();
         this.subreddits = new HashMap<>();
-        currentViewID = ViewID.MAIN_MENU;
+        currentViewID = ViewID.LOGIN_MENU;
     }
 
     public static ViewManager getInstance() {
@@ -45,6 +52,7 @@ public class ViewManager {
     }
 
     private void initAllViews() {
+        views.put(ViewID.LOGIN_MENU, ViewSetup.initLoginMenu());
         views.put(ViewID.MAIN_MENU, ViewSetup.initMainMenu());
         views.put(ViewID.POST_MENU, ViewSetup.initPostMenu());
         //views.put(ViewID.COMMENT_MENU, ViewSetup.initCommentMenu());
@@ -54,6 +62,12 @@ public class ViewManager {
         ViewSetup.linkViews(views);
     }
 
+    public static User getUser() {
+        return user;
+    }
+    public static void setUser(User user) {
+        ViewManager.user = user;
+    }
     public PostService getPostService() {
         return postService;
     }

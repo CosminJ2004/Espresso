@@ -1,6 +1,10 @@
 package org.example.menu;
 
 public enum MenuOption {
+    LOGIN_MENU,
+    LOGIN,
+    REGISTER,
+    CONTINUE_AS_GUEST,
     OPEN_POST_MENU,
     SHOW_FEED,
     CREATE_POST,

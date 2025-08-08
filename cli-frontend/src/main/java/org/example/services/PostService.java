@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PostService {
-    private static PostService instance;;
+    private static PostService instance;
     private PostUI postUI = PostUI.getInstance();
     private Gson gson;
 

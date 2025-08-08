@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.io.IOException;
 import java.net.http.*;
 import java.net.URI;
 import java.util.Scanner;
@@ -22,6 +23,16 @@ public class ApiUserService {
             instance = new ApiUserService(client);
         }
         return instance;
+    }
+    public JsonObject handleLogin(String json) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/login"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonObject responseObject = JsonParser.parseString(response.body()).getAsJsonObject();
+        return responseObject.getAsJsonObject("data");
     }
 
     public JsonArray handleGet(HttpClient client) throws Exception {

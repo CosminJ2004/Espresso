@@ -3,8 +3,11 @@ package org.example.menu.views;
 import org.example.menu.MenuOption;
 import org.example.menu.commands.IMenuCommand;
 import org.example.menu.commands.QuitCommand;
-import org.example.menu.commands.maincommands.*;
-import org.example.menu.commands.postcommands.*;
+import org.example.menu.commands.maincommands.OpenPostMenuCommand;
+import org.example.menu.commands.maincommands.OpenUserMenuCommand;
+import org.example.menu.commands.postcommands.CreatePostCommand;
+import org.example.menu.commands.postcommands.ShowFeedCommand;
+import org.example.menu.commands.usercommands.LoginCommand;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -13,6 +16,7 @@ public class ViewSetup {
 
     protected static View initMainMenu() {
         View mainMenu =  new View();
+
 
         mainMenu.setViewID(ViewID.MAIN_MENU);
 
@@ -24,6 +28,21 @@ public class ViewSetup {
         mainMenu.setMenu(menu);
 
         return mainMenu;
+    }
+
+    protected static View initLoginMenu() {
+        View loginMenu = new View();
+
+        loginMenu.setViewID(ViewID.LOGIN_MENU);
+
+        LinkedHashMap<MenuOption, IMenuCommand> menu = new LinkedHashMap<>();
+        menu.put(MenuOption.LOGIN, new LoginCommand());
+//        menu.put(MenuOption.REGISTER, new RegisterCommand());
+//        menu.put(MenuOption.CONTINUE_AS_GUEST, new ContinueAsGuestCommand());
+
+        loginMenu.setMenu(menu);
+
+        return loginMenu;
     }
 
     protected static View initPostMenu() {
