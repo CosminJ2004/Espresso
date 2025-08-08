@@ -22,6 +22,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         port: 22
         script: |
+          export ENV_FILE="${{ secrets.ENV_FILE }}"
           bash /home/ec2-user/deploy.sh
           
   deploy-processor:
