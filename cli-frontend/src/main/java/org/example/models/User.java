@@ -3,8 +3,10 @@ package org.example.models;
 public class User {
     long id;
     String username;
+    String email;
     String password;
     String createdAt;
+    String updatedAt;
     int postCount;
     int commentCount;
 

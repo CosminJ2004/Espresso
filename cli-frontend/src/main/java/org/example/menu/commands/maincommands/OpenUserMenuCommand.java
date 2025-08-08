@@ -6,6 +6,7 @@ import org.example.menu.views.View;
 public class OpenUserMenuCommand implements IMenuCommand {
 
     public boolean execute(View view) {
+
         return true;
     }
 

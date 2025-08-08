@@ -1,20 +1,25 @@
 package org.example.menu.views;
 
+import com.google.gson.Gson;
 import org.example.apiservices.*;
 import org.example.models.Subreddit;
 import org.example.services.*;
+import org.example.ui.PostUI;
 
 import java.net.http.HttpClient;
 import java.util.HashMap;
 
 public class ViewManager {
     private final HttpClient client = HttpClient.newHttpClient();
+    private final Gson gson = new Gson();
     private static ViewManager instance;
     private HashMap<String, Subreddit> subreddits;
     private HashMap<ViewID, View> views;
     private ViewID currentViewID;
 
-    private final PostService postService = PostService.getInstance();
+    private final PostUI postUI = PostUI.getInstance();
+
+    private final PostService postService = PostService.getInstance(gson);
     private final CommentService commentService = CommentService.getInstance();
     private final UserService userService = UserService.getInstance();
     private final VoteService voteService = VoteService.getInstance();
@@ -27,6 +32,7 @@ public class ViewManager {
 
     private ViewManager() {
         this.views = new HashMap<>();
+        this.subreddits = new HashMap<>();
         currentViewID = ViewID.MAIN_MENU;
     }
 
@@ -40,7 +46,7 @@ public class ViewManager {
 
     private void initAllViews() {
         views.put(ViewID.MAIN_MENU, ViewSetup.initMainMenu());
-        //views.put(ViewID.POST_MENU, ViewSetup.initPostMenu());
+        views.put(ViewID.POST_MENU, ViewSetup.initPostMenu());
         //views.put(ViewID.COMMENT_MENU, ViewSetup.initCommentMenu());
         //views.put(ViewID.VOTE_MENU, ViewSetup.initVoteMenu());
         //views.put(ViewID.USER_MENU, ViewSetup.initUserMenu());
@@ -102,5 +108,9 @@ public class ViewManager {
 
     public ViewID getCurrentViewID() {
         return currentViewID;
+    }
+
+    public PostUI getPostUI() {
+        return postUI;
     }
 }

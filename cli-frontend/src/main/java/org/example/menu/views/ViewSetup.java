@@ -3,12 +3,11 @@ package org.example.menu.views;
 import org.example.menu.MenuOption;
 import org.example.menu.commands.IMenuCommand;
 import org.example.menu.commands.QuitCommand;
-import org.example.menu.commands.maincommands.OpenPostMenuCommand;
-import org.example.menu.commands.maincommands.OpenUserMenuCommand;
+import org.example.menu.commands.maincommands.*;
+import org.example.menu.commands.postcommands.*;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class ViewSetup {
 
@@ -16,7 +15,7 @@ public class ViewSetup {
         View mainMenu =  new View();
 
         mainMenu.setViewID(ViewID.MAIN_MENU);
-        //TODO inlocuieste cu TreeMap
+
         LinkedHashMap<MenuOption, IMenuCommand> menu = new LinkedHashMap<>();
         menu.put(MenuOption.OPEN_POST_MENU, new OpenPostMenuCommand());
         menu.put(MenuOption.OPEN_USER_MENU, new OpenUserMenuCommand());
@@ -27,20 +26,23 @@ public class ViewSetup {
         return mainMenu;
     }
 
-    protected static View initPotMenu() {
+    protected static View initPostMenu() {
         View postMenu = new View();
 
         postMenu.setViewID(ViewID.POST_MENU);
 
-        HashMap<MenuOption, IMenuCommand> menu = new HashMap<>(Map.of(
+        LinkedHashMap<MenuOption, IMenuCommand> menu = new LinkedHashMap<>();
+        menu.put(MenuOption.SHOW_FEED, new ShowFeedCommand());
+        menu.put(MenuOption.CREATE_POST, new CreatePostCommand());
 
-        ));
+        postMenu.setMenu(menu);
 
         return postMenu;
     }
 
     protected static void linkViews(HashMap<ViewID, View> views) {
-
+        linkMainMenu(views);
+        linkPostMenu(views);
     }
 
     protected static void linkMainMenu(HashMap<ViewID, View> views) {
@@ -49,5 +51,13 @@ public class ViewSetup {
         nextViewsMainMenu.put(ViewID.USER_MENU, views.get(ViewID.USER_MENU));
 
         views.get(ViewID.MAIN_MENU).setNextViews(nextViewsMainMenu);
+    }
+
+    protected static void linkPostMenu(HashMap<ViewID, View> views) {
+        HashMap<ViewID, View> nextViewsPostMenu = new HashMap<>();
+        nextViewsPostMenu.put(ViewID.COMMENT_MENU, views.get(ViewID.COMMENT_MENU));
+        nextViewsPostMenu.put(ViewID.VOTE_MENU, views.get(ViewID.VOTE_MENU));
+
+        views.get(ViewID.POST_MENU).setNextViews(nextViewsPostMenu);
     }
 }

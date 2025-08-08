@@ -6,24 +6,27 @@ import org.example.models.Post;
 import org.example.models.Subreddit;
 import org.example.ui.PostUI;
 
-import java.net.http.HttpClient;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PostService {
-    private static PostService instance;
-    private ApiPostService apiPostService;
+    private static PostService instance;;
     private PostUI postUI = PostUI.getInstance();
+    private Gson gson;
 
-    public static PostService getInstance() {
+    private PostService(Gson gson) {
+        this.gson = gson;
+    }
+
+    public static PostService getInstance(Gson gson) {
         if (instance == null) {
-            instance = new PostService();
+            instance = new PostService(gson);
         }
         return instance;
     }
 
     //POST
-    public void createPost(HashMap<String, Subreddit> subreddits, Gson gson) throws Exception {
+    public void createPost(HashMap<String, Subreddit> subreddits, ApiPostService apiPostService) throws Exception {
         ArrayList<String> postDetails = postUI.getPostDetailsFromUser();
         String title = postDetails.get(0);
         String content = postDetails.get(1);
@@ -43,7 +46,7 @@ public class PostService {
         subreddits.get(post.getSubreddit()).addPost(post);
     }
     //PUT
-    public void editPost(HashMap<String, Subreddit> subreddits, Gson gson) throws Exception {
+    public void editPost(HashMap<String, Subreddit> subreddits, ApiPostService apiPostService) throws Exception {
         ArrayList<String> updatedDetails = postUI.getUpdatedPostDetailsFromUser();
         long id = Long.parseLong(updatedDetails.get(0));
         String title = updatedDetails.get(1);
@@ -58,7 +61,7 @@ public class PostService {
         subreddits.get(post.getSubreddit()).addPost(post);
     }
     //DELETE
-    public void deletePost(HashMap<String, Subreddit> subreddits) throws Exception {
+    public void deletePost(HashMap<String, Subreddit> subreddits, ApiPostService apiPostService) throws Exception {
         long id = postUI.getPostIDFromUser();
         apiPostService.handleDelete(id);
         for(Subreddit subreddit : subreddits.values()) {

@@ -8,6 +8,10 @@ public class InputTranslator {
         String stringInput = translateInputToString(input, viewID);
 
         return switch (stringInput) {
+            case "post menu" -> MenuOption.OPEN_POST_MENU;
+            case "user menu" -> MenuOption.OPEN_USER_MENU;
+            case "show feed" -> MenuOption.SHOW_FEED;
+            case "create post" -> MenuOption.CREATE_POST;
             case "quit" -> MenuOption.QUIT;
 
             default -> null;
@@ -18,6 +22,9 @@ public class InputTranslator {
         switch (viewID) {
             case MAIN_MENU:
                 return translateMenuInput(input);
+
+            case POST_MENU:
+                return translatePostMenuInput(input);
         }
 
         return input;
@@ -29,6 +36,15 @@ public class InputTranslator {
             case "1" -> "post menu";
             case "2" -> "user menu";
             case "3" -> "quit";
+            default -> input;
+        };
+    }
+
+    private static String translatePostMenuInput(String input) {
+        //1. Show feed, 2. Create post, 3. Add comment to post, 4 Update post, 5. Delete post
+        return switch (input) {
+            case "1" -> "show feed";
+            case "2" -> "create post";
             default -> input;
         };
     }
