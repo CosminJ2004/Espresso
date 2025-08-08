@@ -33,7 +33,7 @@ public class FilterController : ControllerBase
         var file = form.Files["image"];
         if (file == null)
             return BadRequest("Missing image");
-
+        // TODO: controller directly handles business (it calls the handler, etc.)
         try
         {
             using var stream = file.OpenReadStream();
