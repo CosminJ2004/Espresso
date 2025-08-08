@@ -8,7 +8,7 @@ public enum MenuOption {
     OPEN_POST_MENU,
     SHOW_FEED,
     CREATE_POST,
-    UPDATE_POST,
+    EDIT_POST,
     DELETE_POST,
     ADD_COMMENT,
     OPEN_USER_MENU,
