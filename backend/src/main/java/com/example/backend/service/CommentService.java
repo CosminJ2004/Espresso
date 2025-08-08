@@ -12,6 +12,7 @@ import com.example.backend.repository.CommentRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.VoteRepository;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -97,9 +98,7 @@ public class CommentService {
 
         commentResponse.setCreatedAt(comment.getCreatedAt());
         commentResponse.setUpdatedAt(comment.getUpdatedAt());
-        commentResponse.setReplies(comment.getReplies().stream()
-                .map(this::commentToCommentResponseDto)
-                .collect(java.util.stream.Collectors.toList()));
+        commentResponse.setReplies(new ArrayList<>());
 
         return commentResponse;
     }
