@@ -14,7 +14,13 @@ public class Main {
     public static void main(String[] args) {
         ViewManager viewManager = ViewManager.getInstance();
 
-        System.out.println("CLI Java Client - Interfață interactivă");
+        System.out.println("Bine ai venit pe reddit espresso - Sa ai spor la cafeluta suflet drag");
+        System.out.println("""
+                 ((     ___
+                  ))  \\___/_  Bottomless
+                 |~~| /~~~\\ \\ cup o'
+                C|__| \\___/   coffee
+                """);
 
         Scanner sc  = new Scanner(System.in);
         boolean isActive = true;
