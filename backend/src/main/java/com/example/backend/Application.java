@@ -1,5 +1,6 @@
 package com.example.backend;
 
+import com.example.backend.config.DotenvInitializer;
 import com.example.backend.util.logger.LogLevel;
 import com.example.backend.util.logger.LoggerManager;
 import org.springframework.boot.SpringApplication;
@@ -11,7 +12,9 @@ import org.springframework.context.event.EventListener;
 public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+		SpringApplication app = new SpringApplication(Application.class);
+		app.addInitializers(new DotenvInitializer());
+		app.run(args);
 	}
 
 	@EventListener(ApplicationReadyEvent.class)
