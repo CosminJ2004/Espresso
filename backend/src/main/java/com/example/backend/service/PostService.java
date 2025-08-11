@@ -283,7 +283,9 @@ public class PostService {
         Vote authorVote = new Vote(author, updatedComment, VoteType.UP);
         voteRepository.save(authorVote);
 
-        return commentService.commentToCommentResponseDto(updatedComment);
+        Comment refreshedComment = commentRepository.findById(updatedComment.getId()).orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+
+        return commentService.commentToCommentResponseDto(refreshedComment);
     }
 
     private PostResponseDto postToPostResponseDto(Post post) {
