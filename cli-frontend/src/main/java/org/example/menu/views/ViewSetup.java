@@ -6,8 +6,12 @@ import org.example.menu.commands.QuitCommand;
 import org.example.menu.commands.maincommands.OpenPostMenuCommand;
 import org.example.menu.commands.maincommands.OpenUserMenuCommand;
 import org.example.menu.commands.postcommands.CreatePostCommand;
+import org.example.menu.commands.postcommands.DeletePostCommand;
+import org.example.menu.commands.postcommands.EditPostCommand;
 import org.example.menu.commands.postcommands.ShowFeedCommand;
+import org.example.menu.commands.usercommands.ContinueAsGuestCommand;
 import org.example.menu.commands.usercommands.LoginCommand;
+import org.example.menu.commands.usercommands.RegisterCommand;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -37,8 +41,8 @@ public class ViewSetup {
 
         LinkedHashMap<MenuOption, IMenuCommand> menu = new LinkedHashMap<>();
         menu.put(MenuOption.LOGIN, new LoginCommand());
-//        menu.put(MenuOption.REGISTER, new RegisterCommand());
-//        menu.put(MenuOption.CONTINUE_AS_GUEST, new ContinueAsGuestCommand());
+        menu.put(MenuOption.REGISTER, new RegisterCommand());
+        menu.put(MenuOption.CONTINUE_AS_GUEST, new ContinueAsGuestCommand());
 
         loginMenu.setMenu(menu);
 
