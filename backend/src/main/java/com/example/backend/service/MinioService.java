@@ -6,12 +6,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.UUID;
@@ -51,4 +55,28 @@ public class MinioService {
 
         return baseUrl + "/" + bucketName + "/" + filename;
     }
+
+
+
+    public byte[] downloadImage(String filename) throws IOException {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(filename)
+                .build();
+
+        try (ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getObjectRequest);
+             ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+
+            byte[] data = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = s3Object.read(data)) != -1) {
+                buffer.write(data, 0, bytesRead);
+            }
+
+            return buffer.toByteArray();
+        }
+    }
+
+
+
 }

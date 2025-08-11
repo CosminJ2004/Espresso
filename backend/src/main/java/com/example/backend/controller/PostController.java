@@ -74,6 +74,22 @@ public class PostController {
     public ResponseEntity<Response<PostResponseDto>> getGrayscaleFilter(PostRequestImageDto postRequestDto)throws  IOException {
         return Response.ok(postService.getPostWithGrayscale(postRequestDto));
     }
+
+    @GetMapping("/{id}/filter/{filterType}")
+    public ResponseEntity<byte[]> getPostWithFilter(
+            @PathVariable Long id,
+            @PathVariable String filterType) throws IOException {
+
+        byte[] filteredImage = postService.getPostImageWithFilter(id, filterType);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG) // sau PNG dacă filtrele tale returnează PNG
+                .body(filteredImage);
+    }
+
+
+
+
 }
 
 
