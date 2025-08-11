@@ -20,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -76,14 +75,14 @@ public class PostService {
         Post post = new Post(author, dto.getTitle(), dto.getContent());
         postRepository.save(post);
 
-        Vote authorVote = new Vote(author, post, VoteType.up);
+        Vote authorVote = new Vote(author, post, VoteType.UP);
         voteRepository.save(authorVote);
         loggerManager.log("console", LogLevel.INFO, "post created");
         return postToPostResponseDto(post);
 
     }
 
-    public PostResponseDto createPostWithImage(PostRequestImageDto dto) throws IOException {
+    public PostResponseDto createPostWithImage(PostRequestImageDto dto) {
         Post post = new Post();
         post.setTitle(dto.getTitle());
         post.setContent(dto.getContent());
@@ -92,16 +91,20 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Author not found"));
         post.setAuthor(author);
 
-        if (dto.getImage() != null && !dto.getImage().isEmpty()) {
-            String imageUrl = minioService.uploadImage(dto.getImage());
-            post.setFilePath(imageUrl);
-        }
+        try {
+            if (dto.getImage() != null && !dto.getImage().isEmpty()) {
+                String imageUrl = minioService.uploadImage(dto.getImage());
+                post.setFilePath(imageUrl);
+            }
 
-        postRepository.save(post);
-        return postToPostResponseDto(post);
+            postRepository.save(post);
+            return postToPostResponseDto(post);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create post with image: " + e.getMessage(), e);
+        }
     }
 
-        public PostResponseDto getPostWithGrayscale(PostRequestImageDto dto) throws IOException{
+        public PostResponseDto getPostWithGrayscale(PostRequestImageDto dto) {
             if (dto.getImage() == null || dto.getImage().isEmpty()) {
                 loggerManager.log("file",LogLevel.INFO,"getting post with image");
             }
@@ -204,6 +207,7 @@ public class PostService {
 
 
 
+
     public PostResponseDto updatePost(Long id, PostRequestDto dto) {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
@@ -243,7 +247,7 @@ public class PostService {
         voteResponse.setScore(post.getScore());
 
         Optional<Vote> currentVote = voteRepository.findByUserAndPost(user, post);
-        voteResponse.setUserVote(currentVote.map(Vote::getType).orElse(VoteType.none));
+        voteResponse.setUserVote(currentVote.map(Vote::getType).orElse(VoteType.NONE));
 
         return voteResponse;
     }
@@ -253,26 +257,11 @@ public class PostService {
             throw new IllegalArgumentException("Post not found with ID: " + postId);
         }
 
-        List<Comment> comments = commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
+        List<Comment> rootComments = commentRepository.findByPostIdAndParentIsNullOrderByCreatedAtAsc(postId);
 
-        Map<Long, CommentResponseDto> dtoMap = new HashMap<>();
-        List<CommentResponseDto> rootComments = new ArrayList<>();
-
-        for (Comment comment : comments) {
-            CommentResponseDto dto = commentService.commentToCommentResponseDto(comment);
-            dtoMap.put(comment.getId(), dto);
-
-            if (comment.getParent() != null) {
-                CommentResponseDto parentDto = dtoMap.get(comment.getParent().getId());
-                if (parentDto != null) {
-                    parentDto.getReplies().add(dto);
-                }
-            } else {
-                rootComments.add(dto);
-            }
-        }
-
-        return rootComments;
+        return rootComments.stream()
+                .map(commentService::commentToCommentResponseDto)
+                .collect(Collectors.toList());
     }
 
     public CommentResponseDto addComment(Long id, CommentRequestDto commentRequest) {
@@ -291,7 +280,7 @@ public class PostService {
         Comment newComment = new Comment(author, commentRequest.getContent(), post, parent);
         Comment updatedComment = commentRepository.save(newComment);
 
-        Vote authorVote = new Vote(author, updatedComment, VoteType.up);
+        Vote authorVote = new Vote(author, updatedComment, VoteType.UP);
         voteRepository.save(authorVote);
 
         return commentService.commentToCommentResponseDto(updatedComment);

@@ -71,7 +71,7 @@ public class Vote {
     }
 
     public int getVoteValue() {
-        return type == VoteType.up ? 1 : -1;
+        return type == VoteType.UP ? 1 : -1;
     }
 
     @Override

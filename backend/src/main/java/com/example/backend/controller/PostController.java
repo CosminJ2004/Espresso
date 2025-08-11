@@ -63,15 +63,13 @@ public class PostController {
         return Response.ok(postService.addComment(id, commentRequest));
     }
 
-
     @PostMapping(value = "/with-image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Response<PostResponseDto>> createPostWithImage(PostRequestImageDto postRequestDto) throws IOException
-    {
+    public ResponseEntity<Response<PostResponseDto>> createPostWithImage(PostRequestImageDto postRequestDto) {
         return Response.ok(postService.createPostWithImage(postRequestDto));
     }
 
     @GetMapping(value = "/get-grayscale-filter")
-    public ResponseEntity<Response<PostResponseDto>> getGrayscaleFilter(PostRequestImageDto postRequestDto)throws  IOException {
+    public ResponseEntity<Response<PostResponseDto>> getGrayscaleFilter(PostRequestImageDto postRequestDto) {
         return Response.ok(postService.getPostWithGrayscale(postRequestDto));
     }
 

@@ -225,8 +225,8 @@ public class PostServiceTest {
     //vote
     @Test
     void shouldVotePostSuccessfully() {
-        VoteRequestDto voteRequest = TestDataUtility.createVoteRequest(VoteType.up);
-        Vote vote = TestDataUtility.createVote(mockUser, mockPost, VoteType.up);
+        VoteRequestDto voteRequest = TestDataUtility.createVoteRequest(VoteType.UP);
+        Vote vote = TestDataUtility.createVote(mockUser, mockPost, VoteType.UP);
 
         when(postRepository.findById(mockPost.getId())).thenReturn(Optional.of(mockPost));
         when(userRepository.findByUsername(mockUser.getUsername())).thenReturn(Optional.of(mockUser));
@@ -236,13 +236,13 @@ public class PostServiceTest {
         VoteResponseDto result = postService.votePost(mockPost.getId(), voteRequest);
 
         assertThat(result).isNotNull();
-        assertThat(result.getUserVote()).isEqualTo(VoteType.up);
-        verify(voteService).vote(any(), any(), any(), eq(VoteType.up));
+        assertThat(result.getUserVote()).isEqualTo(VoteType.UP);
+        verify(voteService).vote(any(), any(), any(), eq(VoteType.UP));
     }
 
     @Test
     void shouldThrowExceptionWhenPostNotFoundInVote() {
-        VoteRequestDto voteRequest = TestDataUtility.createVoteRequest(VoteType.up);
+        VoteRequestDto voteRequest = TestDataUtility.createVoteRequest(VoteType.UP);
 
         when(postRepository.findById(999L)).thenReturn(Optional.empty());
 
@@ -291,7 +291,7 @@ public class PostServiceTest {
                 .thenReturn(response2);
 
         when(postRepository.existsById(mockPost.getId())).thenReturn(true);
-        when(commentRepository.findByPostIdOrderByCreatedAtAsc(mockPost.getId()))
+        when(commentRepository.findByPostIdAndParentIsNullOrderByCreatedAtAsc(mockPost.getId()))
                 .thenReturn(comments);
 
         var result = postService.getCommentsByPostId(mockPost.getId());
@@ -370,21 +370,27 @@ public class PostServiceTest {
         anotherMockComment.setParent(null);
         mockComment.setParent(anotherMockComment);
 
-        CommentResponseDto parentDto = new CommentResponseDto(
-                anotherMockComment.getId(),
-                mockPost.getId(),
-                null,
-                anotherMockComment.getText(),
-                anotherMockComment.getAuthor().getUsername(),
-                0L,
-                0L,
-                0L,
-                null,
-                anotherMockComment.getCreatedAt(),
-                anotherMockComment.getUpdatedAt(),
-                new ArrayList<>()
-        );
+        anotherMockComment.getReplies().clear();
+        anotherMockComment.getReplies().add(mockComment);
 
+        CommentResponseDto parentDto = getCommentResponseDto();
+
+        when(postRepository.existsById(mockPost.getId())).thenReturn(true);
+        when(commentRepository.findByPostIdAndParentIsNullOrderByCreatedAtAsc(mockPost.getId()))
+                .thenReturn(List.of(anotherMockComment));
+        when(commentService.commentToCommentResponseDto(anotherMockComment)).thenReturn(parentDto);
+
+        List<CommentResponseDto> result = postService.getCommentsByPostId(mockPost.getId());
+
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.getFirst().getId()).isEqualTo(anotherMockComment.getId());
+        assertThat(result.getFirst().getReplies().size()).isEqualTo(1);
+        assertThat(result.getFirst().getReplies().getFirst().getId()).isEqualTo(mockComment.getId());
+        verify(commentService, times(1)).commentToCommentResponseDto(any(Comment.class));
+    }
+
+    private CommentResponseDto getCommentResponseDto() {
         CommentResponseDto childDto = new CommentResponseDto(
                 mockComment.getId(),
                 mockPost.getId(),
@@ -400,20 +406,20 @@ public class PostServiceTest {
                 new ArrayList<>()
         );
 
-        when(postRepository.existsById(mockPost.getId())).thenReturn(true);
-        when(commentRepository.findByPostIdOrderByCreatedAtAsc(mockPost.getId()))
-                .thenReturn(List.of(anotherMockComment, mockComment));
-        when(commentService.commentToCommentResponseDto(anotherMockComment)).thenReturn(parentDto);
-        when(commentService.commentToCommentResponseDto(mockComment)).thenReturn(childDto);
-
-        List<CommentResponseDto> result = postService.getCommentsByPostId(mockPost.getId());
-
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(1);
-        assertThat(result.getFirst().getId()).isEqualTo(anotherMockComment.getId());
-        assertThat(result.getFirst().getReplies().size()).isEqualTo(1);
-        assertThat(result.getFirst().getReplies().getFirst().getId()).isEqualTo(mockComment.getId());
-        verify(commentService, times(2)).commentToCommentResponseDto(any(Comment.class));
+        return new CommentResponseDto(
+                anotherMockComment.getId(),
+                mockPost.getId(),
+                null,
+                anotherMockComment.getText(),
+                anotherMockComment.getAuthor().getUsername(),
+                0L,
+                0L,
+                0L,
+                null,
+                anotherMockComment.getCreatedAt(),
+                anotherMockComment.getUpdatedAt(),
+                List.of(childDto)
+        );
     }
 
     //image

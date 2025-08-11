@@ -46,7 +46,7 @@ class CommentControllerTest {
         responseDto.setUpvotes(5L);
         responseDto.setDownvotes(2L);
         responseDto.setScore(3L);
-        responseDto.setUserVote(VoteType.up);
+        responseDto.setUserVote(VoteType.UP);
         responseDto.setCreatedAt(LocalDateTime.now());
         responseDto.setUpdatedAt(LocalDateTime.now());
         responseDto.setReplies(new ArrayList<>());
@@ -105,13 +105,13 @@ class CommentControllerTest {
     void voteComment() throws Exception {
         Long commentId = 1L;
         VoteRequestDto voteRequest = new VoteRequestDto();
-        voteRequest.setVoteType(VoteType.up);
+        voteRequest.setVoteType(VoteType.UP);
 
         VoteResponseDto voteResponse = new VoteResponseDto();
         voteResponse.setUpvotes(6L);
         voteResponse.setDownvotes(0L);
         voteResponse.setScore(6L);
-        voteResponse.setUserVote(VoteType.up);
+        voteResponse.setUserVote(VoteType.UP);
 
         when(commentService.voteComment(commentId, voteRequest))
                 .thenReturn(voteResponse);

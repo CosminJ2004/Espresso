@@ -28,7 +28,7 @@ public class VoteService {
             throw new IllegalArgumentException("Either post or comment must be provided");
         }
 
-        if (voteType == null || VoteType.none == voteType) {
+        if (voteType == null || VoteType.NONE == voteType) {
             existingVote.ifPresent(voteRepository::delete);
         } else {
             if (existingVote.isPresent()) {
