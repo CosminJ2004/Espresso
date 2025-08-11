@@ -3,12 +3,16 @@ package org.example.textlib;
 import org.example.menu.MenuOption;
 import org.example.menu.views.ViewID;
 
+import java.awt.*;
+
 public class InputTranslator {
     public static MenuOption translateInput(String input, ViewID viewID) {
         String stringInput = translateInputToString(input, viewID);
 
         return switch (stringInput) {
             case "login" -> MenuOption.LOGIN;
+            case "register" -> MenuOption.REGISTER;
+            case "continue as guest" -> MenuOption.CONTINUE_AS_GUEST;
             case "post menu" -> MenuOption.OPEN_POST_MENU;
             case "user menu" -> MenuOption.OPEN_USER_MENU;
             case "show feed" -> MenuOption.SHOW_FEED;

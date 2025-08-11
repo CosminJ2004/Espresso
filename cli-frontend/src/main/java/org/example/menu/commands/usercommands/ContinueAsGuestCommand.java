@@ -5,16 +5,11 @@ import org.example.menu.views.View;
 import org.example.menu.views.ViewID;
 import org.example.menu.views.ViewManager;
 
-public class LoginCommand implements IMenuCommand {
+public class ContinueAsGuestCommand implements IMenuCommand {
     public boolean execute(View view) {
         ViewManager viewManager = view.getViewManager();
-
-        boolean isLoggedIn = viewManager.getUserService().loginUser(viewManager.getApiUserService());
-        if (isLoggedIn) {
-            viewManager.switchToNextView(ViewID.MAIN_MENU);
-        } else {
-            viewManager.switchToNextView(ViewID.LOGIN_MENU);
-        }
+        viewManager.getUserService().continueAsGuest();
+        viewManager.switchToNextView(ViewID.MAIN_MENU);
         return true;
     }
 }
