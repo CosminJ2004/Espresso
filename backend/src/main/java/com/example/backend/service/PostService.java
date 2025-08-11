@@ -33,13 +33,14 @@ public class PostService {
     private final VoteRepository voteRepository;
     private final VoteService voteService;
     private final MinioService minioService;
+    private final ImageFilterService imageFilterService;
 
     private final Path uploadDir = Paths.get("uploads/images");
 
     private static final LoggerManager loggerManager = LoggerManager.getInstance();
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, CommentService commentService, VoteRepository voteRepository, VoteService voteService,MinioService minioService) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, CommentService commentService, VoteRepository voteRepository, VoteService voteService, MinioService minioService, ImageFilterService imageFilterService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
@@ -47,6 +48,7 @@ public class PostService {
         this.voteRepository = voteRepository;
         this.voteService = voteService;
         this.minioService = minioService;
+        this.imageFilterService = imageFilterService;
     }
 
     public List<PostResponseDto> getAllPosts() {
@@ -183,6 +185,28 @@ public class PostService {
                 throw new RuntimeException("Error processing grayscale post", e);
             }
         }
+
+    public byte[] getPostImageWithFilter(Long postId, String filterType) throws IOException {
+        // 1. Găsește postarea în DB
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + postId));
+
+        // 2. Ia filepath-ul din S3
+        String filePath = post.getFilePath();
+
+        // 3. Descarcă imaginea din S3
+        byte[] originalImage = minioService.downloadImage(filePath);
+        // (s3Service.downloadFile returnează byte[])
+
+        // 4. Aplică filtrul (apelezi metoda ta existentă de procesare)
+        byte[] filteredImage = imageFilterService.applyFilter(originalImage, filterType);
+
+        // 5. Returnează imaginea filtrată ca byte[]
+        return filteredImage;
+    }
+
+
+
 
     public PostResponseDto updatePost(Long id, PostRequestDto dto) {
         Post existingPost = postRepository.findById(id)
