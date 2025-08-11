@@ -94,7 +94,7 @@ public class Post {
             return 0;
         }
         return votes.stream()
-                .filter(vote -> vote.getType() == VoteType.up)
+                .filter(vote -> vote.getType() == VoteType.UP)
                 .count();
     }
 
@@ -103,7 +103,7 @@ public class Post {
             return 0;
         }
         return votes.stream()
-                .filter(vote -> vote.getType() == VoteType.down)
+                .filter(vote -> vote.getType() == VoteType.DOWN)
                 .count();
     }
 

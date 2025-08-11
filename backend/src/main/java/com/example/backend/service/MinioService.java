@@ -31,10 +31,11 @@ public class MinioService {
         
         this.s3Client = S3Client.builder()
                 .endpointOverride(URI.create(baseUrl))
-                .region(Region.US_EAST_1)
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(accessKey, secretKey)
                 ))
+                .region(Region.US_EAST_1)
+                .forcePathStyle(true)
                 .build();
     }
 

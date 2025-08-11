@@ -84,7 +84,7 @@ public class Comment{
             return 0;
         }
         return votes.stream()
-                .filter(vote -> vote.getType() == VoteType.up)
+                .filter(vote -> vote.getType() == VoteType.UP)
                 .count();
     }
 
@@ -93,7 +93,7 @@ public class Comment{
             return 0;
         }
         return votes.stream()
-                .filter(vote -> vote.getType() == VoteType.down)
+                .filter(vote -> vote.getType() == VoteType.DOWN)
                 .count();
     }
 

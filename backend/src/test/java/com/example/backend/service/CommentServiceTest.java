@@ -139,7 +139,7 @@ class CommentServiceTest {
     @Test
     void voteComment() {
         VoteRequestDto voteRequest = new VoteRequestDto();
-        voteRequest.setVoteType(VoteType.up);
+        voteRequest.setVoteType(VoteType.UP);
 
         Comment mockRefreshedComment = mock(Comment.class);
         when(mockRefreshedComment.getUpvoteCount()).thenReturn(5L);
@@ -147,7 +147,7 @@ class CommentServiceTest {
         when(mockRefreshedComment.getScore()).thenReturn(3L);
 
         Vote userVote = new Vote();
-        userVote.setType(VoteType.up);
+        userVote.setType(VoteType.UP);
 
         when(commentRepository.findById(1L))
                 .thenReturn(Optional.of(testComment))
@@ -157,14 +157,14 @@ class CommentServiceTest {
 
         VoteResponseDto result = commentService.voteComment(1L, voteRequest);
 
-        verify(voteService).vote(testUser, null, testComment, VoteType.up);
-        assertThat(result.getUserVote()).isEqualTo(VoteType.up);
+        verify(voteService).vote(testUser, null, testComment, VoteType.UP);
+        assertThat(result.getUserVote()).isEqualTo(VoteType.UP);
     }
 
     @Test
     void throwExceptionWhenVotingNonExistentComment() {
         VoteRequestDto voteRequest = new VoteRequestDto();
-        voteRequest.setVoteType(VoteType.up);
+        voteRequest.setVoteType(VoteType.UP);
 
         when(commentRepository.findById(999L)).thenReturn(Optional.empty());
 
@@ -178,7 +178,7 @@ class CommentServiceTest {
     @Test
     void throwExceptionWhenUserNotFoundForVoting() {
         VoteRequestDto voteRequest = new VoteRequestDto();
-        voteRequest.setVoteType(VoteType.up);
+        voteRequest.setVoteType(VoteType.UP);
 
         when(commentRepository.findById(1L)).thenReturn(Optional.of(testComment));
         when(userRepository.findByUsername("current_user")).thenReturn(Optional.empty());

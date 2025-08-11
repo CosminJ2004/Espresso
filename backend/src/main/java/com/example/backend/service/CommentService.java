@@ -13,7 +13,9 @@ import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.VoteRepository;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -76,7 +78,7 @@ public class CommentService {
         voteResponse.setScore(comment.getScore());
 
         Optional<Vote> currentVote = voteRepository.findByUserAndComment(user, comment);
-        voteResponse.setUserVote(currentVote.map(Vote::getType).orElse(VoteType.none));
+        voteResponse.setUserVote(currentVote.map(Vote::getType).orElse(VoteType.NONE));
 
         return voteResponse;
     }
@@ -98,7 +100,14 @@ public class CommentService {
 
         commentResponse.setCreatedAt(comment.getCreatedAt());
         commentResponse.setUpdatedAt(comment.getUpdatedAt());
-        commentResponse.setReplies(new ArrayList<>());
+        
+        List<CommentResponseDto> replies = new ArrayList<>();
+        if (comment.getReplies() != null && !comment.getReplies().isEmpty()) {
+            replies = comment.getReplies().stream()
+                    .map(this::commentToCommentResponseDto)
+                    .toList();
+        }
+        commentResponse.setReplies(replies);
 
         return commentResponse;
     }
