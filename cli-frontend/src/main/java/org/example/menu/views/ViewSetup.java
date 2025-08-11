@@ -3,11 +3,9 @@ package org.example.menu.views;
 import org.example.menu.MenuOption;
 import org.example.menu.commands.IMenuCommand;
 import org.example.menu.commands.QuitCommand;
-import org.example.menu.commands.maincommands.OpenPostMenuCommand;
-import org.example.menu.commands.maincommands.OpenUserMenuCommand;
-import org.example.menu.commands.postcommands.CreatePostCommand;
-import org.example.menu.commands.postcommands.ShowFeedCommand;
-import org.example.menu.commands.usercommands.LoginCommand;
+import org.example.menu.commands.maincommands.*;
+import org.example.menu.commands.postcommands.*;
+import org.example.menu.commands.usercommands.*;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;

@@ -15,7 +15,7 @@ public class Post {
     private VoteType userVote;
     private String createdAt;
     private String updateAt;
-    private HashMap<String, Comment> postComments;
+    private HashMap<String, Comment> postComments = new HashMap<>();
 
     public long getId() {
         return id;
