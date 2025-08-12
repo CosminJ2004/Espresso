@@ -20,6 +20,115 @@ public class Renderer {
         System.out.println();
     }
 
+    public void displayGoodbyeBanner() {
+        List<String> lines = box.buildBox(
+                "Goodbye!",
+                List.of("Thank you for using Espresso CLI. See you next time!")
+        );
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toOrange(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayLoginMenu() {
+        List<String> lines = box.buildBox(
+                "SIGN-IN MENU",
+                List.of(
+                        "Please select an option:",
+                        "1. Register",
+                        "2. Login",
+                        "3. Exit"
+                )
+        );
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toYellow(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayUserMenu() {
+        List<String> lines = box.buildBox(
+                "USER MENU",
+                List.of(
+                        "Please select an option:",
+                        "1. View Profile",
+                        "2. Edit Profile",
+                        "3. Search Users",
+                        "4. Delete Account",
+                        "5. Logout"
+                )
+        );
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toYellow(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayPostMenu() {
+        List<String> lines = box.buildBox(
+                "POSTS MENU",
+                List.of(
+                        "Please select an option:",
+                        "1. Create Post",
+                        "2. View Posts",
+                        "3. Edit Post",
+                        "4. Delete Post",
+                        "5. Vote Post"
+                )
+        );
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toYellow(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayCommentMenu() {
+        List<String> lines = box.buildBox(
+                "COMMENTS MENU",
+                List.of(
+                        "Please select an option:",
+                        "1. Create Comment",
+                        "2. View Comments",
+                        "3. Edit Comment",
+                        "4. Delete Comment",
+                        "5. Vote Comment"
+                )
+        );
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toYellow(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayError(String message) {
+        List<String> lines = box.buildBox("[ERROR]", List.of(message));
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toRed(line)));
+        }
+        System.out.println();
+    }
+
+    public void displaySuccess(String message) {
+        List<String> lines = box.buildBox("[SUCCESS]", List.of(message));
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toGreen(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayInfo(String message) {
+        List<String> lines = box.buildBox("[INFO]", List.of(message));
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toBlue(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayInputPrompt(String prompt) {
+        System.out.print(Colors.toBold(Colors.toYellow(prompt)));
+    }
+
 //    public void displayGoodbyeBanner() {
 //        System.out.println(Colors.toBold(Colors.toOrange("╭─────────────────────────────────────────────────────────╮")));
 //        System.out.println(Colors.toBold(Colors.toOrange("│                     Goodbye!                            │")));

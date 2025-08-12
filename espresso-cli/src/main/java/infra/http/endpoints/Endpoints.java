@@ -4,7 +4,7 @@ public final class Endpoints {
     private Endpoints() {
     }
 
-    public static final String API_BASE_URL = "http://3.65.147.49/";
+    public static final String API_BASE_URL = "http://3.65.147.49";
 
     public static String getPostsEndpoint() {
         return API_BASE_URL + "/posts";

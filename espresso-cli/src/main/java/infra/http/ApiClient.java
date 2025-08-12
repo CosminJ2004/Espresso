@@ -62,8 +62,11 @@ public final class ApiClient {
     private <T> ApiResult<T> executeRequest(HttpRequest request, TypeReference<ApiResult<T>> type) {
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            //System.out.println("Response body: " + response.body());  // pentru debug, sa vad raspunsul in caz de ceva
             return objectMapper.readValue(response.body(), type);
-        } catch (Exception e) { // JsonProcessing sau JsonMapping
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+            //e.printStackTrace();  // //debug
             return ApiResult.error("Could not process the request! Please try again later!", 500);
         }
     }

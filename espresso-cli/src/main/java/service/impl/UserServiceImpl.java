@@ -54,8 +54,8 @@ public class UserServiceImpl implements UserService {
     public ApiResult<User> login(UserRequestDto dto) {
         try {
             String url = baseUrl + "/login";
-            return apiClient.post(url, dto, new TypeReference<ApiResult<User>>() {
-            });
+            //System.out.println("Login URL: " + url);  // pentru debug sa vedem ce url construieste
+            return apiClient.post(url, dto, new TypeReference<ApiResult<User>>() {});
         } catch (Exception e) {
             return ApiResult.error("Login failed: " + e.getMessage(), 500);
         }
