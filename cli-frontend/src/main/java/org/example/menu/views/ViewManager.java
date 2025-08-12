@@ -30,7 +30,7 @@ public class ViewManager {
     private final CommentService commentService = CommentService.getInstance();
     private final UserService userService = UserService.getInstance(gson);
     private final VoteService voteService = VoteService.getInstance();
-    private final SubredditService subredditService = SubredditService.getInstance();
+    private final SubredditService subredditService = SubredditService.getInstance(gson);
 
     private final ApiPostService apiPostService = ApiPostService.getInstance(client);
     private final ApiCommentService apiCommentService = ApiCommentService.getInstance(client);
@@ -59,15 +59,23 @@ public class ViewManager {
         //views.put(ViewID.VOTE_MENU, ViewSetup.initVoteMenu());
         //views.put(ViewID.USER_MENU, ViewSetup.initUserMenu());
 
+        try {
+            subredditService.populateSubreddits(subreddits, apiPostService.handleGet());
+        } catch (Exception e) {
+            System.err.println("Could't load subreddits.");
+        }
+
         ViewSetup.linkViews(views);
     }
 
     public static User getUser() {
         return user;
     }
+
     public static void setUser(User user) {
         ViewManager.user = user;
     }
+
     public PostService getPostService() {
         return postService;
     }

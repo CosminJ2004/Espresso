@@ -24,7 +24,7 @@ public class ApiCommentService {
         return instance;
     }
 
-    public JsonArray handleGet(HttpClient client) throws Exception {
+    public JsonArray handleGet() throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
                 .GET()
@@ -35,7 +35,7 @@ public class ApiCommentService {
         return responseObject.getAsJsonArray("data");
     }
 
-    public void handlePost(Scanner scanner, HttpClient client) throws Exception {
+    public void handlePost(Scanner scanner) throws Exception {
         System.out.print("Text comentariu: ");
         String content = scanner.nextLine();
         System.out.print("Username autor: ");
@@ -61,7 +61,7 @@ public class ApiCommentService {
         System.out.println("Comentariu adăugat:\n" + response.body());
     }
 
-    public void handlePut(Scanner scanner, HttpClient client) throws Exception {
+    public void handlePut(Scanner scanner) throws Exception {
         System.out.print("ID comentariu de editat: ");
         Long id = Long.parseLong(scanner.nextLine());
         System.out.print("Text nou: ");
@@ -90,7 +90,7 @@ public class ApiCommentService {
         System.out.println("Comentariu actualizat:\n" + response.body());
     }
 
-    public void handleDelete(Scanner scanner, HttpClient client) throws Exception {
+    public void handleDelete(Scanner scanner) throws Exception {
         System.out.print("ID comentariu de șters: ");
         Long id = Long.parseLong(scanner.nextLine());
 

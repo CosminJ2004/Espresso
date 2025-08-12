@@ -26,7 +26,7 @@ public class PostService {
     }
 
     //POST
-    public void createPost(HashMap<String, Subreddit> subreddits, ApiPostService apiPostService) throws Exception {
+    public Post createPost(ApiPostService apiPostService) throws Exception {
         ArrayList<String> postDetails = postUI.getPostDetailsFromUser();
         String title = postDetails.get(0);
         String content = postDetails.get(1);
@@ -42,8 +42,7 @@ public class PostService {
         }
         """, title, content, author, subreddit);
 
-        Post post = gson.fromJson(apiPostService.handlePost(json), Post.class);
-        subreddits.get(post.getSubreddit()).addPost(post);
+        return gson.fromJson(apiPostService.handlePost(json), Post.class);
     }
     //PUT
     public void editPost(HashMap<String, Subreddit> subreddits, ApiPostService apiPostService) throws Exception {
