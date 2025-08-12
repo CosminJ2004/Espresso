@@ -12,6 +12,8 @@ public final class EspressoCLI implements AutoCloseable{
     private final CommentService commentService;
     private final ConsoleIO io;
     private final Renderer ui;
+    private final MenuManager menuManager;
+    private final AppState appState;
 
     public EspressoCLI(PostService postService, UserService userService, CommentService commentService, ConsoleIO io, Renderer ui) {
         this.postService = postService;
@@ -19,12 +21,22 @@ public final class EspressoCLI implements AutoCloseable{
         this.commentService = commentService;
         this.io = io;
         this.ui = ui;
+        this.menuManager = new MenuManager(userService, io, ui);
+        this.appState = AppState.getInstance();
     }
 
     public void run(){
-        //TO DO
-
-        System.out.println("Espresso CLI merge blana...");
+        try {
+            ui.displayWelcomeBanner();
+            //menuManager.runLoginMenu();
+            
+            if (!appState.isRunning()) {
+                //ui.displayGoodbyeBanner();
+            }
+        } catch (Exception e) {
+            //ui.displayError("An unexpected error occurred: " + e.getMessage());
+            //ui.displayGoodbyeBanner();
+        }
     }
 
     @Override

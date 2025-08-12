@@ -9,6 +9,11 @@ public final class ConsoleIO implements AutoCloseable {
         return scanner.nextLine();
     }
 
+    public String readLine(String prompt) {
+        System.out.print(prompt);
+        return scanner.nextLine();
+    }
+
     @Override
     public void close() {
         scanner.close();

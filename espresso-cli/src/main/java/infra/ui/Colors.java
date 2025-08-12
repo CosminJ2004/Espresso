@@ -19,4 +19,12 @@ public final class Colors {
     public static String toBold(String s) {
         return "\u001B[1m" + s + "\u001B[0m";
     }
+
+    public static String toYellow(String s) {
+        return "\u001B[33m" + s + "\u001B[0m";
+    }
+
+    public static String toOrange(String s) { // mesaje welcome, goodbye
+        return "\u001B[38;5;208m" + s + "\u001B[0m";
+    }
 }
