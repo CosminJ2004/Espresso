@@ -20,6 +20,18 @@ namespace Processing.Filters
             return filter.Apply(image);
 
         }
+
+
+        public RgbImage ApplyMultiple(IEnumerable<string> filterNames, RgbImage image)
+        {
+            var result = image;
+            foreach (var name in filterNames)
+            {
+                result = Apply(name, result);
+            }
+            return result;
+        }
+
     }
 
 }

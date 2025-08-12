@@ -1,30 +1,29 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Processing.Filters;
-using Processing.Models;
-using Processing.Utils;
+﻿    using Microsoft.AspNetCore.Mvc;
+    using Processing.Filters;
+    using Processing.Models;
+    using Processing.Utils;
 
-namespace Processor2.Controllers;
+    namespace Processor2.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class FilterController : ControllerBase
-{
-    private readonly RgbImageReader _reader;
-    private readonly RgbImageWriter _writer;
-    private readonly FilterHandler _handler;
-
-    public FilterController(RgbImageReader reader, RgbImageWriter writer, FilterHandler handler)
+    [ApiController]
+    [Route("[controller]")]
+    public class FilterController : ControllerBase
     {
-        _reader = reader;
-        _writer = writer;
-        _handler = handler;
-    }
+        private readonly RgbImageReader _reader;
+        private readonly RgbImageWriter _writer;
+        private readonly FilterHandler _handler;
 
+        public FilterController(RgbImageReader reader, RgbImageWriter writer, FilterHandler handler)
+        {
+            _reader = reader;
+            _writer = writer;
+            _handler = handler;
+        }
     [HttpPost]
-    public async Task<IActionResult> ApplyFilter([FromQuery] string filter)
+    public async Task<IActionResult> ApplyFilter([FromQuery] List<string> filter)
     {
-        if (string.IsNullOrEmpty(filter))
-            return BadRequest("Missing filter name");
+        if (filter == null || filter.Count == 0)
+            return BadRequest("Missing filter names");
 
         if (!Request.HasFormContentType)
             return BadRequest("Content-Type must be form-data.");
@@ -33,7 +32,7 @@ public class FilterController : ControllerBase
         var file = form.Files["image"];
         if (file == null)
             return BadRequest("Missing image");
-        // TODO: controller directly handles business (it calls the handler, etc.)
+
         try
         {
             using var stream = file.OpenReadStream();
@@ -42,7 +41,13 @@ public class FilterController : ControllerBase
             ms.Position = 0;
 
             var inputImage = _reader.ReadFromStream(ms);
-            var outputImage = _handler.Apply(filter, inputImage);
+
+            // Aplica filtrele pe rând
+            var outputImage = inputImage;
+            foreach (var filterName in filter)
+            {
+                outputImage = _handler.Apply(filterName, outputImage);
+            }
 
             var outStream = new MemoryStream();
             _writer.WriteToStream(outStream, outputImage);
@@ -59,4 +64,5 @@ public class FilterController : ControllerBase
             return Problem(ex.Message + " " + ex.StackTrace);
         }
     }
+
 }
