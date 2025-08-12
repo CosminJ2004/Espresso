@@ -1,6 +1,11 @@
+import config.Wiring;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("test!");
+        Wiring wiring = new Wiring();
+
+//        EspressoCLI cli = new EspressoCLI();
+//        cli.run();
+//        cli.close();
     }
 }

@@ -2,16 +2,13 @@ package infra.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.Objects;
 //TO DO:: error handling mai bun, revin
 public final class ApiClient {
     private final HttpClient httpClient;
@@ -67,7 +64,7 @@ public final class ApiClient {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return objectMapper.readValue(response.body(), type);
         } catch (Exception e) { // JsonProcessing sau JsonMapping
-            return ApiResult.error("Could not process the request!", 500);
+            return ApiResult.error("Could not process the request! Please try again later!", 500);
         }
     }
 
