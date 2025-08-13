@@ -7,34 +7,38 @@ namespace Processing.Convertors
     public class MatRgbConvertor
     {
 
-        public static Mat RgbImageToMat(RgbImage rgb)
+        public static byte[] RgbImageToByteArray(RgbImage rgb)
         {
-            var mat = new Mat(rgb.Height, rgb.Width, MatType.CV_8UC3);
+            byte[] data = new byte[rgb.Width * rgb.Height * 3];
+            int index = 0;
 
             for (int y = 0; y < rgb.Height; y++)
             {
                 for (int x = 0; x < rgb.Width; x++)
                 {
                     var px = rgb.Pixels[y, x];
-                    // OpenCvSharp uses BGR order by default
-                    mat.Set(y, x, new Vec3b(px.B, px.G, px.R));
+                    data[index++] = px.B; // B
+                    data[index++] = px.G; // G
+                    data[index++] = px.R; // R
                 }
             }
 
-            return mat;
+            return data;
         }
-        public static RgbImage MatToRgbImage(Mat mat)
+
+        public static RgbImage ByteArrayToRgbImage(byte[] data, int width, int height)
         {
-            int width = mat.Width;
-            int height = mat.Height;
             var rgb = new RgbImage(width, height);
+            int index = 0;
 
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    var vec = mat.At<Vec3b>(y, x);
-                    rgb.Pixels[y, x] = new RgbPixel(vec.Item2, vec.Item1, vec.Item0); // R,G,B order
+                    byte b = data[index++];
+                    byte g = data[index++];
+                    byte r = data[index++];
+                    rgb.Pixels[y, x] = new RgbPixel(r, g, b);
                 }
             }
 
