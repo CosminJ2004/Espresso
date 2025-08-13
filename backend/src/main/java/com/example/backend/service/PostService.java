@@ -43,11 +43,7 @@ public class PostService {
     }
 
     public List<PostResponseDto> getAllPosts() {
-
-        loggerManager.log("file", LogLevel.INFO, "getting all posts");
-        loggerManager.log("console", LogLevel.INFO, "getting all posts");
-
-        return postRepository.findAll()
+        return postRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
                 .map(this::postToPostResponseDto)
                 .collect(Collectors.toList());
