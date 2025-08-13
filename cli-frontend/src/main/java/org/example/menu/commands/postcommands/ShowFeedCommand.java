@@ -12,14 +12,7 @@ public class ShowFeedCommand implements IMenuCommand {
 
     public boolean execute(View view) {
         ViewManager viewManager = view.getViewManager();
-        HashMap<String, Subreddit> subreddits = viewManager.getSubreddits();
-        try {
-            subreddits = viewManager.getSubredditService().populateSubreddits(subreddits, viewManager.getApiPostService().handleGet());
-        } catch (Exception e) {
-            System.out.println("Error fetching feed");
-        }
-        viewManager.setSubreddits(subreddits);
-        viewManager.getPostUI().showFeed(subreddits.get("echipa3_general"));
+        viewManager.getPostUI().showFeed(viewManager.getSubreddits().get("echipa3_general"));
         return true;
     }
 }

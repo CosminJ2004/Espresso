@@ -19,6 +19,11 @@ builder.Services.AddScoped<IImageFilter, InvertFilter>();
 builder.Services.AddScoped<IImageFilter, GaussianFilter>();
 builder.Services.AddScoped<IImageFilter, DoNothingFilter>();
 
+builder.Services.AddScoped<IImageFilter, FaceDetection>();
+builder.Services.AddScoped<IImageFilter, Yolo>();
+builder.Services.AddScoped<IImageFilter, SepiaFilter>();
+
+
 var app = builder.Build();
 
 app.MapControllers();
