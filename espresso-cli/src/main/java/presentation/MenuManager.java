@@ -4,6 +4,7 @@ import objects.domain.User;
 import objects.dto.UserRequestDto;
 import presentation.io.ConsoleIO;
 import presentation.io.Renderer;
+import presentation.views.UserMenuManager;
 import service.UserService;
 import infra.http.ApiResult;
 
@@ -20,6 +21,24 @@ public final class MenuManager {
         this.appState = AppState.getInstance();
     }
 
+    public void run() {
+        while(appState.isRunning() && appState.isLoggedIn()){
+            ui.displayWelcomeMenu();
+            String option = io.readLine("> ").trim();
+            switch(option){
+                case "1":
+                    new UserMenuManager(userService, io , ui).run();
+                    break;
+                case "4": // Logout
+                    appState.setCurrentUser(null);
+                    ui.displayInfo("You have been logged out.");
+                    return;
+                case "5": //Exitt
+                    handleExit();
+                    return;
+            }
+        }
+    }
     //TO DO: better separation between option input and field input
     public void runLoginMenu() {
         while (appState.isRunning() && !appState.isLoggedIn()) {
@@ -60,6 +79,7 @@ public final class MenuManager {
         if (result.isSuccess()) {
             User user = result.getData();
             appState.setCurrentUser(user);
+            appState.setRunning(true);
             ui.displaySuccess("Welcome back, " + user.username() + "!");
             appState.setCurrentUser(user);
             return true;
