@@ -10,9 +10,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-
 @Service
-public class ImageFilterService {
+public class ProcessService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -26,7 +25,7 @@ public class ImageFilterService {
         body.add("image", new ByteArrayResource(originalImage) {
             @Override
             public String getFilename() {
-                return "image.jpg"; // nume temporar
+                return "image.png";
             }
         });
 

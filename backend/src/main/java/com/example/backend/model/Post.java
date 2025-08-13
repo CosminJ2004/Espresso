@@ -8,6 +8,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -31,7 +32,11 @@ public class Post {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-    private String filePath;
+    private String imageId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "filter_id")
+    private Filter filter;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -46,7 +51,8 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Vote> votes = new ArrayList<>();
 
-    public Post() {}
+    public Post() {
+    }
 
     public Post(User author, String title, String content) {
         this.author = author;
@@ -56,11 +62,11 @@ public class Post {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Post(User author, String title, String content, String filePath) {
+    public Post(User author, String title, String content, Filter filter) {
         this.author = author;
         this.title = title;
         this.content = content;
-        this.filePath = filePath;
+        this.filter = filter;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -68,6 +74,9 @@ public class Post {
     protected void onCreate() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
+        }
+        if (filter != null && imageId == null) {
+            imageId = UUID.randomUUID().toString();
         }
     }
 
@@ -124,6 +133,17 @@ public class Post {
 
     public String getAuthorUsername() {
         return author != null ? author.getUsername() : "Unknown";
+    }
+
+    public String getImageUrl() {
+        if (imageId == null) {
+            return null;
+        }
+        return generateImageUrl(imageId, filter != null ? filter.getName() : "none");
+    }
+    
+    private String generateImageUrl(String imageId, String filter) {
+        return String.format("http://13.61.12.137/images/%s/%s.png", filter, imageId);
     }
 
     @Override

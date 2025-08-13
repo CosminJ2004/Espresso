@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -32,9 +31,14 @@ public class PostController {
         return Response.ok(postService.getPostById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<Response<PostResponseDto>> createPost(@RequestBody PostRequestDto postRequest) {
-        return Response.ok(postService.createPost(postRequest));
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<PostResponseDto>> createPostWithoutImage(@RequestBody PostRequestDto postRequest) {
+        return Response.ok(postService.createPostWithoutImage(postRequest));
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Response<PostResponseDto>> createPostWithImage(@ModelAttribute PostRequestDto postRequest) {
+        return Response.ok(postService.createPostWithImage(postRequest));
     }
 
     @PutMapping("/{id}")
@@ -62,32 +66,6 @@ public class PostController {
     public ResponseEntity<Response<CommentResponseDto>> addComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequest) {
         return Response.ok(postService.addComment(id, commentRequest));
     }
-
-    @PostMapping(value = "/with-image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Response<PostResponseDto>> createPostWithImage(PostRequestImageDto postRequestDto) {
-        return Response.ok(postService.createPostWithImage(postRequestDto));
-    }
-
-    @GetMapping(value = "/get-grayscale-filter")
-    public ResponseEntity<Response<PostResponseDto>> getGrayscaleFilter(PostRequestImageDto postRequestDto) {
-        return Response.ok(postService.getPostWithGrayscale(postRequestDto));
-    }
-
-    @GetMapping("/{id}/filter/{filterType}")
-    public ResponseEntity<byte[]> getPostWithFilter(
-            @PathVariable Long id,
-            @PathVariable String filterType) throws IOException {
-
-        byte[] filteredImage = postService.getPostImageWithFilter(id, filterType);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_PNG) // sau PNG dacă filtrele tale returnează PNG
-                .body(filteredImage);
-    }
-
-
-
-
 }
 
 

@@ -13,6 +13,5 @@ public class LoggerConfig {
         LoggerManager manager = LoggerManager.getInstance();
         manager.addLogger("console", LoggerFactory.create(LoggerType.CONSOLE));
         manager.addLogger("file", LoggerFactory.create(LoggerType.FILE, "app.log"));
-
     }
 }

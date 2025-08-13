@@ -24,6 +24,10 @@ public class PostRequestDto {
 
     private String subreddit;
 
+    private MultipartFile image;
 
+    private Long filter;
 
+    public PostRequestDto(String title, String content, String authorUsername, String subredditName) {
+    }
 }

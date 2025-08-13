@@ -18,30 +18,15 @@ import java.util.List;
 public class CommentResponseDto {
 
     private Long id;
-
-    @NotNull(message = "Post ID is required")
     private Long postId;
-
     private Long parentId;
-
-    @NotBlank(message = "Comment content is required")
-    @Size(max = 1000, message = "Comment too long")
     private String content;
-
-    @NotBlank(message = "Author is required")
     private String author;
-
     private Long upvotes;
-
     private Long downvotes;
-
     private Long score;
-
     private VoteType userVote;
-
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
-
     private List<CommentResponseDto> replies = new ArrayList<>();
 }

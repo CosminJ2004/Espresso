@@ -4,6 +4,7 @@ import com.example.backend.dto.UserResponseDto;
 import com.example.backend.model.User;
 
 public final class UserMapper {
+
     private UserMapper() {
     }
 

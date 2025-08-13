@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
            @UniqueConstraint(columnNames = {"user_id", "comment_id"})
        })
 public class Vote {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

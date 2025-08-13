@@ -3,6 +3,7 @@ package com.example.backend.service;
 import com.example.backend.dto.*;
 import com.example.backend.model.*;
 import com.example.backend.repository.CommentRepository;
+import com.example.backend.repository.FilterRepository;
 import com.example.backend.repository.PostRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.VoteRepository;
@@ -10,16 +11,6 @@ import com.example.backend.util.logger.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,28 +23,28 @@ public class PostService {
     private final CommentService commentService;
     private final VoteRepository voteRepository;
     private final VoteService voteService;
-    private final MinioService minioService;
-    private final ImageFilterService imageFilterService;
-
-    private final Path uploadDir = Paths.get("uploads/images");
+    private final StorageService storageService;
+    private final ProcessService processService;
+    private final FilterRepository filterRepository;
 
     private static final LoggerManager loggerManager = LoggerManager.getInstance();
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, CommentService commentService, VoteRepository voteRepository, VoteService voteService, MinioService minioService, ImageFilterService imageFilterService) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, CommentService commentService, VoteRepository voteRepository, VoteService voteService, StorageService storageService, ProcessService processService, FilterRepository filterRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.commentService = commentService;
         this.voteRepository = voteRepository;
         this.voteService = voteService;
-        this.minioService = minioService;
-        this.imageFilterService = imageFilterService;
+        this.storageService = storageService;
+        this.processService = processService;
+        this.filterRepository = filterRepository;
     }
 
     public List<PostResponseDto> getAllPosts() {
 
-        loggerManager.log("file",LogLevel.INFO,"getting all posts");
+        loggerManager.log("file", LogLevel.INFO, "getting all posts");
         loggerManager.log("console", LogLevel.INFO, "getting all posts");
 
         return postRepository.findAll()
@@ -67,169 +58,68 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
         return postToPostResponseDto(post);
     }
+    public PostResponseDto createPostWithoutImage(PostRequestDto postRequest) {
+        User author = userRepository.findByUsername(postRequest.getAuthor())
+                .orElseThrow(() -> new RuntimeException("Author not found"));
 
-    public PostResponseDto createPost(PostRequestDto dto) {
-        User author = userRepository.findByUsername(dto.getAuthor())
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
-
-        Post post = new Post(author, dto.getTitle(), dto.getContent());
+        Post post = new Post(author, postRequest.getTitle(), postRequest.getContent());
         postRepository.save(post);
 
         Vote authorVote = new Vote(author, post, VoteType.UP);
         voteRepository.save(authorVote);
-        loggerManager.log("console", LogLevel.INFO, "post created");
-        return postToPostResponseDto(post);
+        post.getVotes().add(authorVote);
 
+        return postToPostResponseDto(post);
     }
 
-    public PostResponseDto createPostWithImage(PostRequestImageDto dto) {
-        Post post = new Post();
-        post.setTitle(dto.getTitle());
-        post.setContent(dto.getContent());
-
-        User author = userRepository.findByUsername(dto.getAuthor())
+    public PostResponseDto createPostWithImage(PostRequestDto postRequest) {
+        User author = userRepository.findByUsername(postRequest.getAuthor())
                 .orElseThrow(() -> new RuntimeException("Author not found"));
-        post.setAuthor(author);
 
         try {
-            if (dto.getImage() != null && !dto.getImage().isEmpty()) {
-                String imageUrl = minioService.uploadImage(dto.getImage());
-                post.setFilePath(imageUrl);
-            }
+            // if image
+            if (postRequest.getImage() != null && !postRequest.getImage().isEmpty()) {
+                Filter filter = filterRepository.findById(postRequest.getFilter())
+                        .orElseThrow(() -> new RuntimeException("Filter not found"));
+                Post post = new Post(author, postRequest.getTitle(), postRequest.getContent());
+                Post newPost = postRepository.save(post);
+                storageService.uploadImage(filter.getName(), newPost.getImageId(), postRequest.getImage());
 
-            postRepository.save(post);
-            return postToPostResponseDto(post);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create post with image: " + e.getMessage(), e);
-        }
-    }
-
-        public PostResponseDto getPostWithGrayscale(PostRequestImageDto dto) {
-            if (dto.getImage() == null || dto.getImage().isEmpty()) {
-                loggerManager.log("file",LogLevel.INFO,"getting post with image");
-            }
-
-            try {
-                // Pregateste requestul
-                HttpClient client = HttpClient.newHttpClient();
-
-                HttpRequest.BodyPublisher imageBodyPublisher;
-
-                try {
-                    imageBodyPublisher = HttpRequest.BodyPublishers.ofInputStream(() -> {
-                        try {
-                            return dto.getImage().getInputStream();
-                        } catch (IOException e) {
-                            throw new UncheckedIOException(e); // convertim excepția verificată într-una neverificată
-                        }
-                    });
-                } catch (UncheckedIOException e) {
-                    loggerManager.log("exception", LogLevel.ERROR, e.getMessage());
-                    imageBodyPublisher = HttpRequest.BodyPublishers.noBody(); // fallback în caz de eroare
-                }
-
-                String boundary = "----WebKitFormBoundary" + UUID.randomUUID();
-                String CRLF = "\r\n";
-
-                // Construcție multipart manuală
-                var multipart = new StringBuilder();
-                multipart.append("--").append(boundary).append(CRLF);
-                multipart.append("Content-Disposition: form-data; name=\"image\"; filename=\"")
-                        .append(dto.getImage().getOriginalFilename()).append("\"").append(CRLF);
-                multipart.append("Content-Type: ").append(dto.getImage().getContentType()).append(CRLF);
-                multipart.append(CRLF);
-
-                byte[] imageBytes = dto.getImage().getBytes();
-                byte[] multipartHeader = multipart.toString().getBytes(StandardCharsets.UTF_8);
-                byte[] multipartFooter = (CRLF + "--" + boundary + "--" + CRLF).getBytes(StandardCharsets.UTF_8);
-
-                byte[] fullBody = new byte[multipartHeader.length + imageBytes.length + multipartFooter.length];
-                System.arraycopy(multipartHeader, 0, fullBody, 0, multipartHeader.length);
-                System.arraycopy(imageBytes, 0, fullBody, multipartHeader.length, imageBytes.length);
-                System.arraycopy(multipartFooter, 0, fullBody, multipartHeader.length + imageBytes.length, multipartFooter.length);
-
-                // Construiește requestul
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create("http://16.171.148.84/filter?filter=grayscale")) // sau IP EC2
-                        .header("Content-Type", "multipart/form-data; boundary=" + boundary)
-                        .POST(HttpRequest.BodyPublishers.ofByteArray(fullBody))
-                        .build();
-
-                HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-
-                if (response.statusCode() != 200) {
-                    throw new RuntimeException("Image processing failed");
-                }
-
-                // Salvează imaginea procesată (ex: local sau pe MinIO)
-                String filename = UUID.randomUUID() + "_grayscale.png";
-                Path outputPath = Paths.get("uploads/" + filename);
-                Files.createDirectories(outputPath.getParent());
-                Files.write(outputPath, response.body());
-
-                // Construiește Post-ul
-                Post post = new Post();
-                post.setTitle(dto.getTitle());
-                post.setContent(dto.getContent());
-                post.setFilePath("/uploads/" + filename);
-
-                User author = userRepository.findByUsername(dto.getAuthor())
-                        .orElseThrow(() -> new RuntimeException("Author not found"));
-                post.setAuthor(author);
-
-                postRepository.save(post);
+                // start processing
+//                processService.applyFilter(postRequest.getImage().getBytes(), post.getFilter().getName());
+                Vote authorVote = new Vote(author, post, VoteType.UP);
+                voteRepository.save(authorVote);
 
                 return postToPostResponseDto(post);
-
-            } catch (Exception e) {
-                throw new RuntimeException("Error processing grayscale post", e);
             }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create post: " + e.getMessage(), e);
         }
-
-    public byte[] getPostImageWithFilter(Long postId, String filterType) throws IOException {
-        // 1. Găsește postarea în DB
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + postId));
-
-        // 2. Ia filepath-ul din S3
-        String filePath = post.getFilePath();
-
-        // 3. Descarcă imaginea din S3
-        byte[] originalImage = minioService.downloadImage(filePath);
-        // (s3Service.downloadFile returnează byte[])
-
-        // 4. Aplică filtrul (apelezi metoda ta existentă de procesare)
-        byte[] filteredImage = imageFilterService.applyFilter(originalImage, filterType);
-
-        // 5. Returnează imaginea filtrată ca byte[]
-        return filteredImage;
+        return null;
     }
 
-
-
-
-    public PostResponseDto updatePost(Long id, PostRequestDto dto) {
+    public PostResponseDto updatePost (Long id, PostRequestDto postRequest) {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
 
-        existingPost.setTitle(dto.getTitle());
-        existingPost.setContent(dto.getContent());
+        existingPost.setTitle(postRequest.getTitle());
+        existingPost.setContent(postRequest.getContent());
 
-        User author = userRepository.findByUsername(dto.getAuthor())
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + dto.getAuthor()));
+        User author = userRepository.findByUsername(postRequest.getAuthor())
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + postRequest.getAuthor()));
         existingPost.setAuthor(author);
 
         return postToPostResponseDto(postRepository.save(existingPost));
     }
 
-    public void deletePost(Long id) {
+    public void deletePost (Long id){
         if (!postRepository.existsById(id)) {
             throw new IllegalArgumentException("Post not found with ID: " + id);
         }
         postRepository.deleteById(id);
     }
 
-    public VoteResponseDto votePost(Long postId, VoteRequestDto voteRequest) {
+    public VoteResponseDto votePost (Long postId, VoteRequestDto voteRequest){
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
@@ -252,7 +142,7 @@ public class PostService {
         return voteResponse;
     }
 
-    public List<CommentResponseDto> getCommentsByPostId(Long postId) {
+    public List<CommentResponseDto> getCommentsByPostId (Long postId) {
         if (!postRepository.existsById(postId)) {
             throw new IllegalArgumentException("Post not found with ID: " + postId);
         }
@@ -264,7 +154,7 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    public CommentResponseDto addComment(Long id, CommentRequestDto commentRequest) {
+    public CommentResponseDto addComment (Long id, CommentRequestDto commentRequest){
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
@@ -289,7 +179,109 @@ public class PostService {
         return commentService.commentToCommentResponseDto(refreshedComment);
     }
 
-    private PostResponseDto postToPostResponseDto(Post post) {
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount() , post.getDownvoteCount(), post.getScore(), post.getCommentCount(), post.getUserVote(userRepository.findByUsername("current_user").orElseThrow()), post.getCreatedAt(), post.getUpdatedAt());
+    private PostResponseDto postToPostResponseDto (Post post){
+        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getImageUrl(), post.getFilter() != null ? post.getFilter().getId() : null, post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount(), post.getDownvoteCount(), post.getScore(), post.getCommentCount(), post.getUserVote(userRepository.findByUsername("current_user").orElseThrow()), post.getCreatedAt(), post.getUpdatedAt());
     }
 }
+
+
+//    public PostResponseDto getPostWithGrayscale(PostRequestDto dto) {
+//            if (dto.getImage() == null || dto.getImage().isEmpty()) {
+//                loggerManager.log("file",LogLevel.INFO,"getting post with image");
+//            }
+//
+//            try {
+//                // Pregateste requestul
+//                HttpClient client = HttpClient.newHttpClient();
+//
+//                HttpRequest.BodyPublisher imageBodyPublisher;
+//
+//                try {
+//                    imageBodyPublisher = HttpRequest.BodyPublishers.ofInputStream(() -> {
+//                        try {
+//                            return dto.getImage().getInputStream();
+//                        } catch (IOException e) {
+//                            throw new UncheckedIOException(e); // convertim excepția verificată într-una neverificată
+//                        }
+//                    });
+//                } catch (UncheckedIOException e) {
+//                    loggerManager.log("exception", LogLevel.ERROR, e.getMessage());
+//                    imageBodyPublisher = HttpRequest.BodyPublishers.noBody(); // fallback în caz de eroare
+//                }
+//
+//                String boundary = "----WebKitFormBoundary" + UUID.randomUUID();
+//                String CRLF = "\r\n";
+//
+//                // Construcție multipart manuală
+//                var multipart = new StringBuilder();
+//                multipart.append("--").append(boundary).append(CRLF);
+//                multipart.append("Content-Disposition: form-data; name=\"image\"; filename=\"")
+//                        .append(dto.getImage().getOriginalFilename()).append("\"").append(CRLF);
+//                multipart.append("Content-Type: ").append(dto.getImage().getContentType()).append(CRLF);
+//                multipart.append(CRLF);
+//
+//                byte[] imageBytes = dto.getImage().getBytes();
+//                byte[] multipartHeader = multipart.toString().getBytes(StandardCharsets.UTF_8);
+//                byte[] multipartFooter = (CRLF + "--" + boundary + "--" + CRLF).getBytes(StandardCharsets.UTF_8);
+//
+//                byte[] fullBody = new byte[multipartHeader.length + imageBytes.length + multipartFooter.length];
+//                System.arraycopy(multipartHeader, 0, fullBody, 0, multipartHeader.length);
+//                System.arraycopy(imageBytes, 0, fullBody, multipartHeader.length, imageBytes.length);
+//                System.arraycopy(multipartFooter, 0, fullBody, multipartHeader.length + imageBytes.length, multipartFooter.length);
+//
+//                // Construiește requestul
+//                HttpRequest request = HttpRequest.newBuilder()
+//                        .uri(URI.create("http://16.171.148.84/filter?filter=grayscale")) // sau IP EC2
+//                        .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+//                        .POST(HttpRequest.BodyPublishers.ofByteArray(fullBody))
+//                        .build();
+//
+//                HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+//
+//                if (response.statusCode() != 200) {
+//                    throw new RuntimeException("Image processing failed");
+//                }
+//
+//                // Salvează imaginea procesată (ex: local sau pe MinIO)
+//                String filename = UUID.randomUUID() + "_grayscale.png";
+//                Path outputPath = Paths.get("uploads/" + filename);
+//                Files.createDirectories(outputPath.getParent());
+//                Files.write(outputPath, response.body());
+//
+//                // Construiește Post-ul
+//                Post post = new Post();
+//                post.setTitle(dto.getTitle());
+//                post.setContent(dto.getContent());
+//                post.setFilePath("/uploads/" + filename);
+//
+//                User author = userRepository.findByUsername(dto.getAuthor())
+//                        .orElseThrow(() -> new RuntimeException("Author not found"));
+//                post.setAuthor(author);
+//
+//                postRepository.save(post);
+//
+//                return postToPostResponseDto(post);
+//
+//            } catch (Exception e) {
+//                throw new RuntimeException("Error processing grayscale post", e);
+//            }
+//        }
+
+//    public byte[] getPostImageWithFilter(Long postId, String filterType) throws IOException {
+//        // 1. Găsește postarea în DB
+//        Post post = postRepository.findById(postId)
+//                .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + postId));
+//
+//        // 2. Ia filepath-ul din S3
+//        String filePath = post.getFilePath();
+//
+//        // 3. Descarcă imaginea din S3
+//        byte[] originalImage = storageService.downloadImage(filePath);
+//        // (s3Service.downloadFile returnează byte[])
+//
+//        // 4. Aplică filtrul (apelezi metoda ta existentă de procesare)
+//        byte[] filteredImage = processService.applyFilter(originalImage, filterType);
+//
+//        // 5. Returnează imaginea filtrată ca byte[]
+//        return filteredImage;
+//    }
