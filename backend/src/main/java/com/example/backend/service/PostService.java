@@ -208,16 +208,14 @@ public class PostService {
                     .orElseThrow(() -> new IllegalArgumentException("Parent comment not found"));
         }
 
-        Comment newComment = new Comment(author, commentRequest.getContent(), post, parent);
-        Comment updatedComment = commentRepository.save(newComment);
+        Comment comment = new Comment(author, commentRequest.getContent(), post, parent);
+        comment = commentRepository.save(comment);
 
-        Vote authorVote = new Vote(author, updatedComment, VoteType.UP);
+        Vote authorVote = new Vote(author, comment, VoteType.UP);
         voteRepository.save(authorVote);
+        comment.getVotes().add(authorVote);
 
-        commentRepository.flush();
-        Comment refreshedComment = commentRepository.findById(updatedComment.getId()).orElseThrow(() -> new IllegalArgumentException("Comment not found"));
-
-        return commentService.commentToCommentResponseDto(refreshedComment);
+        return commentService.commentToCommentResponseDto(comment);
     }
 
     private PostResponseDto postToPostResponseDto (Post post){
