@@ -11,13 +11,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UserResponseDto {
 
-    private Long id;
+    private String id;
     private String username;
     private LocalDateTime createdAt;
     private int postCount;
     private int commentCount;
 
-    public UserResponseDto(Long id, String username, LocalDateTime createdAt) {
+    public UserResponseDto(String id, String username, LocalDateTime createdAt) {
         this.id = id;
         this.username = username;
         this.createdAt = createdAt;

@@ -17,9 +17,9 @@ import java.util.List;
 @AllArgsConstructor
 public class CommentResponseDto {
 
-    private Long id;
-    private Long postId;
-    private Long parentId;
+    private String id;
+    private String postId;
+    private String parentId;
     private String content;
     private String author;
     private Long upvotes;

@@ -18,5 +18,5 @@ public class CommentRequestDto {
     @NotBlank(message = "Author is required")
     private String author;
 
-    private Long parentId;
+    private String parentId;
 }

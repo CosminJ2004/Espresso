@@ -27,7 +27,7 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Response<PostResponseDto>> getPostById(@PathVariable Long id) {
+    public ResponseEntity<Response<PostResponseDto>> getPostById(@PathVariable String id) {
         return Response.ok(postService.getPostById(id));
     }
 
@@ -42,33 +42,33 @@ public class PostController {
     }
 
     @PutMapping(value = "/{id}", consumes =  MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<PostResponseDto>> updatePostWithoutImage(@PathVariable Long id, @RequestBody PostRequestDto postRequest) {
+    public ResponseEntity<Response<PostResponseDto>> updatePostWithoutImage(@PathVariable String id, @RequestBody PostRequestDto postRequest) {
         return Response.ok(postService.updatePostWithoutImage(id, postRequest));
     }
 
     @PutMapping(value = "/{id}", consumes =  MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Response<PostResponseDto>> updatePostWithImage(@PathVariable Long id, @ModelAttribute PostRequestDto postRequest) {
+    public ResponseEntity<Response<PostResponseDto>> updatePostWithImage(@PathVariable String id, @ModelAttribute PostRequestDto postRequest) {
         return Response.ok(postService.updatePostWithImage(id, postRequest));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Response<Void>> deletePost(@PathVariable Long id) {
+    public ResponseEntity<Response<Void>> deletePost(@PathVariable String id) {
         postService.deletePost(id);
         return Response.ok("Post deleted successfully");
     }
 
     @PutMapping("/{id}/vote")
-    public ResponseEntity<Response<VoteResponseDto>> votePost(@PathVariable Long id, @RequestBody VoteRequestDto voteRequest) {
+    public ResponseEntity<Response<VoteResponseDto>> votePost(@PathVariable String id, @RequestBody VoteRequestDto voteRequest) {
         return Response.ok(postService.votePost(id, voteRequest));
     }
 
     @GetMapping("/{id}/comments")
-    public ResponseEntity<Response<List<CommentResponseDto>>> getCommentsByPostId(@PathVariable Long id) {
+    public ResponseEntity<Response<List<CommentResponseDto>>> getCommentsByPostId(@PathVariable String id) {
         return Response.ok(postService.getCommentsByPostId(id));
     }
 
     @PostMapping("/{id}/comments")
-    public ResponseEntity<Response<CommentResponseDto>> addComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequest) {
+    public ResponseEntity<Response<CommentResponseDto>> addComment(@PathVariable String id, @RequestBody CommentRequestDto commentRequest) {
         return Response.ok(postService.addComment(id, commentRequest));
     }
 }

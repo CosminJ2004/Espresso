@@ -14,8 +14,8 @@ import java.util.List;
 public class Comment{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     @NotBlank(message = "Comment text is required")

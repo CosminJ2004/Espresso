@@ -48,7 +48,7 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    public PostResponseDto getPostById(Long id) {
+    public PostResponseDto getPostById(String id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
         return postToPostResponseDto(post);
@@ -100,7 +100,7 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponseDto updatePostWithoutImage (Long id, PostRequestDto postRequest) {
+    public PostResponseDto updatePostWithoutImage (String id, PostRequestDto postRequest) {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
 
@@ -115,7 +115,7 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponseDto updatePostWithImage(Long id, PostRequestDto postRequest) {
+    public PostResponseDto updatePostWithImage(String id, PostRequestDto postRequest) {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
 
@@ -140,7 +140,7 @@ public class PostService {
             Post updatedPost = postRepository.save(existingPost);
 
             byte[] imageBytes = postRequest.getImage().getBytes();
-            String filterName = updatedPost.getFilter().getName();
+            String filterName = updatedPost.getFilter() != null ? updatedPost.getFilter().getName() : "none";
             processService.processImage(imageBytes, filterName, updatedPost.getImageId());
 
             return postToPostResponseDto(updatedPost);
@@ -151,7 +151,7 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost (Long id){
+    public void deletePost (String id){
         if (!postRepository.existsById(id)) {
             throw new IllegalArgumentException("Post not found with ID: " + id);
         }
@@ -159,7 +159,7 @@ public class PostService {
     }
 
     @Transactional
-    public VoteResponseDto votePost (Long postId, VoteRequestDto voteRequest){
+    public VoteResponseDto votePost (String postId, VoteRequestDto voteRequest){
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
@@ -182,7 +182,7 @@ public class PostService {
         return voteResponse;
     }
 
-    public List<CommentResponseDto> getCommentsByPostId (Long postId) {
+    public List<CommentResponseDto> getCommentsByPostId (String postId) {
         if (!postRepository.existsById(postId)) {
             throw new IllegalArgumentException("Post not found with ID: " + postId);
         }
@@ -195,7 +195,7 @@ public class PostService {
     }
 
     @Transactional
-    public CommentResponseDto addComment (Long id, CommentRequestDto commentRequest){
+    public CommentResponseDto addComment (String id, CommentRequestDto commentRequest){
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 

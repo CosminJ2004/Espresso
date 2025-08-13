@@ -31,7 +31,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserResponseDto getUserById(Long id) {
+    public UserResponseDto getUserById(String id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
         return UserMapper.toDto(user);
     }

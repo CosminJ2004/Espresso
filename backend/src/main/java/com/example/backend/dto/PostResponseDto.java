@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class PostResponseDto {
 
-    private Long id;
+    private String id;
     private String title;
     private String content;
     private String imageUrl;

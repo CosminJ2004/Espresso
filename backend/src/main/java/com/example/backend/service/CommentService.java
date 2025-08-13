@@ -36,7 +36,7 @@ public class CommentService {
         this.voteService = voteService;
     }
 
-    public CommentResponseDto getCommentById(Long id) {
+    public CommentResponseDto getCommentById(String id) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found with ID: " + id));
 
@@ -44,7 +44,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponseDto updateComment(Long id, CommentRequestDto commentRequest) {
+    public CommentResponseDto updateComment(String id, CommentRequestDto commentRequest) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found with ID: " + id));
 
@@ -55,7 +55,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void deleteComment(Long commentId) {
+    public void deleteComment(String commentId) {
         if (!commentRepository.existsById(commentId)) {
             throw new IllegalArgumentException("Comment not found");
         }
@@ -63,7 +63,7 @@ public class CommentService {
     }
 
     @Transactional
-    public VoteResponseDto voteComment(Long commentId, VoteRequestDto voteRequest) {
+    public VoteResponseDto voteComment(String commentId, VoteRequestDto voteRequest) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 
