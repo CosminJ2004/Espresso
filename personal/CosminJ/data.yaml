@@ -1,0 +1,5 @@
+train: C:/Users/Cosmin/IdeaProjects/train_yolo/dataset/images/train
+val: C:/Users/Cosmin/IdeaProjects/train_yolo/dataset/images/val
+
+nc: 1
+names: ["face"]
