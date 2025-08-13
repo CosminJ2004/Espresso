@@ -10,6 +10,7 @@ import com.example.backend.repository.VoteRepository;
 import com.example.backend.util.logger.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,21 +24,19 @@ public class PostService {
     private final CommentService commentService;
     private final VoteRepository voteRepository;
     private final VoteService voteService;
-    private final StorageService storageService;
     private final ProcessService processService;
     private final FilterRepository filterRepository;
 
     private static final LoggerManager loggerManager = LoggerManager.getInstance();
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, CommentService commentService, VoteRepository voteRepository, VoteService voteService, StorageService storageService, ProcessService processService, FilterRepository filterRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, CommentService commentService, VoteRepository voteRepository, VoteService voteService, ProcessService processService, FilterRepository filterRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.commentService = commentService;
         this.voteRepository = voteRepository;
         this.voteService = voteService;
-        this.storageService = storageService;
         this.processService = processService;
         this.filterRepository = filterRepository;
     }
@@ -54,6 +53,8 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
         return postToPostResponseDto(post);
     }
+
+    @Transactional
     public PostResponseDto createPostWithoutImage(PostRequestDto postRequest) {
         User author = userRepository.findByUsername(postRequest.getAuthor())
                 .orElseThrow(() -> new RuntimeException("Author not found"));
@@ -68,32 +69,37 @@ public class PostService {
         return postToPostResponseDto(post);
     }
 
+    @Transactional
     public PostResponseDto createPostWithImage(PostRequestDto postRequest) {
         User author = userRepository.findByUsername(postRequest.getAuthor())
                 .orElseThrow(() -> new RuntimeException("Author not found"));
+        Filter filter = filterRepository.findById(postRequest.getFilter())
+                .orElseThrow(() -> new RuntimeException("Filter not found"));
+
+        if (postRequest.getImage() == null || postRequest.getImage().isEmpty()) {
+            throw new IllegalArgumentException("Image is required for createPostWithImage");
+        }
 
         try {
-            // if image
-            if (postRequest.getImage() != null && !postRequest.getImage().isEmpty()) {
-                Filter filter = filterRepository.findById(postRequest.getFilter())
-                        .orElseThrow(() -> new RuntimeException("Filter not found"));
-                Post post = new Post(author, postRequest.getTitle(), postRequest.getContent());
-                Post newPost = postRepository.save(post);
-                storageService.uploadImage(filter.getName(), newPost.getImageId(), postRequest.getImage());
+            byte[] imageBytes = postRequest.getImage().getBytes();
+            
+            Post post = new Post(author, postRequest.getTitle(), postRequest.getContent(), filter);
+            post = postRepository.save(post);
 
-                // start processing
-//                processService.applyFilter(postRequest.getImage().getBytes(), post.getFilter().getName());
-                Vote authorVote = new Vote(author, post, VoteType.UP);
-                voteRepository.save(authorVote);
+            processService.processImage(imageBytes, post.getFilter().getName(), post.getImageId());
 
-                return postToPostResponseDto(post);
-            }
+            Vote authorVote = new Vote(author, post, VoteType.UP);
+            voteRepository.save(authorVote);
+            post.getVotes().add(authorVote);
+
+            return postToPostResponseDto(post);
+            
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create post: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to create post with image: " + e.getMessage(), e);
         }
-        return null;
     }
 
+    @Transactional
     public PostResponseDto updatePost (Long id, PostRequestDto postRequest) {
         Post existingPost = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
@@ -108,6 +114,7 @@ public class PostService {
         return postToPostResponseDto(postRepository.save(existingPost));
     }
 
+    @Transactional
     public void deletePost (Long id){
         if (!postRepository.existsById(id)) {
             throw new IllegalArgumentException("Post not found with ID: " + id);
@@ -115,6 +122,7 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
+    @Transactional
     public VoteResponseDto votePost (Long postId, VoteRequestDto voteRequest){
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
@@ -150,6 +158,7 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public CommentResponseDto addComment (Long id, CommentRequestDto commentRequest){
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found"));
