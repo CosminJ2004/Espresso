@@ -5,6 +5,7 @@ using Processing.Convertors;
 using Processing.Interfaces;
 using Processing.Models;
 using Processing.Utils;
+using System.Reflection;
 using System.Reflection.Emit;
 namespace Processing.Filters
 {
@@ -13,7 +14,12 @@ namespace Processing.Filters
 
 
         public string Name => "yolo";
-        private static readonly string modelPath = "C:\\Users\\Cosmin\\IdeaProjects\\Espresso\\Processor2\\Processing\\Utils\\best.onnx";
+        //private static readonly string modelPath = "C:\\Users\\Cosmin\\IdeaProjects\\Espresso\\Processor2\\Processing\\Utils\\best.onnx";
+        //private static readonly string modelPath = Path.Combine(AppContext.BaseDirectory, "Utils", "best.onnx");
+        //private static readonly string projectRoot = Path.Combine(AppContext.BaseDirectory, "..", "..", "..");
+        //private static readonly string modelPath = Path.Combine(projectRoot, "Processing", "Utils", "best.onnx");
+        private static readonly string modelPath = Path.Combine(AppContext.BaseDirectory, "Utils", "best.onnx");
+
         private static readonly string[] labels = { "face" };
         private readonly YoloDetector _detector = new YoloDetector(modelPath, labels);
 
