@@ -3,16 +3,13 @@ package org.example.menu.commands.postcommands;
 import org.example.menu.commands.IMenuCommand;
 import org.example.menu.views.View;
 import org.example.menu.views.ViewManager;
-import org.example.models.Subreddit;
 
-import java.io.IOException;
-import java.util.HashMap;
-
-public class ShowFeedCommand implements IMenuCommand {
+public class AddCommentCommand implements IMenuCommand {
 
     public boolean execute(View view) {
         ViewManager viewManager = view.getViewManager();
-        viewManager.getPostUI().showFeed(viewManager.getSubreddits().get("echipa3_general"));
+
+
         return true;
     }
 }

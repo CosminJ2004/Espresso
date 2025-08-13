@@ -13,16 +13,20 @@ import java.util.List;
 
 public class SubredditService {
     private static SubredditService instance;
+    private final Gson gson;
 
-    public static SubredditService getInstance() {
+    private SubredditService(Gson gson1) {
+        this.gson = gson1;
+    }
+
+    public static SubredditService getInstance(Gson gson) {
         if (instance == null) {
-            instance = new SubredditService();
+            instance = new SubredditService(gson);
         }
         return instance;
     }
 
     public HashMap<String, Subreddit> populateSubreddits(HashMap<String, Subreddit> subreddits, JsonArray jsonArray) {
-        Gson gson = new Gson();
         Type postArray = new TypeToken<List<Post>>() {}.getType();
         List<Post> posts = gson.fromJson(jsonArray, postArray);
         for (Post post : posts) {

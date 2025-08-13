@@ -1,5 +1,6 @@
 package org.example.ui;
 
+import org.example.models.Comment;
 import org.example.models.Post;
 import org.example.models.Subreddit;
 
@@ -8,6 +9,7 @@ import java.util.Scanner;
 
 public class PostUI {
     private static PostUI instance;
+    private CommentUI commentUI = CommentUI.getInstance();
     private final static String TITLE_SEPARATOR = "=";
 
     public static PostUI getInstance() {
@@ -28,6 +30,14 @@ public class PostUI {
     public void showFeed(Subreddit subreddit) {
         for (Post post : subreddit.getSubPosts().values()) {
             renderPost(post);
+            /*
+            int i = 2;
+            for (Comment comment : post.getPostComments().values()) {
+                commentUI.renderComment(comment, 1);
+                i--;
+                if (i == 0) break;
+            }
+             */
         }
     }
 
