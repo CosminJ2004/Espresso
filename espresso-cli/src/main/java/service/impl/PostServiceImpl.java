@@ -9,6 +9,7 @@ import objects.domain.Post;
 import objects.domain.Vote;
 import objects.dto.CommentRequestDto;
 import objects.dto.PostRequestDto;
+import objects.dto.PostRequestWithImageDto;
 import objects.dto.VoteRequestDto;
 import service.PostService;
 
@@ -52,6 +53,12 @@ public class PostServiceImpl implements PostService {
         } catch (Exception e) {
             return ApiResult.error("Failed to create post: " + e.getMessage(), 500);
         }
+    }
+
+    @Override
+    public ApiResult<Post> createWithImage(PostRequestWithImageDto dto) {
+        return null;
+        //TO DO
     }
 
     @Override

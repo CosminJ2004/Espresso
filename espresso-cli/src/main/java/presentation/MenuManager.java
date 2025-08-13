@@ -4,18 +4,22 @@ import objects.domain.User;
 import objects.dto.UserRequestDto;
 import presentation.io.ConsoleIO;
 import presentation.io.Renderer;
+import presentation.views.PostMenuManager;
 import presentation.views.UserMenuManager;
+import service.PostService;
 import service.UserService;
 import infra.http.ApiResult;
 
 public final class MenuManager {
     private final UserService userService;
+    private final PostService postService;
     private final ConsoleIO io;
     private final Renderer ui;
     private final AppState appState;
 
-    public MenuManager(UserService userService, ConsoleIO io, Renderer ui) {
+    public MenuManager(UserService userService, PostService postService, ConsoleIO io, Renderer ui) {
         this.userService = userService;
+        this.postService = postService;
         this.io = io;
         this.ui = ui;
         this.appState = AppState.getInstance();
@@ -28,6 +32,9 @@ public final class MenuManager {
             switch(option){
                 case "1":
                     new UserMenuManager(userService, io , ui).run();
+                    break;
+                case "2": // View Posts
+                    new PostMenuManager(postService, io, ui).run();
                     break;
                 case "4": // Logout
                     appState.setCurrentUser(null);

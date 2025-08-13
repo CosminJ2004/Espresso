@@ -1,9 +1,10 @@
 package objects.domain;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record Comment(
-        Long id,
+        UUID id,
         Long postId,
         Long parentId,
         String content,

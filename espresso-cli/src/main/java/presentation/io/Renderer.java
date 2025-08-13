@@ -2,10 +2,12 @@ package presentation.io;
 
 
 import infra.ui.Colors;
+import objects.domain.Post;
 import objects.domain.User;
 import presentation.io.outputLayout.BoxRenderer;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Renderer {
@@ -72,7 +74,8 @@ public class Renderer {
                 "POSTS MENU",
                 List.of(
                         "Please select an option:",
-                        "1. Create Post",
+                        "1. Create Post without image",
+                        "2. Create Post with image",
                         "2. View Posts",
                         "3. Edit Post",
                         "4. Delete Post",
@@ -170,4 +173,78 @@ public class Renderer {
         }
         System.out.println();
     }
+    //posts
+    public void displayPost(objects.domain.Post post) {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String created = (post.createdAt() == null) ? "-" : post.createdAt().format(fmt);
+        String updated = (post.updatedAt() == null) ? "-" : post.updatedAt().format(fmt);
+        String img     = (post.imageUrl() == null || post.imageUrl().isBlank()) ? "-" : post.imageUrl();
+        String filter  = (post.filter() == null) ? "-" : String.valueOf(post.filter());
+        String vote    = (post.userVote() == null) ? "-" : post.userVote();
+
+        List<String> lines = box.buildBox(
+                "POST",
+                List.of(
+                        "Title: " + nvl(post.title()),
+                        "Author: " + nvl(post.author()) + " | Subreddit: " + nvl(post.subreddit()),
+                        "ID: " + post.id(),
+                        "Upvotes: " + nvl(post.upvotes()) + " | Downvotes: " + nvl(post.downvotes()),
+                        "Score: " + nvl(post.score()) + " | Comments: " + nvl(post.commentCount()),
+                        "User vote: " + vote + " | Filter: " + filter,
+                        "Image URL: " + img,
+                        "Created: " + created + " | Updated: " + updated,
+                        "",
+                        nvl(post.content())
+                )
+        );
+
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toBlue(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayPosts(List<Post> posts) {
+        if (posts == null || posts.isEmpty()) {
+            displayInfo("No posts yet. Be the first to create one!");
+            return;
+        }
+
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        List<String> body = new ArrayList<>();
+        body.add("Total: " + posts.size());
+
+        for (int i = 0; i < posts.size(); i++) {
+            Post p = posts.get(i);
+
+            String created = (p.createdAt() == null) ? "-" : p.createdAt().format(fmt);
+            String preview = preview(nvl(p.content()), 100);
+            String hasImage = (p.imageUrl() == null || p.imageUrl().isBlank()) ? "no" : "yes";
+
+            body.add("#" + (i + 1) + "  " + nvl(p.title()));
+            body.add("ID: " + p.id() + " | Subreddit: " + nvl(p.subreddit()));
+            body.add("Author: " + nvl(p.author()) + " | Created: " + created);
+            body.add("Score: " + nvl(p.score()) + " | Comments: " + nvl(p.commentCount())
+                    + " | Image: " + hasImage + " | Vote: " + nvl(p.userVote()));
+            if (!preview.equals("-")) {
+                body.add(preview);
+            }
+
+            if (i < posts.size() - 1) body.add("—");
+        }
+
+        List<String> lines = box.buildBox("POSTS", body);
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toBlue(line)));
+        }
+        System.out.println();
+    }
+
+    private String preview(String s, int max) {
+        if (s == null || s.isBlank()) return "-";
+        return s.length() <= max ? s : s.substring(0, max - 1) + "…";
+    }
+    private String nvl(Object o) { return o == null ? "-" : String.valueOf(o); }
+    private String nvl(String s) { return (s == null || s.isBlank()) ? "-" : s; }
 }

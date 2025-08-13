@@ -1,9 +1,10 @@
 package objects.domain;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record Post(
-        Long id,
+        UUID id,
         String title,
         String content,
         String author,
@@ -13,6 +14,10 @@ public record Post(
         Long score,
         Long commentCount,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+
+        String imageUrl,
+        Long filter,
+        String userVote
 ) {
 }
