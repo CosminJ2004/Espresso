@@ -12,13 +12,15 @@
         private readonly RgbImageReader _reader;
         private readonly RgbImageWriter _writer;
         private readonly FilterHandler _handler;
+        private readonly ILogger<FilterController> _logger;
 
-        public FilterController(RgbImageReader reader, RgbImageWriter writer, FilterHandler handler)
-        {
-            _reader = reader;
-            _writer = writer;
-            _handler = handler;
-        }
+    public FilterController(RgbImageReader reader, RgbImageWriter writer, FilterHandler handler, ILogger<FilterController> logger)
+    {
+        _reader = reader;
+        _writer = writer;
+        _handler = handler;
+        _logger = logger;
+    }
     [HttpPost]
     public async Task<IActionResult> ApplyFilter([FromQuery] List<string> filter)
     {
@@ -61,8 +63,10 @@
         }
         catch (Exception ex)
         {
-            return Problem(ex.Message + " " + ex.StackTrace);
+            _logger.LogError(ex, "Error applying filters: {Filters}", string.Join(",", filter));
+            return Problem(detail: ex.Message);
         }
+
     }
 
 }
