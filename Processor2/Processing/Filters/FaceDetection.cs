@@ -2,6 +2,7 @@
 using Processing.Convertors;
 using Processing.Interfaces;
 using Processing.Models;
+using System.Reflection.Metadata.Ecma335;
 namespace Processing.Filters
 {
     public class FaceDetection : IImageFilter
@@ -60,10 +61,10 @@ namespace Processing.Filters
 
         public RgbImage Apply(RgbImage image)
         {
-            var mat = MatRgbConvertor.RgbImageToMat(image);
-            DetectFacesAndPlates(mat);
-            return MatRgbConvertor.MatToRgbImage(mat);
-
+            //var mat = MatRgbConvertor.RgbImageToMat(image);
+            //DetectFacesAndPlates(mat);
+            //return MatRgbConvertor.MatToRgbImage(mat);/
+            return image; // Placeholder, as the actual implementation is not provided
         }
 
     }
