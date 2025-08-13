@@ -28,8 +28,7 @@ public final class MenuManager {
 
             switch (option) {
                 case "1": // Register
-                    // handleRegister();
-                    // ui.displayInfo("Register not implemented yet.");
+                    handleRegister();
                     break;
 
                 case "2": // Login
@@ -40,8 +39,7 @@ public final class MenuManager {
 
                 case "3": // Exit
                 case "q":
-                case "Q":
-                    // handleExit(); sau appState.setRunning(false);
+                    handleExit();
                     return;
 
                 default:
@@ -70,5 +68,27 @@ public final class MenuManager {
             ui.displayError("Login failed: " + result.getError());
             return false;
         }
+    }
+
+    private void handleRegister() {
+        ui.displayInfo("Please enter you new account details:");
+        String username = io.readUsername();
+        String password = io.readPassword();
+
+        UserRequestDto registerDto = new UserRequestDto(username, password);
+        ApiResult<User> result = userService.create(registerDto);
+
+        if (result.isSuccess()) { //dupa creare cnt, trebuie sa se logheze
+            ui.displaySuccess(
+                    "You have succesfully created your account: " + username + "!"
+                            + "\nYou can now login.");
+            //runMainMenu();
+        } else {
+            ui.displayError("Register failed: " + result.getError());
+        }
+    }
+
+    private void handleExit(){
+        appState.setRunning(false);
     }
 }

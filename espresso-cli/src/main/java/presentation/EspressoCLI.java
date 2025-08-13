@@ -28,10 +28,12 @@ public final class EspressoCLI implements AutoCloseable{
     public void run(){
         try {
             ui.displayWelcomeBanner();
+            // Login flow - meniul primary
             menuManager.runLoginMenu();
             
             if (!appState.isRunning()) {
                 ui.displayGoodbyeBanner();
+                return;
             }
         } catch (Exception e) {
             ui.displayError("An unexpected error occurred: " + e.getMessage());
