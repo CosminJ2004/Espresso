@@ -2,6 +2,7 @@ package presentation.io;
 
 
 import infra.ui.Colors;
+import objects.domain.Comment;
 import objects.domain.Post;
 import objects.domain.User;
 import presentation.io.outputLayout.BoxRenderer;
@@ -103,23 +104,7 @@ public class Renderer {
         System.out.println();
     }
 
-    public void displayCommentMenu() {
-        List<String> lines = box.buildBox(
-                "COMMENTS MENU",
-                List.of(
-                        "Please select an option:",
-                        "1. Create Comment",
-                        "2. View Comments",
-                        "3. Edit Comment",
-                        "4. Delete Comment",
-                        "5. Vote Comment"
-                )
-        );
-        for (String line : lines) {
-            System.out.println(Colors.toBold(Colors.toYellow(line)));
-        }
-        System.out.println();
-    }
+
 
     public void displayError(String message) {
         List<String> lines = box.buildBox("[ERROR]", List.of(message));
@@ -171,13 +156,13 @@ public class Renderer {
         System.out.println();
     }
     //posts
-    public void displayPost(objects.domain.Post post) {
+    public void displayPost(Post post) {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String created = (post.createdAt() == null) ? "-" : post.createdAt().format(fmt);
         String updated = (post.updatedAt() == null) ? "-" : post.updatedAt().format(fmt);
         String img     = (post.imageUrl() == null || post.imageUrl().isBlank()) ? "-" : post.imageUrl();
         String filter  = (post.filter() == null) ? "-" : String.valueOf(post.filter());
-        String vote    = (post.userVote() == null) ? "-" : post.userVote();
+        String vote    = (post.userVote() == null) ? "-" : post.userVote().getValue();
 
         List<String> lines = box.buildBox(
                 "POST",
@@ -266,12 +251,152 @@ public class Renderer {
                         "1. Edit Post",
                         "2. Delete Post",
                         "3. Vote Post",
-                        "4. Back to post selection"
+                        "4. Comment Section",
+                        "5. Back to post selection"
                 )
         );
         for (String line : lines) {
             System.out.println(Colors.toBold(Colors.toYellow(line)));
         }
         System.out.println();
+    }
+
+    public void displayCommentMenu(Post post) {
+        List<String> lines = box.buildBox(
+                "COMMENT SECTION - " + nvl(post.title()),
+                List.of(
+                        "Please select an option:",
+                        "1. View Comments",
+                        "2. Add Comment",
+                        "3. Back to Post Actions"
+                )
+        );
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toYellow(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayCommentSelectionMenu() {
+        List<String> lines = box.buildBox(
+                "COMMENT SELECTION",
+                List.of(
+                        "Please select an option:",
+                        "1. Select a comment",
+                        "2. Back to Comment Menu"
+                )
+        );
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toYellow(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayCommentActionMenu(Comment comment) {
+        List<String> lines = box.buildBox(
+                "COMMENT ACTIONS - " + nvl(comment.content()),
+                List.of(
+                        "Please select an option:",
+                        "1. Edit Comment",
+                        "2. Delete Comment",
+                        "3. Vote Comment",
+                        "4. Reply to Comment",
+                        "5. Back to comment selection"
+                )
+        );
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toYellow(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayComments(List<Comment> comments) {
+        if (comments == null || comments.isEmpty()) {
+            displayInfo("No comments yet. Be the first to comment!");
+            return;
+        }
+
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        for (int i = 0; i < comments.size(); i++) {
+            Comment c = comments.get(i);
+            displayCommentInContainer(c, i + 1, fmt);
+            System.out.println();
+        }
+    }
+
+    private void displayReplies(List<Comment> replies, int parentCommentNumber, DateTimeFormatter fmt) {
+        for (int i = 0; i < replies.size(); i++) {
+            Comment reply = replies.get(i);
+            String created = (reply.createdAt() == null) ? "-" : reply.createdAt().format(fmt);
+            String preview = preview(nvl(reply.content()), 50);
+
+            List<String> body = new ArrayList<>();
+            body.add("↳ Reply by: " + nvl(reply.author()));
+            body.add("Score: " + nvl(reply.score()) + " | Upvotes: " + nvl(reply.upvotes()) + " | Downvotes: " + nvl(reply.downvotes()));
+            body.add("Created: " + created);
+            if (!preview.equals("-")) {
+                body.add("Content: " + preview);
+            }
+
+            List<String> lines = box.buildBox("REPLY #" + (parentCommentNumber > 0 ? parentCommentNumber + "." : "") + (i + 1), body);
+            for (String line : lines) {
+                System.out.println(Colors.toBold(Colors.toBlue(line)));
+            }
+            System.out.println();
+
+            if (reply.replies() != null && !reply.replies().isEmpty()) {
+                displayReplies(reply.replies(), parentCommentNumber, fmt);
+            }
+        }
+    }
+
+    private void displayCommentInContainer(Comment comment, int commentNumber, DateTimeFormatter fmt) {
+        String created = (comment.createdAt() == null) ? "-" : comment.createdAt().format(fmt);
+        String preview = preview(nvl(comment.content()), 60);
+        String isReply = (comment.parentId() != null) ? " (Reply)" : "";
+
+        List<String> body = new ArrayList<>();
+        body.add("Author: " + nvl(comment.author()) + isReply);
+        body.add("Score: " + nvl(comment.score()) + " | Upvotes: " + nvl(comment.upvotes()) + " | Downvotes: " + nvl(comment.downvotes()));
+        body.add("Created: " + created);
+        if (!preview.equals("-")) {
+            body.add("Content: " + preview);
+        }
+
+        List<String> lines = box.buildBox("COMMENT #" + commentNumber, body);
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toGreen(line)));
+        }
+
+        if (comment.replies() != null && !comment.replies().isEmpty()) {
+            displayReplies(comment.replies(), commentNumber, fmt);
+        }
+    }
+
+    public void displayComment(Comment comment) {
+        String created = (comment.createdAt() == null) ? "-" : comment.createdAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        String updated = (comment.updatedAt() == null) ? "-" : comment.updatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        String isReply = (comment.parentId() != null) ? " (Reply to comment " + comment.parentId() + ")" : "";
+
+        List<String> lines = box.buildBox(
+                "COMMENT",
+                List.of(
+                        "Author: " + nvl(comment.author()) + isReply,
+                        "Score: " + nvl(comment.score()) + " | Upvotes: " + nvl(comment.upvotes()) + " | Downvotes: " + nvl(comment.downvotes()),
+                        "Created: " + created + " | Updated: " + updated,
+                        "",
+                        nvl(comment.content())
+                )
+        );
+
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toGreen(line)));
+        }
+        System.out.println();
+
+        if (comment.replies() != null && !comment.replies().isEmpty()) {
+            displayReplies(comment.replies(), 0, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")); // 0 pt comentariu singur
+        }
     }
 }

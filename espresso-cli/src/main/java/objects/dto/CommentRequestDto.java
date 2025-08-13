@@ -1,4 +1,4 @@
 package objects.dto;
 
-public record CommentRequestDto(String content, String author, Long parentId) {
+public record CommentRequestDto(String content, String author, String parentId) {
 }

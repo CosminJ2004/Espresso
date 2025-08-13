@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApiResult<User> getById(Long id) {
+    public ApiResult<User> getById(String id) {
         try {
             String url = baseUrl + "/" + id;
             return apiClient.get(url, new TypeReference<ApiResult<User>>() {

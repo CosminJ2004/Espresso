@@ -37,7 +37,7 @@ public final class MenuManager {
                     new UserMenuManager(userService, io , ui).run();
                     break;
                 case "2": // Post Menu
-                    new PostMenuManager(postService, io, ui).run();
+                    new PostMenuManager(postService, commentService, io, ui).run();
                     break;
 //                case "3": // Comment Menu nu o sa mai existe, o sa fie integrat in Post Menu
 //                    new CommentMenuManager(commentService, postService, io, ui).run();

@@ -1,10 +1,10 @@
 package objects.domain;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import objects.domain.VoteType;
 
 public record Post(
-        UUID id,
+        String id,
         String title,
         String content,
         String author,
@@ -18,6 +18,6 @@ public record Post(
 
         String imageUrl,
         Long filter,
-        String userVote
+        VoteType userVote
 ) {
 }

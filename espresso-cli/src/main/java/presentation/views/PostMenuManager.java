@@ -10,6 +10,7 @@ import presentation.AppState;
 import presentation.io.ConsoleIO;
 import presentation.io.Renderer;
 import service.PostService;
+import service.CommentService;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,12 +18,14 @@ import java.util.UUID;
 public class PostMenuManager {
     private static final String DEFAULT_SUBREDDIT = "echipa3_general";
     private final PostService postService;
+    private final CommentService commentService;
     private final ConsoleIO io;
     private final Renderer ui;
     private final AppState appState = AppState.getInstance();
 
-    public PostMenuManager(PostService postService, ConsoleIO io, Renderer ui) {
+    public PostMenuManager(PostService postService, CommentService commentService, ConsoleIO io, Renderer ui) {
         this.postService = postService;
+        this.commentService = commentService;
         this.io = io;
         this.ui = ui;
     }
@@ -111,9 +114,12 @@ public class PostMenuManager {
                     handleVotePost(selectedPost);
                     return;
                 case "4":
+                    handleCommentSection(selectedPost);
+                    return;
+                case "5":
                     return; // Back to post selection
                 default:
-                    ui.displayInfo("Please enter a valid option (1-4).");
+                    ui.displayInfo("Please enter a valid option (1-5).");
             }
         }
     }
@@ -252,6 +258,10 @@ public class PostMenuManager {
         } else {
             ui.displayError("Failed to record vote: " + result.getError());
         }
+    }
+
+    private void handleCommentSection(Post selectedPost) {
+        new CommentMenuManager(postService, commentService, io, ui, selectedPost).run();
     }
 
 }

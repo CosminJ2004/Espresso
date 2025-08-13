@@ -36,7 +36,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ApiResult<Post> getById(UUID id) {
+    public ApiResult<Post> getById(String id) {
         try {
             String url = baseUrl + "/" + id;
             return apiClient.get(url, new TypeReference<ApiResult<Post>>() {
@@ -63,7 +63,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ApiResult<Post> update(UUID id, PostRequestDto dto) {
+    public ApiResult<Post> update(String id, PostRequestDto dto) {
         try {
             String url = baseUrl + "/" + id;
             return apiClient.put(url, dto, new TypeReference<ApiResult<Post>>() {
@@ -74,7 +74,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ApiResult<Void> delete(UUID id) {
+    public ApiResult<Void> delete(String id) {
         try {
             String url = baseUrl + "/" + id;
             return apiClient.delete(url, new TypeReference<ApiResult<Void>>() {
@@ -85,7 +85,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ApiResult<Vote> votePost(UUID id, VoteRequestDto dto) {
+    public ApiResult<Vote> votePost(String id, VoteRequestDto dto) {
         try {
             String url = baseUrl + "/" + id + "/vote";
             return apiClient.put(url, dto, new TypeReference<ApiResult<Vote>>() {
@@ -96,7 +96,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ApiResult<List<Comment>> getCommentsByPostId(UUID id) {
+    public ApiResult<List<Comment>> getCommentsByPostId(String id) {
         try {
             String url = baseUrl + "/" + id + "/comments";
             return apiClient.get(url, new TypeReference<ApiResult<List<Comment>>>() {
@@ -107,7 +107,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ApiResult<Comment> addComment(UUID postId, CommentRequestDto dto) {
+    public ApiResult<Comment> addComment(String postId, CommentRequestDto dto) {
         try {
             String url = baseUrl + "/" + postId + "/comments";
             return apiClient.post(url, dto, new TypeReference<ApiResult<Comment>>() {
