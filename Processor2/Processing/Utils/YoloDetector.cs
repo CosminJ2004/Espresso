@@ -12,8 +12,8 @@ namespace Processing.Utils
     {
         private InferenceSession _session;
         private readonly string[] _labels;
-        private readonly int _inputWidth = 640;
-        private readonly int _inputHeight = 640;
+        private readonly int _inputWidth = 320;
+        private readonly int _inputHeight = 320;
         private readonly float _confThreshold = 0.4f;
         private readonly float _nmsThreshold = 0.45f;
 
@@ -42,7 +42,7 @@ namespace Processing.Utils
             Mat resized = new Mat();
             Cv2.Resize(image, resized, new Size(_inputWidth, _inputHeight));
             Cv2.CvtColor(resized, resized, ColorConversionCodes.BGR2RGB);
-            resized.ConvertTo(resized, MatType.CV_32F, 1.0 / 255);
+            resized.ConvertTo(resized, MatType.CV_32FC3, 1.0 / 255);
 
             var chw = new float[3 * _inputWidth * _inputHeight];
             int index = 0;

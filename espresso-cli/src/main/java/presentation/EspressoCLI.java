@@ -6,7 +6,7 @@ import service.CommentService;
 import service.PostService;
 import service.UserService;
 
-public final class EspressoCLI implements AutoCloseable{
+public final class EspressoCLI implements AutoCloseable {
     private final PostService postService;
     private final UserService userService;
     private final CommentService commentService;
@@ -25,16 +25,22 @@ public final class EspressoCLI implements AutoCloseable{
         this.appState = AppState.getInstance();
     }
 
-    public void run(){
+    public void run() {
         try {
             ui.displayWelcomeBanner();
-            // Login flow - meniul primary
-            menuManager.runLoginMenu();
-            
-            if (!appState.isRunning()) {
-                ui.displayGoodbyeBanner();
-                return;
+// Login flow - meniul primary
+            while (appState.isRunning()) {
+                // Login flow - meniul primary
+                if (!appState.isLoggedIn()) {
+                    menuManager.runLoginMenu();
+                    continue;
+                }
+                // dupa login trecem in run din MenuManager
+                menuManager.run();
             }
+
+            ui.displayGoodbyeBanner();
+
         } catch (Exception e) {
             ui.displayError("An unexpected error occurred: " + e.getMessage());
             ui.displayGoodbyeBanner();
