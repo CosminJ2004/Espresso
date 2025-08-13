@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CommentService {
@@ -42,6 +43,7 @@ public class CommentService {
         return commentToCommentResponseDto(comment);
     }
 
+    @Transactional
     public CommentResponseDto updateComment(Long id, CommentRequestDto commentRequest) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found with ID: " + id));
@@ -52,6 +54,7 @@ public class CommentService {
         return commentToCommentResponseDto(updatedComment);
     }
 
+    @Transactional
     public void deleteComment(Long commentId) {
         if (!commentRepository.existsById(commentId)) {
             throw new IllegalArgumentException("Comment not found");
@@ -59,6 +62,7 @@ public class CommentService {
         commentRepository.deleteById(commentId);
     }
 
+    @Transactional
     public VoteResponseDto voteComment(Long commentId, VoteRequestDto voteRequest) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));

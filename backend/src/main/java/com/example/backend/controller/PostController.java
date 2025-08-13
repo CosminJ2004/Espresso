@@ -41,9 +41,14 @@ public class PostController {
         return Response.ok(postService.createPostWithImage(postRequest));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Response<PostResponseDto>> updatePost(@PathVariable Long id, @RequestBody PostRequestDto postRequest) {
-        return Response.ok(postService.updatePost(id, postRequest));
+    @PutMapping(value = "/{id}", consumes =  MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<PostResponseDto>> updatePostWithoutImage(@PathVariable Long id, @RequestBody PostRequestDto postRequest) {
+        return Response.ok(postService.updatePostWithoutImage(id, postRequest));
+    }
+
+    @PutMapping(value = "/{id}", consumes =  MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Response<PostResponseDto>> updatePostWithImage(@PathVariable Long id, @ModelAttribute PostRequestDto postRequest) {
+        return Response.ok(postService.updatePostWithImage(id, postRequest));
     }
 
     @DeleteMapping("/{id}")

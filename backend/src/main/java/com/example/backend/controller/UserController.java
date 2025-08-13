@@ -37,13 +37,11 @@ public class UserController {
         return Response.ok(userService.createUser(userRequest));
     }
 
-    //endpoint pentru cli-frontend
     @PostMapping("/login")
     public ResponseEntity<Response<UserResponseDto>> loginUser(@RequestBody @Valid UserRequestDto userRequest) {
         return Response.ok(userService.loginUser(userRequest));
     }
 
-    //endpoint pentru cli-frontend ca sa cautam useri
     @GetMapping("/search/{username}")
     public ResponseEntity<Response<UserResponseDto>> findUserByUsername(@PathVariable String username) {
         return Response.ok(userService.getUserByUsername(username));
