@@ -6,28 +6,31 @@ public final class ApiResult<T> {
     @JsonProperty("success") public final boolean success;
     @JsonProperty("data") public final T data;
     @JsonProperty("error") public final String error;
+    @JsonProperty("message") public final String message;
     @JsonProperty("statusCode") public final Integer statusCode;
 
     public ApiResult() {
         this.success = false;
         this.data = null;
         this.error = null;
+        this.message = null;
         this.statusCode = null;
     }
 
-    public ApiResult(boolean success, T data, String error, Integer statusCode) {
+    public ApiResult(boolean success, T data, String error, String message, Integer statusCode) {
         this.success = success;
         this.data = data;
-        this.error = error;//message
+        this.error = error;
+        this.message = message;
         this.statusCode = statusCode;
     }
 
     public static <T> ApiResult<T> success(T data) {
-        return new ApiResult<>(true, data, null, null);
+        return new ApiResult<>(true, data, null, null, null);
     }
 
     public static <T> ApiResult<T> error(String error, Integer statusCode) {
-        return new ApiResult<>(false, null, error, statusCode);
+        return new ApiResult<>(false, null, error, null, statusCode);
     }
 
     public boolean isSuccess() {
@@ -40,6 +43,10 @@ public final class ApiResult<T> {
 
     public String getError() {
         return error;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
     public Integer getStatusCode() {

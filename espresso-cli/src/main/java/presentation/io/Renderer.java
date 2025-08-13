@@ -74,12 +74,9 @@ public class Renderer {
                 "POSTS MENU",
                 List.of(
                         "Please select an option:",
-                        "1. Create Post without image",
-                        "2. Create Post with image",
+                        "1. Create Post",
                         "2. View Posts",
-                        "3. Edit Post",
-                        "4. Delete Post",
-                        "5. Vote Post"
+                        "3. Back to Main Menu"
                 )
         );
         for (String line : lines) {
@@ -95,9 +92,9 @@ public class Renderer {
                         "Please select an option:",
                         "1. User Menu",
                         "2. Post Menu",
-                        "3. Comment Menu",
-                        "4. Logout",
-                        "5. Exit"
+                        //"3. Comment Menu",
+                        "3. Logout",
+                        "4. Exit"
                 )
         );
         for (String line : lines) {
@@ -162,7 +159,7 @@ public class Renderer {
                 "PROFILE",
                 List.of(
                         "Username: " + user.username(),
-                        "ID: " + user.id(),
+                        //"ID: " + user.id(),
                         "Created: " + created,
                         "Posts: " + user.postCount(),
                         "Comments: " + user.commentCount()
@@ -187,7 +184,7 @@ public class Renderer {
                 List.of(
                         "Title: " + nvl(post.title()),
                         "Author: " + nvl(post.author()) + " | Subreddit: " + nvl(post.subreddit()),
-                        "ID: " + post.id(),
+                        //"ID: " + post.id(),
                         "Upvotes: " + nvl(post.upvotes()) + " | Downvotes: " + nvl(post.downvotes()),
                         "Score: " + nvl(post.score()) + " | Comments: " + nvl(post.commentCount()),
                         "User vote: " + vote + " | Filter: " + filter,
@@ -212,33 +209,31 @@ public class Renderer {
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-        List<String> body = new ArrayList<>();
-        body.add("Total: " + posts.size());
-
         for (int i = 0; i < posts.size(); i++) {
             Post p = posts.get(i);
+            displayPostInContainer(p, i + 1, fmt);
+            System.out.println();
+        }
+    }
 
-            String created = (p.createdAt() == null) ? "-" : p.createdAt().format(fmt);
-            String preview = preview(nvl(p.content()), 100);
-            String hasImage = (p.imageUrl() == null || p.imageUrl().isBlank()) ? "no" : "yes";
+    private void displayPostInContainer(Post post, int postNumber, DateTimeFormatter fmt) {
+        String created = (post.createdAt() == null) ? "-" : post.createdAt().format(fmt);
+        String preview = preview(nvl(post.content()), 80);
+        String hasImage = (post.imageUrl() == null || post.imageUrl().isBlank()) ? "no" : "yes";
 
-            body.add("#" + (i + 1) + "  " + nvl(p.title()));
-            body.add("ID: " + p.id() + " | Subreddit: " + nvl(p.subreddit()));
-            body.add("Author: " + nvl(p.author()) + " | Created: " + created);
-            body.add("Score: " + nvl(p.score()) + " | Comments: " + nvl(p.commentCount())
-                    + " | Image: " + hasImage + " | Vote: " + nvl(p.userVote()));
-            if (!preview.equals("-")) {
-                body.add(preview);
-            }
-
-            if (i < posts.size() - 1) body.add("—");
+        List<String> body = new ArrayList<>();
+        body.add("Title: " + nvl(post.title()));
+        body.add("Author: " + nvl(post.author()) + " | Subreddit: " + nvl(post.subreddit()));
+        body.add("Score: " + nvl(post.score()) + " | Comments: " + nvl(post.commentCount()) + " | Image: " + hasImage);
+        body.add("Created: " + created + " | Vote: " + nvl(post.userVote()));
+        if (!preview.equals("-")) {
+            body.add("Content: " + preview);
         }
 
-        List<String> lines = box.buildBox("POSTS", body);
+        List<String> lines = box.buildBox("POST #" + postNumber, body);
         for (String line : lines) {
             System.out.println(Colors.toBold(Colors.toBlue(line)));
         }
-        System.out.println();
     }
 
     private String preview(String s, int max) {
@@ -247,4 +242,36 @@ public class Renderer {
     }
     private String nvl(Object o) { return o == null ? "-" : String.valueOf(o); }
     private String nvl(String s) { return (s == null || s.isBlank()) ? "-" : s; }
+
+    public void displayPostSelectionMenu() {
+        List<String> lines = box.buildBox(
+                "POST SELECTION",
+                List.of(
+                        "Please select an option:",
+                        "1. Select a post",
+                        "2. Back to Posts Menu"
+                )
+        );
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toYellow(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayPostActionMenu(Post post) {
+        List<String> lines = box.buildBox(
+                "POST ACTIONS - " + nvl(post.title()),
+                List.of(
+                        "Please select an option:",
+                        "1. Edit Post",
+                        "2. Delete Post",
+                        "3. Vote Post",
+                        "4. Back to post selection"
+                )
+        );
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toYellow(line)));
+        }
+        System.out.println();
+    }
 }

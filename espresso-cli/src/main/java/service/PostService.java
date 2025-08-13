@@ -10,15 +10,16 @@ import objects.dto.CommentRequestDto;
 import infra.http.ApiResult;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface PostService {
     ApiResult<List<Post>> getAll();
-    ApiResult<Post> getById(Long id);
+    ApiResult<Post> getById(UUID id);
     ApiResult<Post> create(PostRequestDto dto);
     ApiResult<Post> createWithImage(PostRequestWithImageDto dto);
-    ApiResult<Post> update(Long id, PostRequestDto dto);
-    ApiResult<Void> delete(Long id);
-    ApiResult<Vote> votePost(Long id, VoteRequestDto dto);
-    ApiResult<List<Comment>> getCommentsByPostId(Long id);
-    ApiResult<Comment> addComment(Long postId, CommentRequestDto dto);
+    ApiResult<Post> update(UUID id, PostRequestDto dto);
+    ApiResult<Void> delete(UUID id);
+    ApiResult<Vote> votePost(UUID id, VoteRequestDto dto);
+    ApiResult<List<Comment>> getCommentsByPostId(UUID id);
+    ApiResult<Comment> addComment(UUID postId, CommentRequestDto dto);
 }

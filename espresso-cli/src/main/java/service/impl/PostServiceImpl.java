@@ -14,6 +14,7 @@ import objects.dto.VoteRequestDto;
 import service.PostService;
 
 import java.util.List;
+import java.util.UUID;
 
 public class PostServiceImpl implements PostService {
     private final ApiClient apiClient;
@@ -35,7 +36,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ApiResult<Post> getById(Long id) {
+    public ApiResult<Post> getById(UUID id) {
         try {
             String url = baseUrl + "/" + id;
             return apiClient.get(url, new TypeReference<ApiResult<Post>>() {
@@ -62,7 +63,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ApiResult<Post> update(Long id, PostRequestDto dto) {
+    public ApiResult<Post> update(UUID id, PostRequestDto dto) {
         try {
             String url = baseUrl + "/" + id;
             return apiClient.put(url, dto, new TypeReference<ApiResult<Post>>() {
@@ -73,7 +74,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ApiResult<Void> delete(Long id) {
+    public ApiResult<Void> delete(UUID id) {
         try {
             String url = baseUrl + "/" + id;
             return apiClient.delete(url, new TypeReference<ApiResult<Void>>() {
@@ -84,7 +85,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ApiResult<Vote> votePost(Long id, VoteRequestDto dto) {
+    public ApiResult<Vote> votePost(UUID id, VoteRequestDto dto) {
         try {
             String url = baseUrl + "/" + id + "/vote";
             return apiClient.put(url, dto, new TypeReference<ApiResult<Vote>>() {
@@ -95,7 +96,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ApiResult<List<Comment>> getCommentsByPostId(Long id) {
+    public ApiResult<List<Comment>> getCommentsByPostId(UUID id) {
         try {
             String url = baseUrl + "/" + id + "/comments";
             return apiClient.get(url, new TypeReference<ApiResult<List<Comment>>>() {
@@ -106,7 +107,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public ApiResult<Comment> addComment(Long postId, CommentRequestDto dto) {
+    public ApiResult<Comment> addComment(UUID postId, CommentRequestDto dto) {
         try {
             String url = baseUrl + "/" + postId + "/comments";
             return apiClient.post(url, dto, new TypeReference<ApiResult<Comment>>() {
