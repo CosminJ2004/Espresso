@@ -83,6 +83,10 @@ public class Post {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+
+        if (filter != null && imageId == null) {
+            imageId = UUID.randomUUID().toString();
+        }
     }
 
     public long getCommentCount() {
