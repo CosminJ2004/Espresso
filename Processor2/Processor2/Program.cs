@@ -22,6 +22,7 @@ builder.Services.AddScoped<IImageFilter, DoNothingFilter>();
 builder.Services.AddScoped<IImageFilter, FaceDetection>();
 builder.Services.AddScoped<IImageFilter, Yolo>();
 builder.Services.AddScoped<IImageFilter, SepiaFilter>();
+builder.Services.AddScoped<IImageFilter, PixelateFilter>();
 
 
 var app = builder.Build();
