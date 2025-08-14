@@ -58,8 +58,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public ApiResult<Post> createWithImage(PostRequestWithImageDto dto) {
-        return null;
-        //TO DO
+        try {
+            return apiClient.postMultipart(baseUrl, dto, new TypeReference<ApiResult<Post>>() {
+            });
+        } catch (Exception e) {
+            return ApiResult.error("Failed to create post with image: " + e.getMessage(), 500);
+        }
     }
 
     @Override

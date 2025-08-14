@@ -11,7 +11,10 @@ import presentation.io.ConsoleIO;
 import presentation.io.Renderer;
 import service.PostService;
 import service.CommentService;
+import objects.dto.PostRequestWithImageDto;
 
+import java.nio.file.Path;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
 
@@ -156,6 +159,17 @@ public class PostMenuManager {
         String title = io.readLine("Enter post title: ");
         String content = io.readLine("Enter post content: ");
 
+        //imagine optional
+        String uploadImageChoice = io.readLine("Do you want to upload an image? (yes/no): ");
+        
+        if ("yes".equalsIgnoreCase(uploadImageChoice.trim())) {
+            handleCreatePostWithImage(title, content, currentUsername);
+        } else {
+            handleCreatePostWithoutImage(title, content, currentUsername);
+        }
+    }
+
+    private void handleCreatePostWithoutImage(String title, String content, String currentUsername) {
         PostRequestDto requestDto = new PostRequestDto(title, content, currentUsername, DEFAULT_SUBREDDIT);
 
         ApiResult<Post> result = postService.create(requestDto);
@@ -164,6 +178,38 @@ public class PostMenuManager {
             ui.displayPost(result.getData());
         } else {
             ui.displayError("Failed to create post: " + result.getError());
+        }
+    }
+
+    private void handleCreatePostWithImage(String title, String content, String currentUsername) {
+        String imagePath = io.readLine("Enter the full path to your image file: ");
+        
+        if (imagePath == null || imagePath.trim().isEmpty()) {
+            ui.displayError("Image path cannot be empty.");
+            return;
+        }
+//        filtru optional
+        String filterInput = io.readLine("Enter filter ID (or press Enter to skip): ");
+        Long filterId = null;
+        if (filterInput != null && !filterInput.trim().isEmpty()) {
+            try {
+                filterId = Long.parseLong(filterInput.trim());
+            } catch (NumberFormatException e) {
+                ui.displayError("Invalid filter ID. Creating post without filter.");
+            }
+        }
+
+        PostRequestWithImageDto requestDto = new PostRequestWithImageDto(
+            title, content, currentUsername, DEFAULT_SUBREDDIT, 
+            java.nio.file.Path.of(imagePath), filterId
+        );
+
+        ApiResult<Post> result = postService.createWithImage(requestDto);
+        if (result.isSuccess()) {
+            ui.displaySuccess("Post with image created successfully!");
+            ui.displayPost(result.getData());
+        } else {
+            ui.displayError("Failed to create post with image: " + result.getError());
         }
     }
 
