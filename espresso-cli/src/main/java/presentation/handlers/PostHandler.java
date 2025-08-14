@@ -1,4 +1,4 @@
-package presentation.views;
+package presentation.handlers;
 
 import infra.http.ApiResult;
 import objects.domain.Post;
@@ -10,144 +10,24 @@ import objects.dto.VoteRequestDto;
 import presentation.AppState;
 import presentation.io.ConsoleIO;
 import presentation.io.Renderer;
-import service.CommentService;
 import service.PostService;
 
 import java.util.List;
 
-public class PostMenuManager {
+public class PostHandler {
     private static final String DEFAULT_SUBREDDIT = "echipa3_general";
     private final PostService postService;
-    private final CommentService commentService;
     private final ConsoleIO io;
     private final Renderer ui;
     private final AppState appState = AppState.getInstance();
 
-    public PostMenuManager(PostService postService, CommentService commentService, ConsoleIO io, Renderer ui) {
+    public PostHandler(PostService postService, ConsoleIO io, Renderer ui) {
         this.postService = postService;
-        this.commentService = commentService;
         this.io = io;
         this.ui = ui;
     }
 
-    public void run() {
-        boolean stay = true;
-        while (stay && appState.isRunning() && appState.isLoggedIn()) {
-            ui.displayPostMenu();
-            String option = io.readLine("> ").trim();
-            switch (option.trim()) {
-                case "1":
-                    handleCreatePost();
-                    break;
-                case "2":
-                    handleViewPosts();
-                    break;
-//                case "3":
-//                    handleEditPost();
-//                    break;
-//                case "4":
-//                    handleDeletePost();
-//                    break;
-//                case "5":
-//                    handleVotePost();
-//                    break;
-                case "3":
-                    return; // Back to Main Menu
-                default:
-                    ui.displayInfo("Please enter a valid option (1-3).");
-            }
-        }
-    }
-
-    private void handleViewPosts() {
-        ApiResult<List<Post>> result = postService.getAll();
-
-        if (result == null) {
-            ui.displayError("Unexpected null response from service.");
-            return;
-        }
-        if (!result.isSuccess()) {
-            ui.displayError(result.getError() != null ? result.getError() : "Failed to load posts.");
-            return;
-        }
-
-        List<Post> posts = result.getData();
-        if (posts == null || posts.isEmpty()) {
-            ui.displayInfo("No posts yet. Be the first to create one!");
-            return;
-        }
-
-        ui.displayPosts(posts);
-        handlePostSelection(posts);
-    }
-
-    private void handlePostSelection(List<Post> posts) {
-        while (true) {
-            ui.displayPostSelectionMenu();
-            String option = io.readLine("> ").trim();
-
-            switch (option.trim()) {
-                case "1":
-                    selectPostForAction(posts);
-                    break;
-                case "2":
-                    return; // Back to Posts Menu
-                default:
-                    ui.displayInfo("Please enter a valid option (1-2).");
-            }
-        }
-    }
-
-    private void handlePostActionMenu(Post selectedPost) {
-        while (true) {
-            ui.displayPostActionMenu(selectedPost);
-            String option = io.readLine("> ").trim();
-
-            switch (option.trim()) {
-                case "1":
-                    handleEditPost(selectedPost);
-                    return;
-                case "2":
-                    handleDeletePost(selectedPost);
-                    return;
-                case "3":
-                    handleVotePost(selectedPost);
-                    return;
-                case "4":
-                    handleCommentSection(selectedPost);
-                    return;
-                case "5":
-                    return; // Back to post selection
-                default:
-                    ui.displayInfo("Please enter a valid option (1-5).");
-            }
-        }
-    }
-
-    private void selectPostForAction(List<Post> posts) {
-        String postNumberInput = io.readLine("Enter post number (1-" + posts.size() + "): ");
-        if (postNumberInput == null || postNumberInput.trim().isEmpty()) {
-            ui.displayError("Post number cannot be empty.");
-            return;
-        }
-
-        try {
-            int postNumber = Integer.parseInt(postNumberInput.trim());
-            if (postNumber < 1 || postNumber > posts.size()) {
-                ui.displayError("Invalid post number. Please enter a number between 1 and " + posts.size() + ".");
-                return;
-            }
-
-            Post selectedPost = posts.get(postNumber - 1);
-            ui.displayPost(selectedPost);
-            handlePostActionMenu(selectedPost);
-
-        } catch (NumberFormatException e) {
-            ui.displayError("Invalid number format. Please enter a valid number.");
-        }
-    }
-
-    private void handleCreatePost() {
+    public void handleCreatePost() {
         if (!appState.isLoggedIn()) {
             ui.displayError("You must be logged in to create a post.");
             return;
@@ -166,7 +46,7 @@ public class PostMenuManager {
         }
     }
 
-    private void handleCreatePostWithoutImage(String title, String content, String currentUsername) {
+    public void handleCreatePostWithoutImage(String title, String content, String currentUsername) {
         PostRequestDto requestDto = new PostRequestDto(title, content, currentUsername, DEFAULT_SUBREDDIT);
 
         ApiResult<Post> result = postService.create(requestDto);
@@ -178,14 +58,14 @@ public class PostMenuManager {
         }
     }
 
-    private void handleCreatePostWithImage(String title, String content, String currentUsername) {
+    public void handleCreatePostWithImage(String title, String content, String currentUsername) {
         String imagePath = io.readLine("Enter the full path to your image file: ");
         
         if (imagePath == null || imagePath.trim().isEmpty()) {
             ui.displayError("Image path cannot be empty.");
             return;
         }
-//        filtru optional
+        //filtru optional
         String filterInput = io.readLine("Enter filter ID (or press Enter to skip): ");
         Long filterId = 1L; // do nothing filter is at one
         if(filterInput.isEmpty() || filterInput == null) {
@@ -198,14 +78,6 @@ public class PostMenuManager {
                 filterId = 1L;
             }
         }
-//        if (filterInput != null && !filterInput.trim().isEmpty()) {
-//            try {
-//                filterId = Long.parseLong(filterInput.trim());
-//            } catch (NumberFormatException e) {
-//                ui.displayError("Invalid filter ID. Creating post without filter.");
-//            }
-//        }
-
 
         PostRequestWithImageDto requestDto = new PostRequestWithImageDto(
             title, content, currentUsername, DEFAULT_SUBREDDIT, 
@@ -221,7 +93,7 @@ public class PostMenuManager {
         }
     }
 
-    private void handleEditPost(Post existingPost) {
+    public void handleEditPost(Post existingPost) {
         String currentUsername = appState.getCurrentUser().username();
 
         if (!existingPost.author().equals(currentUsername)) {
@@ -246,7 +118,7 @@ public class PostMenuManager {
         }
     }
 
-    private void handleDeletePost(Post existingPost) {
+    public void handleDeletePost(Post existingPost) {
         String currentUsername = appState.getCurrentUser().username();
 
         if (!existingPost.author().equals(currentUsername)) {
@@ -267,7 +139,7 @@ public class PostMenuManager {
                     List<Post> updatedPosts = updatedPostsResult.getData();
                     if (updatedPosts != null && !updatedPosts.isEmpty()) {
                         ui.displayPosts(updatedPosts);
-                        handlePostSelection(updatedPosts);
+                        // Return to post selection - handled by caller
                     } else {
                         ui.displayInfo("No posts remaining. Returning to Posts Menu.");
                     }
@@ -282,7 +154,7 @@ public class PostMenuManager {
         }
     }
 
-    private void handleVotePost(Post existingPost) {
+    public void handleVotePost(Post existingPost) {
         String voteTypeInput = io.readLine("Enter vote type (UP/DOWN/NONE): ");
         if (voteTypeInput == null || voteTypeInput.trim().isEmpty()) {
             ui.displayError("Vote type cannot be empty.");
@@ -314,8 +186,11 @@ public class PostMenuManager {
         }
     }
 
-    private void handleCommentSection(Post selectedPost) {
-        new CommentMenuManager(postService, commentService, io, ui, selectedPost).run();
+    public ApiResult<List<Post>> getAllPosts() {
+        return postService.getAll();
     }
 
+    public ApiResult<Post> getPostById(String id) {
+        return postService.getById(id);
+    }
 }

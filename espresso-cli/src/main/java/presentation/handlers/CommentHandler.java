@@ -1,4 +1,4 @@
-package presentation.views;
+package presentation.handlers;
 
 import infra.http.ApiResult;
 import objects.domain.Comment;
@@ -14,45 +14,22 @@ import service.CommentService;
 import service.PostService;
 
 import java.util.List;
-import java.util.UUID;
 
-public class CommentMenuManager {
+public class CommentHandler {
     private final PostService postService;
     private final CommentService commentService;
     private final ConsoleIO io;
     private final Renderer ui;
-    private final Post currentPost;
     private final AppState appState = AppState.getInstance();
 
-    public CommentMenuManager(PostService postService, CommentService commentService, ConsoleIO io, Renderer ui, Post currentPost) {
+    public CommentHandler(PostService postService, CommentService commentService, ConsoleIO io, Renderer ui) {
         this.postService = postService;
         this.commentService = commentService;
         this.io = io;
         this.ui = ui;
-        this.currentPost = currentPost;
     }
 
-    public void run() {
-        boolean stay = true;
-        while (stay && appState.isRunning() && appState.isLoggedIn()) {
-            ui.displayCommentMenu(currentPost);
-            String option = io.readLine("> ").trim();
-            switch (option.trim()) {
-                case "1":
-                    handleViewComments();
-                    break;
-                case "2":
-                    handleAddComment();
-                    break;
-                case "3":
-                    return; // Back to Post Actions
-                default:
-                    ui.displayInfo("Please enter a valid option (1-3).");
-            }
-        }
-    }
-
-    private void handleViewComments() {
+    public void handleViewComments(Post currentPost) {
         ApiResult<List<Comment>> result = postService.getCommentsByPostId(currentPost.id());
 
         if (result == null) {
@@ -71,76 +48,9 @@ public class CommentMenuManager {
         }
 
         ui.displayComments(comments);
-        handleCommentSelection(comments);
     }
 
-    private void handleCommentSelection(List<Comment> comments) {
-        while (true) {
-            ui.displayCommentSelectionMenu();
-            String option = io.readLine("> ").trim();
-
-            switch (option.trim()) {
-                case "1":
-                    selectCommentForAction(comments);
-                    break;
-                case "2":
-                    return; // Back to Comment Menu
-                default:
-                    ui.displayInfo("Please enter a valid option (1-2).");
-            }
-        }
-    }
-
-    private void handleCommentActionMenu(Comment selectedComment) {
-        while (true) {
-            ui.displayCommentActionMenu(selectedComment);
-            String option = io.readLine("> ").trim();
-
-            switch (option.trim()) {
-                case "1":
-                    handleEditComment(selectedComment);
-                    return;
-                case "2":
-                    handleDeleteComment(selectedComment);
-                    return;
-                case "3":
-                    handleVoteComment(selectedComment);
-                    return;
-                case "4":
-                    handleReplyToComment(selectedComment);
-                    return;
-                case "5":
-                    return; // Back to comment selection
-                default:
-                    ui.displayInfo("Please enter a valid option (1-5).");
-            }
-        }
-    }
-
-    private void selectCommentForAction(List<Comment> comments) {
-        String commentNumberInput = io.readLine("Enter comment number (1-" + comments.size() + "): ");
-        if (commentNumberInput == null || commentNumberInput.trim().isEmpty()) {
-            ui.displayError("Comment number cannot be empty.");
-            return;
-        }
-
-        try {
-            int commentNumber = Integer.parseInt(commentNumberInput.trim());
-            if (commentNumber < 1 || commentNumber > comments.size()) {
-                ui.displayError("Invalid comment number. Please enter a number between 1 and " + comments.size() + ".");
-                return;
-            }
-
-            Comment selectedComment = comments.get(commentNumber - 1);
-            ui.displayComment(selectedComment);
-            handleCommentActionMenu(selectedComment);
-
-        } catch (NumberFormatException e) {
-            ui.displayError("Invalid number format. Please enter a valid number.");
-        }
-    }
-
-    private void handleAddComment() {
+    public void handleAddComment(Post currentPost) {
         if (!appState.isLoggedIn()) {
             ui.displayError("You must be logged in to add a comment.");
             return;
@@ -161,13 +71,13 @@ public class CommentMenuManager {
             ui.displaySuccess("Comment added successfully!");
             ui.displayComment(result.getData());
             // Refresh comments dupa add
-            refreshComments();
+            refreshComments(currentPost);
         } else {
             ui.displayError("Failed to add comment: " + result.getError());
         }
     }
 
-    private void handleEditComment(Comment existingComment) {
+    public void handleEditComment(Comment existingComment) {
         String currentUsername = appState.getCurrentUser().username();
 
         if (!existingComment.author().equals(currentUsername)) {
@@ -187,14 +97,13 @@ public class CommentMenuManager {
         if (result.isSuccess()) {
             ui.displaySuccess("Comment updated successfully!");
             ui.displayComment(result.getData());
-            // Refresh comments dupa edit
-            refreshComments();
+            // Refresh comments dupa edit - handled by caller
         } else {
             ui.displayError("Failed to update comment: " + result.getError());
         }
     }
 
-    private void handleDeleteComment(Comment existingComment) {
+    public void handleDeleteComment(Comment existingComment) {
         String currentUsername = appState.getCurrentUser().username();
 
         if (!existingComment.author().equals(currentUsername)) {
@@ -208,8 +117,7 @@ public class CommentMenuManager {
             if (result.isSuccess()) {
                 String successMessage = result.getMessage() != null ? result.getMessage() : "Comment deleted successfully!";
                 ui.displaySuccess(successMessage);
-                // Refresh comments dupa delete
-                refreshComments();
+                // Refresh comments dupa delete - handled by caller
             } else {
                 ui.displayError("Failed to delete comment: " + result.getError());
             }
@@ -218,7 +126,7 @@ public class CommentMenuManager {
         }
     }
 
-    private void handleVoteComment(Comment existingComment) {
+    public void handleVoteComment(Comment existingComment) {
         String voteTypeInput = io.readLine("Enter vote type (UP/DOWN/NONE): ");
         if (voteTypeInput == null || voteTypeInput.trim().isEmpty()) {
             ui.displayError("Vote type cannot be empty.");
@@ -237,14 +145,13 @@ public class CommentMenuManager {
 
         if (result.isSuccess()) {
             ui.displaySuccess("Vote recorded successfully!");
-            // Refresh comments dupa vot
-            refreshComments();
+            // Refresh comments dupa vot - handled by caller
         } else {
             ui.displayError("Failed to record vote: " + result.getError());
         }
     }
 
-    private void handleReplyToComment(Comment parentComment) {
+    public void handleReplyToComment(Comment parentComment, Post currentPost) {
         if (!appState.isLoggedIn()) {
             ui.displayError("You must be logged in to reply to a comment.");
             return;
@@ -265,14 +172,18 @@ public class CommentMenuManager {
             ui.displaySuccess("Reply added successfully!");
             ui.displayComment(result.getData());
             // Refresh comments dupa reply
-            refreshComments();
+            refreshComments(currentPost);
         } else {
             ui.displayError("Failed to add reply: " + result.getError());
         }
     }
 
-    private void refreshComments() {
+    private void refreshComments(Post currentPost) {
         ui.displayInfo("Refreshing comments...");
-        handleViewComments();
+        handleViewComments(currentPost);
+    }
+
+    public ApiResult<List<Comment>> getCommentsByPostId(String postId) {
+        return postService.getCommentsByPostId(postId);
     }
 }

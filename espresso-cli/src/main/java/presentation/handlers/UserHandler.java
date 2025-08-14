@@ -1,4 +1,4 @@
-package presentation.views;
+package presentation.handlers;
 
 import infra.http.ApiResult;
 import objects.domain.User;
@@ -8,50 +8,19 @@ import presentation.io.ConsoleIO;
 import presentation.io.Renderer;
 import service.UserService;
 
-public class UserMenuManager {
+public class UserHandler {
     private final UserService userService;
     private final ConsoleIO io;
     private final Renderer ui;
     private final AppState appState = AppState.getInstance();
 
-    public UserMenuManager(UserService userService, ConsoleIO io, Renderer ui) {
+    public UserHandler(UserService userService, ConsoleIO io, Renderer ui) {
         this.userService = userService;
         this.io = io;
         this.ui = ui;
     }
 
-    public void run() {
-        boolean stay = true;
-        while (stay && appState.isRunning() && appState.isLoggedIn()) {
-            ui.displayUserMenu();
-            String option = io.readLine("> ").trim();
-            switch (option.trim()) {
-                case "1":
-                    // View Profile
-                    handleViewProfile();
-                    break;
-                case "2":
-                    // Edit Profile
-                    handleEditProfile();
-                    break;
-                case "3":
-                    // Search Users
-                    handleSearchUsers();
-                    break;
-                case "4":
-                    // Delete Account
-                    handleDeleteAccount();
-                    break;
-                case "5":
-                    // Logout sau back cv de genu
-                    stay = false;
-                    break;
-                default:
-                    ui.displayInfo("Invalid option.");
-            }
-        }
-    }
-    private void handleViewProfile() {
+    public void handleViewProfile() {
         User current = appState.getCurrentUser();
         if (current == null) {
             ui.displayError("No active session. Please login first.");
@@ -70,7 +39,7 @@ public class UserMenuManager {
         }
     }
 
-    private void handleEditProfile(){
+    public void handleEditProfile() {
         User current = appState.getCurrentUser();
         if (current == null) {
             ui.displayError("No active session. Please login first.");
@@ -96,7 +65,7 @@ public class UserMenuManager {
         }
     }
 
-    private void handleDeleteAccount() {
+    public void handleDeleteAccount() {
         User current = appState.getCurrentUser();
         if (current == null) {
             ui.displayError("No active session. Please login first.");
@@ -114,7 +83,7 @@ public class UserMenuManager {
         }
     }
 
-    private void handleSearchUsers() {
+    public void handleSearchUsers() {
         ui.displayInfo("Please enter the username you want to search for:");
         String username = io.readUsername();
         ApiResult<User> result = userService.findByUsername(username);
