@@ -44,11 +44,11 @@ public class Post {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @OrderBy("createdAt ASC")
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Vote> votes = new ArrayList<>();
 
     public Post() {
@@ -124,12 +124,12 @@ public class Post {
         return getUpvoteCount() - getDownvoteCount();
     }
 
-    public VoteType getUserVote(User user) {
+    public VoteType getUserVote(String username) {
         if (votes == null || votes.isEmpty()) {
             return null;
         }
         return votes.stream()
-                .filter(vote -> vote.getUser().equals(user))
+                .filter(vote -> vote.getUser().getUsername().equals(username))
                 .map(Vote::getType)
                 .findFirst()
                 .orElse(null);

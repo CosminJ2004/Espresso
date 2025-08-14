@@ -42,22 +42,18 @@ public class PostService {
     }
 
     public List<PostResponseDto> getAllPosts() {
-        return postRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
-                .map(this::postToPostResponseDto)
-                .collect(Collectors.toList());
+        List<Post> allByOrderByCreatedAtDesc = postRepository.findAllByOrderByCreatedAtDesc();
+        return allByOrderByCreatedAtDesc.stream().map(this::postToPostResponseDto).collect(Collectors.toList());
     }
 
     public PostResponseDto getPostById(String id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
+        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
         return postToPostResponseDto(post);
     }
 
     @Transactional
     public PostResponseDto createPostWithoutImage(PostRequestDto postRequest) {
-        User author = userRepository.findByUsername(postRequest.getAuthor())
-                .orElseThrow(() -> new RuntimeException("Author not found"));
+        User author = userRepository.findByUsername(postRequest.getAuthor()).orElseThrow(() -> new RuntimeException("Author not found"));
 
         Post post = new Post(author, postRequest.getTitle(), postRequest.getContent());
         postRepository.save(post);
@@ -71,10 +67,8 @@ public class PostService {
 
     @Transactional
     public PostResponseDto createPostWithImage(PostRequestDto postRequest) {
-        User author = userRepository.findByUsername(postRequest.getAuthor())
-                .orElseThrow(() -> new RuntimeException("Author not found"));
-        Filter filter = filterRepository.findById(postRequest.getFilter())
-                .orElseThrow(() -> new RuntimeException("Filter not found"));
+        User author = userRepository.findByUsername(postRequest.getAuthor()).orElseThrow(() -> new RuntimeException("Author not found"));
+        Filter filter = filterRepository.findById(postRequest.getFilter()).orElseThrow(() -> new RuntimeException("Filter not found"));
 
         if (postRequest.getImage() == null || postRequest.getImage().isEmpty()) {
             throw new IllegalArgumentException("Image is required for createPostWithImage");
@@ -82,7 +76,7 @@ public class PostService {
 
         try {
             byte[] imageBytes = postRequest.getImage().getBytes();
-            
+
             Post post = new Post(author, postRequest.getTitle(), postRequest.getContent(), filter);
             post = postRepository.save(post);
 
@@ -93,22 +87,20 @@ public class PostService {
             post.getVotes().add(authorVote);
 
             return postToPostResponseDto(post);
-            
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to create post with image: " + e.getMessage(), e);
         }
     }
 
     @Transactional
-    public PostResponseDto updatePostWithoutImage (String id, PostRequestDto postRequest) {
-        Post existingPost = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
+    public PostResponseDto updatePostWithoutImage(String id, PostRequestDto postRequest) {
+        Post existingPost = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
 
         existingPost.setTitle(postRequest.getTitle());
         existingPost.setContent(postRequest.getContent());
 
-        User author = userRepository.findByUsername(postRequest.getAuthor())
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + postRequest.getAuthor()));
+        User author = userRepository.findByUsername(postRequest.getAuthor()).orElseThrow(() -> new IllegalArgumentException("User not found: " + postRequest.getAuthor()));
         existingPost.setAuthor(author);
 
         return postToPostResponseDto(postRepository.save(existingPost));
@@ -116,8 +108,7 @@ public class PostService {
 
     @Transactional
     public PostResponseDto updatePostWithImage(String id, PostRequestDto postRequest) {
-        Post existingPost = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
+        Post existingPost = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + id));
 
         if (postRequest.getImage() == null || postRequest.getImage().isEmpty()) {
             throw new IllegalArgumentException("Image is required to update post with image");
@@ -127,13 +118,11 @@ public class PostService {
             existingPost.setTitle(postRequest.getTitle());
             existingPost.setContent(postRequest.getContent());
 
-            User author = userRepository.findByUsername(postRequest.getAuthor())
-                    .orElseThrow(() -> new IllegalArgumentException("User not found: " + postRequest.getAuthor()));
+            User author = userRepository.findByUsername(postRequest.getAuthor()).orElseThrow(() -> new IllegalArgumentException("User not found: " + postRequest.getAuthor()));
             existingPost.setAuthor(author);
 
             if (postRequest.getFilter() != null) {
-                Filter filter = filterRepository.findById(postRequest.getFilter())
-                        .orElseThrow(() -> new RuntimeException("Filter not found"));
+                Filter filter = filterRepository.findById(postRequest.getFilter()).orElseThrow(() -> new RuntimeException("Filter not found"));
                 existingPost.setFilter(filter);
             }
 
@@ -151,7 +140,7 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost (String id){
+    public void deletePost(String id) {
         if (!postRepository.existsById(id)) {
             throw new IllegalArgumentException("Post not found with ID: " + id);
         }
@@ -159,17 +148,14 @@ public class PostService {
     }
 
     @Transactional
-    public VoteResponseDto votePost (String postId, VoteRequestDto voteRequest){
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+    public VoteResponseDto votePost(String postId, VoteRequestDto voteRequest) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
-        User user = userRepository.findByUsername("current_user")
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByUsername("current_user").orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         voteService.vote(user, post, null, voteRequest.getVoteType());
 
-        post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+        post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
         VoteResponseDto voteResponse = new VoteResponseDto();
         voteResponse.setUpvotes(post.getUpvoteCount());
@@ -182,30 +168,25 @@ public class PostService {
         return voteResponse;
     }
 
-    public List<CommentResponseDto> getCommentsByPostId (String postId) {
+    public List<CommentResponseDto> getCommentsByPostId(String postId) {
         if (!postRepository.existsById(postId)) {
             throw new IllegalArgumentException("Post not found with ID: " + postId);
         }
 
         List<Comment> rootComments = commentRepository.findByPostIdAndParentIsNullOrderByCreatedAtAsc(postId);
 
-        return rootComments.stream()
-                .map(commentService::commentToCommentResponseDto)
-                .collect(Collectors.toList());
+        return rootComments.stream().map(commentService::commentToCommentResponseDto).collect(Collectors.toList());
     }
 
     @Transactional
-    public CommentResponseDto addComment (String id, CommentRequestDto commentRequest){
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+    public CommentResponseDto addComment(String id, CommentRequestDto commentRequest) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
-        User author = userRepository.findByUsername(commentRequest.getAuthor())
-                .orElseThrow(() -> new IllegalArgumentException("Author not found"));
+        User author = userRepository.findByUsername(commentRequest.getAuthor()).orElseThrow(() -> new IllegalArgumentException("Author not found"));
 
         Comment parent = null;
         if (commentRequest.getParentId() != null) {
-            parent = commentRepository.findById(commentRequest.getParentId())
-                    .orElseThrow(() -> new IllegalArgumentException("Parent comment not found"));
+            parent = commentRepository.findById(commentRequest.getParentId()).orElseThrow(() -> new IllegalArgumentException("Parent comment not found"));
         }
 
         Comment comment = new Comment(author, commentRequest.getContent(), post, parent);
@@ -218,12 +199,10 @@ public class PostService {
         return commentService.commentToCommentResponseDto(comment);
     }
 
-    private PostResponseDto postToPostResponseDto (Post post){
-        return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getImageUrl(), post.getFilter() != null ? post.getFilter().getId() : null, post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount(), post.getDownvoteCount(), post.getScore(), post.getCommentCount(), post.getUserVote(userRepository.findByUsername("current_user").orElseThrow()), post.getCreatedAt(), post.getUpdatedAt());
-    }
-
-    public String getLatency() {
-        postRepository.getLatency();
-        return "lol";
+    private PostResponseDto postToPostResponseDto(Post post) {
+        VoteType voteType = post.getUserVote("current_user");
+        PostResponseDto postResponseDto = PostResponseDto.fromPost(post);
+        postResponseDto.setUserVote(voteType);
+        return postResponseDto;
     }
 }

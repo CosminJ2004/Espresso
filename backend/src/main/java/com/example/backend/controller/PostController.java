@@ -71,13 +71,6 @@ public class PostController {
     public ResponseEntity<Response<CommentResponseDto>> addComment(@PathVariable String id, @RequestBody CommentRequestDto commentRequest) {
         return Response.ok(postService.addComment(id, commentRequest));
     }
-
-    @GetMapping("/latency")
-    public ResponseEntity<Response<PostResponseDto>> getPostById() {
-        return Response.ok(postService.getLatency());
-    }
-
-
 }
 
 
