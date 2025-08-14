@@ -221,4 +221,9 @@ public class PostService {
     private PostResponseDto postToPostResponseDto (Post post){
         return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getImageUrl(), post.getFilter() != null ? post.getFilter().getId() : null, post.getAuthor().getUsername(), "echipa3_general", post.getUpvoteCount(), post.getDownvoteCount(), post.getScore(), post.getCommentCount(), post.getUserVote(userRepository.findByUsername("current_user").orElseThrow()), post.getCreatedAt(), post.getUpdatedAt());
     }
+
+    public String getLatency() {
+        postRepository.getLatency();
+        return "lol";
+    }
 }
