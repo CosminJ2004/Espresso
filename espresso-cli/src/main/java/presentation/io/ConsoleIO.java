@@ -37,7 +37,6 @@ public final class ConsoleIO implements AutoCloseable {
         return readLine("Username: ");
     }
 
-
     @Override
     public void close() {
         scanner.close();

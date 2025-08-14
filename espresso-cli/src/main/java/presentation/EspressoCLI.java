@@ -21,7 +21,7 @@ public final class EspressoCLI implements AutoCloseable {
         this.commentService = commentService;
         this.io = io;
         this.ui = ui;
-        this.menuManager = new MenuManager(userService, io, ui);
+        this.menuManager = new MenuManager(userService, postService, commentService, io, ui);
         this.appState = AppState.getInstance();
     }
 

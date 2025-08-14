@@ -4,18 +4,25 @@ import objects.domain.User;
 import objects.dto.UserRequestDto;
 import presentation.io.ConsoleIO;
 import presentation.io.Renderer;
+import presentation.views.PostMenuManager;
 import presentation.views.UserMenuManager;
+import service.CommentService;
+import service.PostService;
 import service.UserService;
 import infra.http.ApiResult;
 
 public final class MenuManager {
     private final UserService userService;
+    private final PostService postService;
+    private final CommentService commentService;
     private final ConsoleIO io;
     private final Renderer ui;
     private final AppState appState;
 
-    public MenuManager(UserService userService, ConsoleIO io, Renderer ui) {
+    public MenuManager(UserService userService, PostService postService, CommentService commentService, ConsoleIO io, Renderer ui) {
         this.userService = userService;
+        this.postService = postService;
+        this.commentService = commentService;
         this.io = io;
         this.ui = ui;
         this.appState = AppState.getInstance();
@@ -29,11 +36,17 @@ public final class MenuManager {
                 case "1":
                     new UserMenuManager(userService, io , ui).run();
                     break;
-                case "4": // Logout
+                case "2": // Post Menu
+                    new PostMenuManager(postService, commentService, io, ui).run();
+                    break;
+//                case "3": // Comment Menu nu o sa mai existe, o sa fie integrat in Post Menu
+//                    new CommentMenuManager(commentService, postService, io, ui).run();
+//                    break;
+                case "3": // Logout
                     appState.setCurrentUser(null);
                     ui.displayInfo("You have been logged out.");
                     return;
-                case "5": //Exitt
+                case "4": //Exit
                     handleExit();
                     return;
             }
