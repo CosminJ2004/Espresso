@@ -5,18 +5,15 @@ import objects.domain.Post;
 import objects.domain.Vote;
 import objects.domain.VoteType;
 import objects.dto.PostRequestDto;
+import objects.dto.PostRequestWithImageDto;
 import objects.dto.VoteRequestDto;
 import presentation.AppState;
 import presentation.io.ConsoleIO;
 import presentation.io.Renderer;
-import service.PostService;
 import service.CommentService;
-import objects.dto.PostRequestWithImageDto;
+import service.PostService;
 
-import java.nio.file.Path;
-import java.nio.file.Files;
 import java.util.List;
-import java.util.UUID;
 
 public class PostMenuManager {
     private static final String DEFAULT_SUBREDDIT = "echipa3_general";
@@ -190,14 +187,25 @@ public class PostMenuManager {
         }
 //        filtru optional
         String filterInput = io.readLine("Enter filter ID (or press Enter to skip): ");
-        Long filterId = null;
-        if (filterInput != null && !filterInput.trim().isEmpty()) {
+        Long filterId = 1L; // do nothing filter is at one
+        if(filterInput.isEmpty() || filterInput == null) {
+            ui.displayInfo("No filter ID provided, using default no filter."); // ID 1 : none
+        } else {
             try {
                 filterId = Long.parseLong(filterInput.trim());
             } catch (NumberFormatException e) {
                 ui.displayError("Invalid filter ID. Creating post without filter.");
+                filterId = 1L;
             }
         }
+//        if (filterInput != null && !filterInput.trim().isEmpty()) {
+//            try {
+//                filterId = Long.parseLong(filterInput.trim());
+//            } catch (NumberFormatException e) {
+//                ui.displayError("Invalid filter ID. Creating post without filter.");
+//            }
+//        }
+
 
         PostRequestWithImageDto requestDto = new PostRequestWithImageDto(
             title, content, currentUsername, DEFAULT_SUBREDDIT, 
