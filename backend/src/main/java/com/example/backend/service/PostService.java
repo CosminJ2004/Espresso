@@ -200,9 +200,6 @@ public class PostService {
     }
 
     private PostResponseDto postToPostResponseDto(Post post) {
-        VoteType voteType = post.getUserVote("current_user");
-        PostResponseDto postResponseDto = PostResponseDto.fromPost(post);
-        postResponseDto.setUserVote(voteType);
-        return postResponseDto;
+        return PostResponseDto.fromPost(post);
     }
 }

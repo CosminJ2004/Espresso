@@ -53,7 +53,6 @@ public class Comment{
         this.text = text;
         this.post = post;
         this.parent = null;
-        this.createdAt = LocalDateTime.now();
     }
 
     public Comment(User author, String text, Post post, Comment parent) {
@@ -61,7 +60,6 @@ public class Comment{
         this.text = text;
         this.post = post;
         this.parent = parent;
-        this.createdAt = LocalDateTime.now();
     }
 
     @PrePersist

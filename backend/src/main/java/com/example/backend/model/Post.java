@@ -44,11 +44,11 @@ public class Post {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @OrderBy("createdAt ASC")
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Vote> votes = new ArrayList<>();
 
     public Post() {
@@ -58,8 +58,6 @@ public class Post {
         this.author = author;
         this.title = title;
         this.content = content;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     public Post(User author, String title, String content, Filter filter) {
@@ -67,7 +65,6 @@ public class Post {
         this.title = title;
         this.content = content;
         this.filter = filter;
-        this.createdAt = LocalDateTime.now();
     }
 
     @PrePersist

@@ -34,13 +34,20 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
+    private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Vote> votes = new ArrayList<>();
+
     public User() {}
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     @PrePersist

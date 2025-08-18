@@ -48,7 +48,6 @@ public class Vote {
         this.post = post;
         this.comment = null;
         this.type = type;
-        this.createdAt = LocalDateTime.now();
     }
 
     public Vote(User user, Comment comment, VoteType type) {
@@ -56,7 +55,6 @@ public class Vote {
         this.post = null;
         this.comment = comment;
         this.type = type;
-        this.createdAt = LocalDateTime.now();
     }
 
     @PrePersist

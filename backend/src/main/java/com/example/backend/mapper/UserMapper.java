@@ -15,7 +15,9 @@ public final class UserMapper {
         return new UserResponseDto(
                 user.getId(),
                 user.getUsername(),
-                user.getCreatedAt()
+                user.getCreatedAt(),
+                (long) user.getPosts().size(),
+                (long) user.getComments().size()
         );
     }
 }
