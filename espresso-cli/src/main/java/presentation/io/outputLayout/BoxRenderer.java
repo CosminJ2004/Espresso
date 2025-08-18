@@ -16,6 +16,12 @@ public final class BoxRenderer {
         this.innerWidth = totalWidth - 4;
     }
 
+    public BoxRenderer(int innerWidth) {
+        this.boxLayout = BoxLayout.ROUNDED();
+        this.innerWidth = innerWidth;
+        this.totalWidth = innerWidth + 4;
+    }
+
     public List<String> buildBox(String title, List<String> body) {
         List<String> out = new ArrayList<>();
 

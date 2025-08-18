@@ -41,7 +41,7 @@ public class PostResponseDto {
                 post.getDownvoteCount(),
                 post.getScore(),
                 post.getCommentCount(),
-                post.getUserVote("current_user"),
+                post.getUserVote(post.getAuthorUsername()),
                 post.getCreatedAt(),
                 post.getUpdatedAt()
         );

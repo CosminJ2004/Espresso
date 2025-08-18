@@ -27,4 +27,20 @@ public final class Colors {
     public static String toOrange(String s) { // mesaje welcome, goodbye
         return "\u001B[38;5;208m" + s + "\u001B[0m";
     }
+
+    public static String toCyan(String s) {
+        return "\u001B[36m" + s + "\u001B[0m";
+    }
+
+    public static String toLink(String s) {
+        return "\u001B[1;4;36m" + s + "\u001B[0m";
+    }
+
+    public static String toMagenta(String s){
+        return "\u001B[35m" + s + "\u001B[0m";
+    }
+
+    public static String toBrightWhite(String s) {
+        return "\u001B[97m" + s + "\u001B[0m";
+    }
 }
