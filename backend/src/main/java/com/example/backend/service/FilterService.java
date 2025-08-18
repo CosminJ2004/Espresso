@@ -3,6 +3,7 @@ package com.example.backend.service;
 import com.example.backend.dto.FilterResponseDto;
 import com.example.backend.repository.FilterRepository;
 import com.example.backend.model.Filter;
+import com.example.backend.mapper.FilterMapper;
 import com.example.backend.util.logger.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +29,7 @@ public class FilterService {
         List<Filter> filters = filterRepository.findAll();
         log.info("Retrieved " + filters.size() + " filters");
         return filters.stream()
-                .map(filter -> new FilterResponseDto(
-                        filter.getId(),
-                        filter.getName(),
-                        filter.getDisplayName()
-                ))
+                .map(FilterMapper::toDto)
                 .collect(Collectors.toList());
     }
 }

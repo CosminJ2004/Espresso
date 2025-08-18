@@ -7,6 +7,7 @@ import com.example.backend.repository.FilterRepository;
 import com.example.backend.repository.PostRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.VoteRepository;
+import com.example.backend.mapper.PostMapper;
 import com.example.backend.util.logger.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class PostService {
         log.info("Fetching all posts");
         List<Post> allByOrderByCreatedAtDesc = postRepository.findAllByOrderByCreatedAtDesc();
         log.info("Retrieved " + allByOrderByCreatedAtDesc.size() + " posts");
-        return allByOrderByCreatedAtDesc.stream().map(this::postToPostResponseDto).collect(Collectors.toList());
+        return allByOrderByCreatedAtDesc.stream().map(PostMapper::toDto).collect(Collectors.toList());
     }
 
     public PostResponseDto getPostById(String id) {
@@ -54,7 +55,7 @@ public class PostService {
             log.error("Post not found with ID: " + id);
             return new IllegalArgumentException("Post not found with ID: " + id);
         });
-        return postToPostResponseDto(post);
+        return PostMapper.toDto(post);
     }
 
     @Transactional
@@ -73,7 +74,7 @@ public class PostService {
         voteRepository.save(authorVote);
         post.getVotes().add(authorVote);
 
-        return postToPostResponseDto(post);
+        return PostMapper.toDto(post);
     }
 
     @Transactional
@@ -99,8 +100,7 @@ public class PostService {
             voteRepository.save(authorVote);
             post.getVotes().add(authorVote);
 
-            return postToPostResponseDto(post);
-
+            return PostMapper.toDto(post);
         } catch (Exception e) {
             log.error("Failed to create post with image", e);
             throw new RuntimeException("Failed to create post with image: " + e.getMessage(), e);
@@ -123,7 +123,7 @@ public class PostService {
 
         Post updatedPost = postRepository.save(existingPost);
         log.info("Post updated successfully, ID: " + id);
-        return postToPostResponseDto(updatedPost);
+        return PostMapper.toDto(updatedPost);
     }
 
     @Transactional
@@ -154,7 +154,7 @@ public class PostService {
             processService.processImage(imageBytes, filterName, updatedPost.getImageId());
 
             log.info("Post with image updated successfully, ID: " + id);
-            return postToPostResponseDto(updatedPost);
+            return PostMapper.toDto(updatedPost);
 
         } catch (Exception e) {
             log.error("Failed to update post with image, ID: " + id, e);
@@ -229,9 +229,5 @@ public class PostService {
         comment.getVotes().add(authorVote);
 
         return commentService.commentToCommentResponseDto(comment);
-    }
-
-    private PostResponseDto postToPostResponseDto(Post post) {
-        return PostResponseDto.fromPost(post);
     }
 }
