@@ -7,6 +7,7 @@ import com.example.backend.exception.user.UserNotFoundException;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.util.logger.Logger;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,83 +21,112 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-
-    private static User currentUser;
-
     private final PasswordEncoder passwordEncoder;
+    private final Logger log;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, Logger log) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.log = log;
     }
 
     public UserResponseDto getUserById(String id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+        log.info("Fetching user by ID: " + id);
+        User user = userRepository.findById(id).orElseThrow(() -> {
+            log.error("User not found with ID: " + id);
+            return new IllegalArgumentException("User not found with id: " + id);
+        });
+        log.info("User found: " + user.getUsername());
         return UserMapper.toDto(user);
     }
 
     public List<UserResponseDto> getAllUsers() {
-        return userRepository.findAll()
-                .stream()
+        log.info("Fetching all users");
+        List<User> users = userRepository.findAll();
+        log.info("Retrieved " + users.size() + " users");
+        return users.stream()
                 .map(UserMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     public UserResponseDto createUser(UserRequestDto userRequest) {
+        log.info("Creating new user: " + userRequest.getUsername());
         if (userRepository.existsByUsername(userRequest.getUsername())) {
+            log.error("Username already taken: " + userRequest.getUsername());
             throw new IllegalArgumentException("Username already taken");
         }
         User user = new User(userRequest.getUsername(), userRequest.getPassword());
 
         // exemplu de criptare parolă (folosind bean-ul passwordEncoder)
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        log.info("Password encoded for user: " + user.getUsername());
 
         User savedUser = userRepository.save(user);
+        log.info("User created successfully with ID: " + savedUser.getId());
         return UserMapper.toDto(savedUser);
     }
 
     //metoda folosita in frontend-cli pentru a loga un user ca sa faca postari/comentarii
     public UserResponseDto loginUser(UserRequestDto userRequest) {
         String username = userRequest.getUsername().trim();
+        log.info("Login attempt for user: " + username);
         User user = userRepository
                 .findByUsername(username)
-                .orElseThrow(InvalidCredentialsException::new);//nu arunc userNotFound ca sa nu expun ca exista un user cu acel username
+                .orElseThrow(() -> {
+                    log.warn("Login failed - user not found: " + username);
+                    return new InvalidCredentialsException();
+                });//nu arunc userNotFound ca sa nu expun ca exista un user cu acel username
 
         if (!passwordEncoder.matches(userRequest.getPassword(), user.getPassword())) {
+            log.warn("Login failed - invalid password for user: " + username);
             throw new InvalidCredentialsException(); //Invalid username or password
         }
+        log.info("Login successful for user: " + username);
         return UserMapper.toDto(user);
     }
 
     //metoda folosita in frontend-cli pentru a cauta useri dupa username
     public UserResponseDto getUserByUsername(String username) {
+        log.info("Fetching user by username: " + username);
         User user = userRepository
                 .findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("No user has been found with username: " + username));
+                .orElseThrow(() -> {
+                    log.error("User not found with username: " + username);
+                    return new UserNotFoundException("No user has been found with username: " + username);
+                });
         return UserMapper.toDto(user);
     }
 
     @Transactional
     public void deleteUser(String username) {
+        log.info("Deleting user: " + username);
         if (!userRepository.existsByUsername(username)) {
+            log.error("User not found for deletion: " + username);
             throw new IllegalArgumentException("User not found: " + username);
         }
 
         userRepository.deleteByUsername(username);
+        log.info("User deleted successfully: " + username);
     }
 
     public UserResponseDto updateUser(String username, UserRequestDto dto) {
+        log.info("Updating user: " + username);
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found: " + username));
+                .orElseThrow(() -> {
+                    log.error("User not found for update: " + username);
+                    return new UserNotFoundException("User not found: " + username);
+                });
 
         String newUsername = dto.getUsername();
         if (newUsername != null) {
             newUsername = newUsername.trim();
             if (!newUsername.isEmpty() && !newUsername.equals(user.getUsername())) {
                 if (userRepository.existsByUsername(newUsername)) {
+                    log.error("Username already taken during update: " + newUsername);
                     throw new IllegalArgumentException("Username already taken");
                 }
+                log.info("Updating username from '" + user.getUsername() + "' to '" + newUsername + "'");
                 user.setUsername(newUsername);
             }
         }
@@ -104,101 +134,12 @@ public class UserService {
         String newPassword = dto.getPassword();
         if (newPassword != null && !newPassword.isBlank()) {
             if (!passwordEncoder.matches(newPassword, user.getPassword())) {
+                log.info("Updating password for user: " + user.getUsername());
                 user.setPassword(passwordEncoder.encode(newPassword));
             }
         }
         User saved = userRepository.save(user);
+        log.info("User updated successfully: " + saved.getUsername());
         return UserMapper.toDto(saved);
-    }
-
-    public void logout() {
-        currentUser = null;
-    }
-
-    public boolean isLoggedIn() {
-        return currentUser == null;
-    }
-
-    public boolean register(String username, String password) {
-        if (username == null || username.trim().isEmpty()) {
-            throw new IllegalArgumentException("Username cannot be empty.");
-        }
-
-        if (password == null || password.length() < 6) {
-            throw new IllegalArgumentException("Password must be at least 6 characters.");
-        }
-
-        if (userRepository.existsByUsername(username)) {
-            throw new IllegalStateException("Username already exists.");
-        }
-
-        User newUser = new User(username, password);
-        userRepository.save(newUser);
-        currentUser = newUser;
-        return true;
-    }
-
-    public boolean login(String username, String password) {
-        if (username == null || username.trim().isEmpty()) {
-            throw new IllegalArgumentException("Username cannot be empty.");
-        }
-
-        if (password == null || password.isEmpty()) {
-            throw new IllegalArgumentException("Password cannot be empty.");
-        }
-
-        Optional<User> user = userRepository.findByUsernameAndPassword(username, password);
-        if (user.isPresent()) {
-            currentUser = user.get();
-            return true;
-        }
-
-        return false;
-    }
-
-    public boolean deleteCurrentUser() {
-        if (isLoggedIn()) {
-            throw new IllegalStateException("User is not logged in.");
-        }
-
-        String username = currentUser.getUsername();
-        userRepository.deleteByUsername(username);
-        logout();
-        return true;
-    }
-
-    public boolean changeUsername(String newUsername) {
-        if (isLoggedIn()) {
-            throw new IllegalStateException("User is not logged in.");
-        }
-
-        if (newUsername == null || newUsername.trim().isEmpty()) {
-            throw new IllegalArgumentException("New username cannot be empty.");
-        }
-
-        if (userRepository.existsByUsername(newUsername)) {
-            throw new IllegalStateException("Username already exists.");
-        }
-
-        User user = currentUser;
-        user.setUsername(newUsername);
-//        userRepository.update(user);
-        currentUser = user;
-        return true;
-    }
-
-    public boolean changePassword(String newPassword) {
-        if (isLoggedIn()) {
-            throw new IllegalStateException("User is not logged in.");
-        }
-
-        if (newPassword == null || newPassword.length() < 6) {
-            throw new IllegalArgumentException("New password must be at least 6 characters.");
-        }
-
-        User user = currentUser;
-        user.setPassword(newPassword);
-//        userRepository.update(user);
-        return true;
     }
 }

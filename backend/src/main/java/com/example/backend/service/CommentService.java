@@ -11,6 +11,7 @@ import com.example.backend.model.VoteType;
 import com.example.backend.repository.CommentRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.VoteRepository;
+import com.example.backend.util.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,43 +28,58 @@ public class CommentService {
     private final UserRepository userRepository;
     private final VoteRepository voteRepository;
     private final VoteService voteService;
+    private final Logger log;
 
     @Autowired
-    public CommentService(CommentRepository commentRepository, UserRepository userRepository, VoteRepository voteRepository, VoteService voteService) {
+    public CommentService(CommentRepository commentRepository, UserRepository userRepository, VoteRepository voteRepository, VoteService voteService, Logger log) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.voteRepository = voteRepository;
         this.voteService = voteService;
+        this.log = log;
     }
 
     public CommentResponseDto getCommentById(String id) {
+        log.info("Fetching comment with ID: " + id);
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not found with ID: " + id));
+                .orElseThrow(() -> {
+                    log.error("Comment not found with ID: " + id);
+                    return new IllegalArgumentException("Comment not found with ID: " + id);
+                });
 
         return commentToCommentResponseDto(comment);
     }
 
     @Transactional
     public CommentResponseDto updateComment(String id, CommentRequestDto commentRequest) {
+        log.info("Updating comment with ID: " + id);
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not found with ID: " + id));
+                .orElseThrow(() -> {
+                    log.error("Comment not found for update, ID: " + id);
+                    return new IllegalArgumentException("Comment not found with ID: " + id);
+                });
 
         comment.setText(commentRequest.getContent());
         Comment updatedComment = commentRepository.save(comment);
+        log.info("Comment updated successfully, ID: " + id);
 
         return commentToCommentResponseDto(updatedComment);
     }
 
     @Transactional
     public void deleteComment(String commentId) {
+        log.info("Deleting comment with ID: " + commentId);
         if (!commentRepository.existsById(commentId)) {
+            log.error("Comment not found for deletion, ID: " + commentId);
             throw new IllegalArgumentException("Comment not found");
         }
         commentRepository.deleteById(commentId);
+        log.info("Comment deleted successfully, ID: " + commentId);
     }
 
     @Transactional
     public VoteResponseDto voteComment(String commentId, VoteRequestDto voteRequest) {
+        log.info("Voting on comment, ID: " + commentId + ", vote type: " + voteRequest.getVoteType());
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 
