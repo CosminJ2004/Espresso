@@ -1,8 +1,9 @@
 ﻿    using Microsoft.AspNetCore.Mvc;
     using Processing.Filters;
+    using Processing.Interfaces;
     using Processing.Models;
     using Processing.Utils;
-    using Processing.Interfaces;
+using System.Diagnostics;
 namespace Processor2.Controllers;
 
     [ApiController]
@@ -41,26 +42,40 @@ namespace Processor2.Controllers;
         {
             using var stream = file.OpenReadStream();
             using var ms = new MemoryStream();
+            var sw = Stopwatch.StartNew();
             await stream.CopyToAsync(ms);
             ms.Position = 0;
+            _logger.LogInformation("CopyTo MemoryStream took {ms} ms", sw.ElapsedMilliseconds);
 
             // 🚀 Procesare imagine pe thread separat
+            sw.Restart();
             var outStream = await Task.Run(() =>
             {
-                var inputImage = _reader.ReadFromStream(ms);
+                var swInner = Stopwatch.StartNew();
 
+                // Citire imagine
+                var inputImage = _reader.ReadFromStream(ms);
+                _logger.LogInformation("ReadFromStream took {ms} ms", swInner.ElapsedMilliseconds);
+
+                // Aplicare filtre
+                swInner.Restart();
                 var outputImage = inputImage;
                 foreach (var filterName in filter)
                 {
                     outputImage = _handler.Apply(filterName, outputImage);
                 }
+                _logger.LogInformation("Applying {count} filters took {ms} ms", filter.Count, swInner.ElapsedMilliseconds);
 
+                // Scriere imagine
+                swInner.Restart();
                 var localStream = new MemoryStream();
                 _writer.WriteToStream(localStream, outputImage);
                 localStream.Position = 0;
+                _logger.LogInformation("WriteToStream took {ms} ms", swInner.ElapsedMilliseconds);
 
                 return localStream;
             });
+            _logger.LogInformation("Total processing Task.Run took {ms} ms", sw.ElapsedMilliseconds);
 
             return File(outStream, "image/jpeg");
         }
@@ -74,6 +89,7 @@ namespace Processor2.Controllers;
             return Problem(detail: ex.Message);
         }
     }
+
 
 
 }
