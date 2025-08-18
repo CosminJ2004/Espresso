@@ -117,7 +117,8 @@ namespace Processing.Filters
             List<FaceDetected> facesDetected = yolo.ApplyAndExtract(image);
 
             //using var arcSession = new InferenceSession(modelPath);
-            var font = SystemFonts.CreateFont("Noto Sans", 16);
+            //var font = SystemFonts.CreateFont("Noto Sans", 16);
+            var font = SystemFonts.CreateFont(SystemFonts.Families.First().Name, 16);
 
             var faceMatches = new List<(FaceDetected Face, string Name)>();
 
