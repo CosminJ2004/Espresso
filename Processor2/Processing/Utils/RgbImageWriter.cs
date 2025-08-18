@@ -24,22 +24,28 @@ public class RgbImageWriter: IImageWriter
         img.Save(path, new JpegEncoder());
     }
 
-  
 
-    public void WriteToStream( Stream outputStream, RgbImage image)
+
+    public void WriteToStream(Stream outputStream, RgbImage image)
     {
         using var img = new Image<Rgba32>(image.Width, image.Height);
-        for (int y = 0; y < image.Height; y++)
+
+        img.ProcessPixelRows(accessor =>
         {
-            for (int x = 0; x < image.Width; x++)
+            for (int y = 0; y < image.Height; y++)
             {
-                var pixel = image.Pixels[y, x];
-                img[x, y] = new Rgba32(pixel.R, pixel.G, pixel.B);
+                var row = accessor.GetRowSpan(y);
+                for (int x = 0; x < image.Width; x++)
+                {
+                    var pixel = image.Pixels[y, x];
+                    row[x] = new Rgba32(pixel.R, pixel.G, pixel.B);
+                }
             }
-        }
+        });
 
         img.Save(outputStream, new PngEncoder());
     }
+
     public string GetFileExtension(string filePath)
     {
         return System.IO.Path.GetExtension(filePath).ToLowerInvariant();

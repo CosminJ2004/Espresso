@@ -27,17 +27,44 @@ namespace Processing.Filters
         private readonly string modelPath = Path.Combine(AppContext.BaseDirectory, "Utils", "arcface.onnx");
         private readonly string facesDbPath = Path.Combine(AppContext.BaseDirectory, "Utils", "faces_db4.json");
 
-        private static float CosineSimilarity(float[] a, float[] b)
+        private readonly YoloDetector yolo;
+
+        private readonly InferenceSession arcSession;
+        private readonly Dictionary<string, List<float[]>> knownFaces;
+
+        public ArcfaceFilter(YoloDetector yolo)
         {
-            float dot = 0f, magA = 0f, magB = 0f;
-            for (int i = 0; i < a.Length; i++)
-            {
-                dot += a[i] * b[i];
-                magA += a[i] * a[i];
-                magB += b[i] * b[i];
-            }
-            return dot / (float)(Math.Sqrt(magA) * Math.Sqrt(magB));
+
+            
+            if (!File.Exists(modelPath) || !File.Exists(facesDbPath))
+                throw new FileNotFoundException("Modelul ArcFace sau baza de date nu au fost găsite.");
+
+            arcSession = new InferenceSession(modelPath);
+            knownFaces = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, List<float[]>>>(File.ReadAllText(facesDbPath));
+            this.yolo = yolo;
         }
+
+        //private static float CosineSimilarity(float[] a, float[] b)
+        //{
+        //    float dot = 0f, magA = 0f, magB = 0f;
+        //    for (int i = 0; i < a.Length; i++)
+        //    {
+        //        dot += a[i] * b[i];
+        //        magA += a[i] * a[i];
+        //        magB += b[i] * b[i];
+        //    }
+        //    return dot / (float)(Math.Sqrt(magA) * Math.Sqrt(magB));
+        //}
+
+
+        float CosineSimilarity(float[] a, float[] b)
+        {
+            float sim = 0;
+            for (int i = 0; i < a.Length; i++)
+                sim += a[i] * b[i];  // nu mai trebuie divizare, sunt normalizate
+            return sim;
+        }
+
 
         private static float[,,,] PreprocessFace(Image<Rgb24> faceImage)
         {
@@ -82,59 +109,66 @@ namespace Processing.Filters
             }
 
             //var knownFaces = JsonConvert.DeserializeObject<Dictionary<string, float[]>>(File.ReadAllText(facesDbPath));
-            var knownFaces = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, List<float[]>>>(File.ReadAllText(facesDbPath));
+            //var knownFaces = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, List<float[]>>>(File.ReadAllText(facesDbPath));
 
             var imgSharp = ConvertToImageSharp(image);
 
-            YoloDetector yolo = new YoloDetector();
+           
             List<FaceDetected> facesDetected = yolo.ApplyAndExtract(image);
 
-            using var arcSession = new InferenceSession(modelPath);
+            //using var arcSession = new InferenceSession(modelPath);
             var font = SystemFonts.CreateFont("Arial", 16);
+
+            var faceMatches = new List<(FaceDetected Face, string Name)>();
 
             foreach (var face in facesDetected)
             {
-                var faceImgSharp = ConvertToImageSharp(face.FaceImage);
+                var faceBox = face.Box;
+                var faceImgSharp = imgSharp.Clone(ctx => ctx.Crop(new Rectangle(faceBox.X, faceBox.Y, faceBox.Width, faceBox.Height)));
                 var tensorData = PreprocessFace(faceImgSharp);
                 var flattened = tensorData.Cast<float>().ToArray();
                 var tensor = new DenseTensor<float>(flattened, new int[] { 1, 112, 112, 3 });
 
                 var inputs = new List<NamedOnnxValue>
-                {
-                    NamedOnnxValue.CreateFromTensor("input_1", tensor)
-                };
+    {
+        NamedOnnxValue.CreateFromTensor("input_1", tensor)
+    };
 
                 using var results = arcSession.Run(inputs);
                 var embedding = results.First().AsEnumerable<float>().ToArray();
                 float norm = (float)Math.Sqrt(embedding.Sum(x => x * x));
                 embedding = embedding.Select(x => x / norm).ToArray();
 
-                string matchedName = "Unknown";
                 float maxSim = -1f;
+                string matchedName = "Unknown";
 
-
-                foreach (var kv in knownFaces) // kv.Value este acum List<List<float>>
+                foreach (var kv in knownFaces)
                 {
-                    foreach (var emb in kv.Value) // iterăm prin fiecare embedding al persoanei
+                    foreach (var emb in kv.Value)
                     {
                         float sim = CosineSimilarity(embedding, emb);
-                        if (sim > maxSim)
+                        if (sim > 0.55f && sim > maxSim)
                         {
                             maxSim = sim;
-                            matchedName = sim > 0.55f ? kv.Key : "nu stim";
+                            matchedName = kv.Key;
                         }
                     }
                 }
 
-                Console.WriteLine($"Best match: {matchedName} with similarity {maxSim}");
+                faceMatches.Add((face, matchedName));
+                //Console.WriteLine($"Face at ({faceBox.X},{faceBox.Y}) matched with {matchedName} ({maxSim})");
+            }
 
-                imgSharp.Mutate(ctx =>
+            // Desenăm toate fețele cu numele lor
+            imgSharp.Mutate(ctx =>
+            {
+                foreach (var (face, name) in faceMatches)
                 {
                     var box = face.Box;
                     ctx.Draw(Color.Red, 2, new RectangularPolygon(box.X, box.Y, box.Width, box.Height));
-                    ctx.DrawText(matchedName, font, Color.Yellow, new PointF(box.X, box.Y - 20));
-                });
-            }
+                    ctx.DrawText(name, font, Color.Yellow, new PointF(box.X, Math.Max(box.Y - 20, 0)));
+                }
+            });
 
             var output = new RgbImage(image.Width, image.Height);
             for (int y = 0; y < imgSharp.Height; y++)
