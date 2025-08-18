@@ -1,20 +1,17 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.CommentRequestDto;
+import com.example.backend.exception.*;
 import com.example.backend.dto.CommentResponseDto;
 import com.example.backend.dto.VoteRequestDto;
 import com.example.backend.dto.VoteResponseDto;
+import com.example.backend.mapper.VoteMapper;
 import com.example.backend.model.Comment;
 import com.example.backend.model.User;
-import com.example.backend.model.Vote;
-import com.example.backend.model.VoteType;
 import com.example.backend.repository.CommentRepository;
 import com.example.backend.repository.UserRepository;
-import com.example.backend.repository.VoteRepository;
 import com.example.backend.mapper.CommentMapper;
 import com.example.backend.util.logger.Logger;
-
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,15 +22,13 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
-    private final VoteRepository voteRepository;
     private final VoteService voteService;
     private final Logger log;
 
     @Autowired
-    public CommentService(CommentRepository commentRepository, UserRepository userRepository, VoteRepository voteRepository, VoteService voteService, Logger log) {
+    public CommentService(CommentRepository commentRepository, UserRepository userRepository, VoteService voteService, Logger log) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
-        this.voteRepository = voteRepository;
         this.voteService = voteService;
         this.log = log;
     }
@@ -43,7 +38,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Comment not found with ID: " + id);
-                    return new IllegalArgumentException("Comment not found with ID: " + id);
+                    return new CommentNotFoundException(id);
                 });
 
         return CommentMapper.toDto(comment);
@@ -55,7 +50,7 @@ public class CommentService {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Comment not found for update, ID: " + id);
-                    return new IllegalArgumentException("Comment not found with ID: " + id);
+                    return new CommentNotFoundException(id);
                 });
 
         comment.setText(commentRequest.getContent());
@@ -70,7 +65,7 @@ public class CommentService {
         log.info("Deleting comment with ID: " + commentId);
         if (!commentRepository.existsById(commentId)) {
             log.error("Comment not found for deletion, ID: " + commentId);
-            throw new IllegalArgumentException("Comment not found");
+            throw new CommentNotFoundException(commentId);
         }
         commentRepository.deleteById(commentId);
         log.info("Comment deleted successfully, ID: " + commentId);
@@ -80,26 +75,18 @@ public class CommentService {
     public VoteResponseDto voteComment(String commentId, VoteRequestDto voteRequest) {
         log.info("Voting on comment, ID: " + commentId + ", vote type: " + voteRequest.getVoteType());
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+                .orElseThrow(() -> new CommentNotFoundException(commentId));
 
 //        hardcoded - current_user
         User user = userRepository.findByUsername("current_user")
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found: current_user"));
 
         voteService.vote(user, null, comment, voteRequest.getVoteType());
 
         comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+                .orElseThrow(() -> new CommentNotFoundException(commentId));
 
-        VoteResponseDto voteResponse = new VoteResponseDto();
-        voteResponse.setUpvotes(comment.getUpvoteCount());
-        voteResponse.setDownvotes(comment.getDownvoteCount());
-        voteResponse.setScore(comment.getScore());
-
-        Optional<Vote> currentVote = voteRepository.findByUserAndComment(user, comment);
-        voteResponse.setUserVote(currentVote.map(Vote::getType).orElse(VoteType.NONE));
-
-        return voteResponse;
+        return VoteMapper.toDto(comment, user.getUsername());
     }
 
 }

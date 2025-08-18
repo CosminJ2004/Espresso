@@ -16,7 +16,6 @@ public final class CommentMapper {
             return null;
         }
         
-        // Convert replies recursively
         List<CommentResponseDto> replies = new ArrayList<>();
         if (comment.getReplies() != null && !comment.getReplies().isEmpty()) {
             replies = comment.getReplies().stream()

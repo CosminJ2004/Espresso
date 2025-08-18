@@ -1,7 +1,5 @@
 package com.example.backend.exception;
 
-import com.example.backend.exception.login.InvalidCredentialsException;
-import com.example.backend.exception.user.UserNotFoundException;
 import com.example.backend.util.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -44,5 +42,45 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Response<Object>> handleUserNotFoundException(UserNotFoundException e) {
         return Response.error(404, e.getMessage());
+    }
+
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity<Response<Object>> handlePostNotFoundException(PostNotFoundException e) {
+        return Response.error(404, e.getMessage());
+    }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<Response<Object>> handleCommentNotFoundException(CommentNotFoundException e) {
+        return Response.error(404, e.getMessage());
+    }
+
+    @ExceptionHandler(FilterNotFoundException.class)
+    public ResponseEntity<Response<Object>> handleFilterNotFoundException(FilterNotFoundException e) {
+        return Response.error(404, e.getMessage());
+    }
+
+    @ExceptionHandler(ImageRequiredException.class)
+    public ResponseEntity<Response<Object>> handleImageRequiredException(ImageRequiredException e) {
+        return Response.error(400, e.getMessage());
+    }
+
+    @ExceptionHandler(UsernameAlreadyTakenException.class)
+    public ResponseEntity<Response<Object>> handleUsernameAlreadyTakenException(UsernameAlreadyTakenException e) {
+        return Response.error(409, e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidVoteException.class)
+    public ResponseEntity<Response<Object>> handleInvalidVoteException(InvalidVoteException e) {
+        return Response.error(400, e.getMessage());
+    }
+
+    @ExceptionHandler(ImageProcessingException.class)
+    public ResponseEntity<Response<Object>> handleImageProcessingException(ImageProcessingException e) {
+        return Response.error(500, e.getMessage());
+    }
+
+    @ExceptionHandler(UnauthorizedOperationException.class)
+    public ResponseEntity<Response<Object>> handleUnauthorizedOperationException(UnauthorizedOperationException e) {
+        return Response.error(403, e.getMessage());
     }
 }

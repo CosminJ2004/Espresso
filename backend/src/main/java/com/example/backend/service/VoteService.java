@@ -29,11 +29,8 @@ public class VoteService {
 
         if (post != null) {
             existingVote = voteRepository.findByUserAndPost(user, post);
-        } else if (comment != null) {
-            existingVote = voteRepository.findByUserAndComment(user, comment);
         } else {
-            log.error("Vote attempted without post or comment");
-            throw new IllegalArgumentException("Either post or comment must be provided");
+            existingVote = voteRepository.findByUserAndComment(user, comment);
         }
 
         if (voteType == null || VoteType.NONE == voteType) {

@@ -2,8 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.dto.UserRequestDto;
 import com.example.backend.dto.UserResponseDto;
-import com.example.backend.exception.login.InvalidCredentialsException;
-import com.example.backend.exception.user.UserNotFoundException;
+import com.example.backend.exception.*;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
@@ -14,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +33,7 @@ public class UserService {
         log.info("Fetching user by ID: " + id);
         User user = userRepository.findById(id).orElseThrow(() -> {
             log.error("User not found with ID: " + id);
-            return new IllegalArgumentException("User not found with id: " + id);
+            return new UserNotFoundException("User not found with id: " + id);
         });
         log.info("User found: " + user.getUsername());
         return UserMapper.toDto(user);
@@ -54,7 +52,7 @@ public class UserService {
         log.info("Creating new user: " + userRequest.getUsername());
         if (userRepository.existsByUsername(userRequest.getUsername())) {
             log.error("Username already taken: " + userRequest.getUsername());
-            throw new IllegalArgumentException("Username already taken");
+            throw new UsernameAlreadyTakenException(userRequest.getUsername());
         }
         User user = new User(userRequest.getUsername(), userRequest.getPassword());
 
@@ -103,7 +101,7 @@ public class UserService {
         log.info("Deleting user: " + username);
         if (!userRepository.existsByUsername(username)) {
             log.error("User not found for deletion: " + username);
-            throw new IllegalArgumentException("User not found: " + username);
+            throw new UserNotFoundException("User not found: " + username);
         }
 
         userRepository.deleteByUsername(username);
@@ -124,7 +122,7 @@ public class UserService {
             if (!newUsername.isEmpty() && !newUsername.equals(user.getUsername())) {
                 if (userRepository.existsByUsername(newUsername)) {
                     log.error("Username already taken during update: " + newUsername);
-                    throw new IllegalArgumentException("Username already taken");
+                    throw new UsernameAlreadyTakenException(newUsername);
                 }
                 log.info("Updating username from '" + user.getUsername() + "' to '" + newUsername + "'");
                 user.setUsername(newUsername);
