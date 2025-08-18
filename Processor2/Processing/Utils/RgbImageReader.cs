@@ -29,21 +29,27 @@ public  class RgbImageReader: IImageReader
 
         return result;
     }
-    public RgbImage ReadFromStream(Stream stream)
-    {
-        using var image = SixLabors.ImageSharp.Image.Load<Rgb24>(stream);
-        var rgbImage = new RgbImage(image.Width, image.Height);
+   public RgbImage ReadFromStream(Stream stream)
+{
+    using var image = SixLabors.ImageSharp.Image.Load<Rgb24>(stream);
+    var rgbImage = new RgbImage(image.Width, image.Height);
 
+    image.ProcessPixelRows(accessor =>
+    {
         for (int y = 0; y < image.Height; y++)
         {
+            var row = accessor.GetRowSpan(y);
             for (int x = 0; x < image.Width; x++)
             {
-                var pixel = image[x, y];
+                var pixel = row[x];
                 rgbImage.Pixels[y, x] = new RgbPixel(pixel.R, pixel.G, pixel.B);
             }
         }
-        return rgbImage;
-    }
+    });
+
+    return rgbImage;
+}
+
     public string GetFileExtension(string path)
     {
         return System.IO.Path.GetExtension(path).ToLowerInvariant();

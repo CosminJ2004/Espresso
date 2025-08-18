@@ -26,9 +26,9 @@ namespace Processing.Utils
         private readonly float _nmsThreshold = 0.45f;
 
 
-        public YoloDetector()
+        public YoloDetector(InferenceSession session)
         {
-           
+            _session = session; // folosim sesiunea singleton
         }
 
 
@@ -133,7 +133,7 @@ namespace Processing.Utils
                 crops.Add(new FaceDetected { FaceImage = crop, Box = box });
             }
 
-            Console.WriteLine($"Detected {boxes.Count} boxes, extracted {crops.Count} crops after NMS");
+            //Console.WriteLine($"Detected {boxes.Count} boxes, extracted {crops.Count} crops after NMS");
 
             return crops;
         }

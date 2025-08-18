@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
+using Microsoft.ML.OnnxRuntime;
 using Processing.Filters;
 using Processing.Interfaces;
 using Processing.Utils;
@@ -14,20 +15,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // DI din proiectul Processing
-builder.Services.AddScoped<RgbImageReader>();
-builder.Services.AddScoped<RgbImageWriter>();
-builder.Services.AddScoped<FilterHandler>();
+builder.Services.AddSingleton(sp => new InferenceSession(Path.Combine(AppContext.BaseDirectory, "Utils", "best.onnx")));
 
-builder.Services.AddScoped<IImageFilter, GrayscaleFilter>();
-builder.Services.AddScoped<IImageFilter, InvertFilter>();
-builder.Services.AddScoped<IImageFilter, GaussianFilter>();
-builder.Services.AddScoped<IImageFilter, DoNothingFilter>();
 
-//builder.Services.AddScoped<IImageFilter, FaceDetection>();
-builder.Services.AddScoped<IImageFilter, Yolo>();
-builder.Services.AddScoped<IImageFilter, SepiaFilter>();
+builder.Services.AddTransient<RgbImageReader>();
+builder.Services.AddTransient<RgbImageWriter>();
+builder.Services.AddSingleton<YoloDetector>();
 
-builder.Services.AddScoped<IImageFilter, ArcfaceFilter>();
+builder.Services.AddSingleton<IImageFilter, GrayscaleFilter>();
+builder.Services.AddSingleton<IImageFilter, InvertFilter>();
+builder.Services.AddSingleton<IImageFilter, GaussianFilter>();
+builder.Services.AddSingleton<IImageFilter, DoNothingFilter>();
+builder.Services.AddSingleton<IImageFilter>(sp => new ArcfaceFilter(sp.GetRequiredService<YoloDetector>()));
+
+builder.Services.AddSingleton<FilterHandler>();
 
 
 var app = builder.Build();
