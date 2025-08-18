@@ -7,13 +7,6 @@ using Processor2.Controllers;
 
 
 
-var arcface = new ArcFaceHelper("C:\\Users\\Cosmin\\IdeaProjects\\Espresso\\Processor2\\Processing\\Utils\\arcface.onnx");
-
-var emb1 = arcface.GetEmbedding("poza1.jpeg");
-var emb2 = arcface.GetEmbedding("poza2.jpeg"); // exact aceeași poză
-
-float sim = ArcFaceHelper.CosineSimilarity(emb1, emb2);
-Console.WriteLine($"Similaritate cosine: {sim}");
 
 
 var builder = WebApplication.CreateBuilder(args);
