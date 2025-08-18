@@ -15,8 +15,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // DI din proiectul Processing
-builder.Services.AddSingleton(sp => new InferenceSession(Path.Combine(AppContext.BaseDirectory, "Utils", "best.onnx")));
 
+
+builder.Services.AddSingleton(sp =>
+{
+    var session = new InferenceSession(Path.Combine(AppContext.BaseDirectory, "Utils", "best.onnx"));
+    // warmup: rulează o dată o intrare dummy
+    return session;
+});
 
 
 builder.Services.AddTransient<RgbImageReader>();
@@ -24,14 +30,14 @@ builder.Services.AddTransient<RgbImageWriter>();
 builder.Services.AddSingleton<YoloDetector>();
 
 //builder.Services.AddScoped<IImageFilter, FaceDetection>();
-builder.Services.AddScoped<IImageFilter, Yolo>();
-builder.Services.AddScoped<IImageFilter, SepiaFilter>();
-builder.Services.AddScoped<IImageFilter, PixelateFilter>();
+builder.Services.AddTransient<IImageFilter, Yolo>();
+builder.Services.AddTransient<IImageFilter, SepiaFilter>();
+builder.Services.AddTransient<IImageFilter, PixelateFilter>();
 
-builder.Services.AddSingleton<IImageFilter, GrayscaleFilter>();
-builder.Services.AddSingleton<IImageFilter, InvertFilter>();
-builder.Services.AddSingleton<IImageFilter, GaussianFilter>();
-builder.Services.AddSingleton<IImageFilter, DoNothingFilter>();
+builder.Services.AddTransient<IImageFilter, GrayscaleFilter>();
+builder.Services.AddTransient<IImageFilter, InvertFilter>();
+builder.Services.AddTransient<IImageFilter, GaussianFilter>();
+builder.Services.AddTransient<IImageFilter, DoNothingFilter>();
 builder.Services.AddSingleton<IImageFilter>(sp => new ArcfaceFilter(sp.GetRequiredService<YoloDetector>()));
 
 builder.Services.AddScoped<FilterHandler>();
