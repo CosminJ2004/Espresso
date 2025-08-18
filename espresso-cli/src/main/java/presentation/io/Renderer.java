@@ -1,11 +1,11 @@
 package presentation.io;
 
-
 import infra.ui.Colors;
 import objects.domain.Comment;
 import objects.domain.Post;
 import objects.domain.User;
 import presentation.io.outputLayout.BoxRenderer;
+import presentation.io.outputLayout.TextLayout;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -86,6 +86,24 @@ public class Renderer {
         System.out.println();
     }
 
+    //varianta veche, inainte de undo/redo
+//    public void displayWelcomeMenu() {
+//        List<String> lines = box.buildBox(
+//                "MAIN MENU",
+//                List.of(
+//                        "Please select an option:",
+//                        "1. User Menu",
+//                        "2. Post Menu",
+//                        //"3. Comment Menu",
+//                        "3. Logout",
+//                        "4. Exit"
+//                )
+//        );
+//        for (String line : lines) {
+//            System.out.println(Colors.toBold(Colors.toYellow(line)));
+//        }
+//        System.out.println();
+//    }
     public void displayWelcomeMenu() {
         List<String> lines = box.buildBox(
                 "MAIN MENU",
@@ -93,9 +111,9 @@ public class Renderer {
                         "Please select an option:",
                         "1. User Menu",
                         "2. Post Menu",
-                        //"3. Comment Menu",
-                        "3. Logout",
-                        "4. Exit"
+                        "3. Undo/Redo",
+                        "4. Logout",
+                        "5. Exit"
                 )
         );
         for (String line : lines) {
@@ -104,7 +122,22 @@ public class Renderer {
         System.out.println();
     }
 
-
+    public void displayUndoRedoMenu() {
+        List<String> lines = box.buildBox(
+                "UNDO/REDO MENU",
+                List.of(
+                        "Please select an option:",
+                        "1. Undo last operation",
+                        "2. Redo last operation",
+                        "3. Show undo/redo status",
+                        "4. Back to Main Menu"
+                )
+        );
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toYellow(line)));
+        }
+        System.out.println();
+    }
 
     public void displayError(String message) {
         List<String> lines = box.buildBox("[ERROR]", List.of(message));
@@ -126,6 +159,23 @@ public class Renderer {
         List<String> lines = box.buildBox("[INFO]", List.of(message));
         for (String line : lines) {
             System.out.println(Colors.toBold(Colors.toBlue(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayImage(String url) {
+        final String title = "IMAGE";
+        final String label = "Image URL: ";
+        final String line = label + url;
+
+        int inner = Math.max(title.length(), line.length());
+        BoxRenderer tight = new BoxRenderer(inner);
+        String bodyLine = line;
+
+        List<String> lines = tight.buildBox(title, List.of(bodyLine));
+
+        for (String l : lines) {
+            System.out.println(Colors.toBold(Colors.toCyan(l)));
         }
         System.out.println();
     }
@@ -155,14 +205,15 @@ public class Renderer {
         }
         System.out.println();
     }
+
     //posts
     public void displayPost(Post post) {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String created = (post.createdAt() == null) ? "-" : post.createdAt().format(fmt);
         String updated = (post.updatedAt() == null) ? "-" : post.updatedAt().format(fmt);
-        String img     = (post.imageUrl() == null || post.imageUrl().isBlank()) ? "-" : post.imageUrl();
-        String filter  = (post.filter() == null) ? "-" : String.valueOf(post.filter());
-        String vote    = (post.userVote() == null) ? "-" : post.userVote().getValue();
+        String img = (post.imageUrl() == null || post.imageUrl().isBlank()) ? "-" : post.imageUrl();
+        String filter = (post.filter() == null) ? "-" : String.valueOf(post.filter());
+        String vote = (post.userVote() == null) ? "-" : post.userVote().getValue();
 
         List<String> lines = box.buildBox(
                 "POST",
@@ -173,7 +224,7 @@ public class Renderer {
                         "Upvotes: " + nvl(post.upvotes()) + " | Downvotes: " + nvl(post.downvotes()),
                         "Score: " + nvl(post.score()) + " | Comments: " + nvl(post.commentCount()),
                         "User vote: " + vote + " | Filter: " + filter,
-                        "Image URL: " + img,
+                        //"Image URL: " + img,
                         "Created: " + created + " | Updated: " + updated,
                         "",
                         nvl(post.content())
@@ -181,7 +232,10 @@ public class Renderer {
         );
 
         for (String line : lines) {
-            System.out.println(Colors.toBold(Colors.toBlue(line)));
+            System.out.println(Colors.toBold(Colors.toBrightWhite(line)));
+        }
+        if(!img.equals("-")) {
+            displayImage(img);
         }
         System.out.println();
     }
@@ -217,7 +271,11 @@ public class Renderer {
 
         List<String> lines = box.buildBox("POST #" + postNumber, body);
         for (String line : lines) {
-            System.out.println(Colors.toBold(Colors.toBlue(line)));
+            System.out.println(Colors.toBold(Colors.toBrightWhite(line)));
+        }
+
+        if(hasImage.equals("yes")){
+            displayImage(post.imageUrl());
         }
     }
 
@@ -225,8 +283,14 @@ public class Renderer {
         if (s == null || s.isBlank()) return "-";
         return s.length() <= max ? s : s.substring(0, max - 1) + "…";
     }
-    private String nvl(Object o) { return o == null ? "-" : String.valueOf(o); }
-    private String nvl(String s) { return (s == null || s.isBlank()) ? "-" : s; }
+
+    private String nvl(Object o) {
+        return o == null ? "-" : String.valueOf(o);
+    }
+
+    private String nvl(String s) {
+        return (s == null || s.isBlank()) ? "-" : s;
+    }
 
     public void displayPostSelectionMenu() {
         List<String> lines = box.buildBox(

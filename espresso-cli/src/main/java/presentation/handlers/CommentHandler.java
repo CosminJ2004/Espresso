@@ -1,5 +1,6 @@
 package presentation.handlers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import infra.http.ApiResult;
 import objects.domain.Comment;
 import objects.domain.Post;
@@ -12,8 +13,13 @@ import presentation.io.ConsoleIO;
 import presentation.io.Renderer;
 import service.CommentService;
 import service.PostService;
+import undo.UndoRedoManager;
+import undo.action.Action;
+import undo.action.UndoableAction;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public class CommentHandler {
     private final PostService postService;
@@ -21,12 +27,16 @@ public class CommentHandler {
     private final ConsoleIO io;
     private final Renderer ui;
     private final AppState appState = AppState.getInstance();
+    private final UndoRedoManager undoRedoManager;
+    private final ObjectMapper objectMapper;
 
     public CommentHandler(PostService postService, CommentService commentService, ConsoleIO io, Renderer ui) {
         this.postService = postService;
         this.commentService = commentService;
         this.io = io;
         this.ui = ui;
+        this.undoRedoManager = UndoRedoManager.getInstance();
+        this.objectMapper = new ObjectMapper();
     }
 
     public void handleViewComments(Post currentPost) {
@@ -84,6 +94,13 @@ public class CommentHandler {
             ui.displayError("You can only edit your own comments.");
             return;
         }
+        //pt undo
+        CommentRequestDto oldDto = new CommentRequestDto(
+                existingComment.content(),
+                currentUsername,
+                existingComment.parentId()
+        );
+        String oldData = serializeCommentRequestDto(oldDto);
 
         String newContent = io.readLine("Enter new content (or press Enter to keep current): ");
 
@@ -95,6 +112,26 @@ public class CommentHandler {
         ApiResult<Comment> result = commentService.update(existingComment.id(), updateDto);
 
         if (result.isSuccess()) {
+            CommentRequestDto newDto = new CommentRequestDto(
+                    result.getData().content(),
+                    currentUsername,
+                    result.getData().parentId()
+            );
+            String newData = serializeCommentRequestDto(newDto);
+
+            UndoableAction undoableAction = new UndoableAction(
+                    UUID.randomUUID(),
+                    Action.UPDATE_COMMENT,
+                    existingComment.id(),
+                    "COMMENT",
+                    oldData,
+                    newData,
+                    LocalDateTime.now(),
+                    currentUsername
+            );
+
+            undoRedoManager.record(undoableAction);
+
             ui.displaySuccess("Comment updated successfully!");
             ui.displayComment(result.getData());
             // Refresh comments dupa edit - handled by caller
@@ -185,5 +222,13 @@ public class CommentHandler {
 
     public ApiResult<List<Comment>> getCommentsByPostId(String postId) {
         return postService.getCommentsByPostId(postId);
+    }
+
+    private String serializeCommentRequestDto(CommentRequestDto dto) {
+        try {
+            return objectMapper.writeValueAsString(dto);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

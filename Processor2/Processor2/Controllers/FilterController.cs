@@ -2,8 +2,8 @@
     using Processing.Filters;
     using Processing.Models;
     using Processing.Utils;
-
-    namespace Processor2.Controllers;
+    using Processing.Interfaces;
+namespace Processor2.Controllers;
 
     [ApiController]
     [Route("[controller]")]
@@ -13,6 +13,8 @@
         private readonly RgbImageWriter _writer;
         private readonly FilterHandler _handler;
         private readonly ILogger<FilterController> _logger;
+
+        
 
     public FilterController(RgbImageReader reader, RgbImageWriter writer, FilterHandler handler, ILogger<FilterController> logger)
     {
@@ -42,18 +44,23 @@
             await stream.CopyToAsync(ms);
             ms.Position = 0;
 
-            var inputImage = _reader.ReadFromStream(ms);
-
-            // Aplica filtrele pe rând
-            var outputImage = inputImage;
-            foreach (var filterName in filter)
+            // 🚀 Procesare imagine pe thread separat
+            var outStream = await Task.Run(() =>
             {
-                outputImage = _handler.Apply(filterName, outputImage);
-            }
+                var inputImage = _reader.ReadFromStream(ms);
 
-            var outStream = new MemoryStream();
-            _writer.WriteToStream(outStream, outputImage);
-            outStream.Position = 0;
+                var outputImage = inputImage;
+                foreach (var filterName in filter)
+                {
+                    outputImage = _handler.Apply(filterName, outputImage);
+                }
+
+                var localStream = new MemoryStream();
+                _writer.WriteToStream(localStream, outputImage);
+                localStream.Position = 0;
+
+                return localStream;
+            });
 
             return File(outStream, "image/jpeg");
         }
@@ -66,7 +73,8 @@
             _logger.LogError(ex, "Error applying filters: {Filters}", string.Join(",", filter));
             return Problem(detail: ex.Message);
         }
-
     }
 
+
 }
+

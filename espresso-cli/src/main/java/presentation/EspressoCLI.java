@@ -28,7 +28,7 @@ public final class EspressoCLI implements AutoCloseable {
     public void run() {
         try {
             ui.displayWelcomeBanner();
-// Login flow - meniul primary
+            // Login flow - meniul primary
             while (appState.isRunning()) {
                 // Login flow - meniul primary
                 if (!appState.isLoggedIn()) {
