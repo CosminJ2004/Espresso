@@ -34,7 +34,7 @@ builder.Services.AddSingleton<IImageFilter, GaussianFilter>();
 builder.Services.AddSingleton<IImageFilter, DoNothingFilter>();
 builder.Services.AddSingleton<IImageFilter>(sp => new ArcfaceFilter(sp.GetRequiredService<YoloDetector>()));
 
-builder.Services.AddSingleton<FilterHandler>();
+builder.Services.AddScoped<FilterHandler>();
 
 
 var app = builder.Build();
