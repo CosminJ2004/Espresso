@@ -1,5 +1,6 @@
 package presentation.handlers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import infra.http.ApiResult;
 import objects.domain.Post;
 import objects.domain.Vote;
@@ -11,8 +12,13 @@ import presentation.AppState;
 import presentation.io.ConsoleIO;
 import presentation.io.Renderer;
 import service.PostService;
+import undo.UndoRedoManager;
+import undo.action.Action;
+import undo.action.UndoableAction;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public class PostHandler {
     private static final String DEFAULT_SUBREDDIT = "echipa3_general";
@@ -20,11 +26,15 @@ public class PostHandler {
     private final ConsoleIO io;
     private final Renderer ui;
     private final AppState appState = AppState.getInstance();
+    private final UndoRedoManager undoRedoManager;
+    private final ObjectMapper objectMapper;
 
     public PostHandler(PostService postService, ConsoleIO io, Renderer ui) {
         this.postService = postService;
         this.io = io;
         this.ui = ui;
+        this.undoRedoManager = UndoRedoManager.getInstance();
+        this.objectMapper = new ObjectMapper();
     }
 
     public void handleCreatePost() {
@@ -100,6 +110,14 @@ public class PostHandler {
             ui.displayError("You can only edit your own posts.");
             return;
         }
+        //salvez starea pentru undo
+        PostRequestDto oldDto = new PostRequestDto(
+                existingPost.title(),
+                existingPost.content(),
+                currentUsername,
+                existingPost.subreddit()
+        );
+        String oldData = serializePostRequestDto(oldDto);
 
         String newTitle = io.readLine("Enter new title (or press Enter to keep current): ");
         String newContent = io.readLine("Enter new content (or press Enter to keep current): ");
@@ -111,6 +129,26 @@ public class PostHandler {
 
         ApiResult<Post> result = postService.update(existingPost.id(), updateDto);
         if (result.isSuccess()) {
+            PostRequestDto newDto = new PostRequestDto(
+                    result.getData().title(),
+                    result.getData().content(),
+                    currentUsername,
+                    result.getData().subreddit()
+            );
+            String newData = serializePostRequestDto(newDto);
+            UndoableAction undoableAction = new UndoableAction(
+                    UUID.randomUUID(),
+                    Action.UPDATE_POST,
+                    existingPost.id(),
+                    "POST",
+                    oldData,
+                    newData,
+                    LocalDateTime.now(),
+                    currentUsername
+            );
+            //inregsitrez actiunea de undo
+            undoRedoManager.record(undoableAction);
+
             ui.displaySuccess("Post updated successfully!");
             ui.displayPost(result.getData());
         } else {
@@ -192,5 +230,13 @@ public class PostHandler {
 
     public ApiResult<Post> getPostById(String id) {
         return postService.getById(id);
+    }
+
+    private String serializePostRequestDto(PostRequestDto dto) {
+        try {
+            return objectMapper.writeValueAsString(dto);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

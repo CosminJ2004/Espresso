@@ -7,6 +7,7 @@ import presentation.AppState;
 import presentation.io.ConsoleIO;
 import presentation.io.Renderer;
 import service.UserService;
+import undo.UndoRedoManager;
 
 public class AuthHandler {
     private final UserService userService;
@@ -60,6 +61,8 @@ public class AuthHandler {
 
     public void handleLogout() {
         appState.setCurrentUser(null);
+        //sterge toate actiunile de undo/redo ca le tin per sesiune
+        UndoRedoManager.getInstance().clearAll();
         ui.displayInfo("You have been logged out.");
     }
 

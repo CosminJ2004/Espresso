@@ -1,9 +1,6 @@
 package presentation;
 
-import presentation.handlers.AuthHandler;
-import presentation.handlers.CommentHandler;
-import presentation.handlers.PostHandler;
-import presentation.handlers.UserHandler;
+import presentation.handlers.*;
 import presentation.menus.CommentMenu;
 import presentation.menus.LoginMenu;
 import presentation.menus.MainMenu;
@@ -28,7 +25,7 @@ public final class MenuManager {
     private final UserHandler userHandler;
     private final PostHandler postHandler;
     private final CommentHandler commentHandler;
-
+    private final UndoRedoHandler undoRedoHandler;
     //menirui
     private final LoginMenu loginMenu;
     private final MainMenu mainMenu;
@@ -45,12 +42,13 @@ public final class MenuManager {
         this.userHandler = new UserHandler(userService, io, ui);
         this.postHandler = new PostHandler(postService, io, ui);
         this.commentHandler = new CommentHandler(postService, commentService, io, ui);
+        this.undoRedoHandler = new UndoRedoHandler(io, ui);
 
         UserMenu userMenu = new UserMenu(userHandler, io, ui);
         PostMenu postMenu = new PostMenu(postHandler, commentHandler, io, ui);
         
         this.loginMenu = new LoginMenu(authHandler, io, ui);
-        this.mainMenu = new MainMenu(userMenu, postMenu, authHandler, io, ui);
+        this.mainMenu = new MainMenu(userMenu, postMenu, undoRedoHandler, authHandler, io, ui);
     }
 
     public void run() {

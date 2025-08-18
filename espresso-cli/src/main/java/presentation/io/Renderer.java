@@ -85,7 +85,24 @@ public class Renderer {
         }
         System.out.println();
     }
-
+    //varianta veche, inainte de undo/redo
+//    public void displayWelcomeMenu() {
+//        List<String> lines = box.buildBox(
+//                "MAIN MENU",
+//                List.of(
+//                        "Please select an option:",
+//                        "1. User Menu",
+//                        "2. Post Menu",
+//                        //"3. Comment Menu",
+//                        "3. Logout",
+//                        "4. Exit"
+//                )
+//        );
+//        for (String line : lines) {
+//            System.out.println(Colors.toBold(Colors.toYellow(line)));
+//        }
+//        System.out.println();
+//    }
     public void displayWelcomeMenu() {
         List<String> lines = box.buildBox(
                 "MAIN MENU",
@@ -93,9 +110,9 @@ public class Renderer {
                         "Please select an option:",
                         "1. User Menu",
                         "2. Post Menu",
-                        //"3. Comment Menu",
-                        "3. Logout",
-                        "4. Exit"
+                        "3. Undo/Redo",
+                        "4. Logout",
+                        "5. Exit"
                 )
         );
         for (String line : lines) {
@@ -103,8 +120,22 @@ public class Renderer {
         }
         System.out.println();
     }
-
-
+    public void displayUndoRedoMenu() {
+        List<String> lines = box.buildBox(
+                "UNDO/REDO MENU",
+                List.of(
+                        "Please select an option:",
+                        "1. Undo last operation",
+                        "2. Redo last operation",
+                        "3. Show undo/redo status",
+                        "4. Back to Main Menu"
+                )
+        );
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toYellow(line)));
+        }
+        System.out.println();
+    }
 
     public void displayError(String message) {
         List<String> lines = box.buildBox("[ERROR]", List.of(message));
