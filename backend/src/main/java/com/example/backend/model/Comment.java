@@ -100,12 +100,12 @@ public class Comment{
         return getUpvoteCount() - getDownvoteCount();
     }
 
-    public VoteType getUserVote(User user) {
+    public VoteType getUserVote(String username) {
         if (votes == null || votes.isEmpty()) {
             return null;
         }
         return votes.stream()
-                .filter(vote -> vote.getUser().equals(user))
+                .filter(vote -> vote.getUser().getUsername().equals(username))
                 .map(Vote::getType)
                 .findFirst()
                 .orElse(null);

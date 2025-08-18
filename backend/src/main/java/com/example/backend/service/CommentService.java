@@ -11,10 +11,9 @@ import com.example.backend.model.VoteType;
 import com.example.backend.repository.CommentRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.VoteRepository;
+import com.example.backend.mapper.CommentMapper;
 import com.example.backend.util.logger.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +46,7 @@ public class CommentService {
                     return new IllegalArgumentException("Comment not found with ID: " + id);
                 });
 
-        return commentToCommentResponseDto(comment);
+        return CommentMapper.toDto(comment);
     }
 
     @Transactional
@@ -63,7 +62,7 @@ public class CommentService {
         Comment updatedComment = commentRepository.save(comment);
         log.info("Comment updated successfully, ID: " + id);
 
-        return commentToCommentResponseDto(updatedComment);
+        return CommentMapper.toDto(updatedComment);
     }
 
     @Transactional
@@ -103,32 +102,4 @@ public class CommentService {
         return voteResponse;
     }
 
-    public CommentResponseDto commentToCommentResponseDto(Comment comment) {
-        CommentResponseDto commentResponse = new CommentResponseDto();
-        commentResponse.setId(comment.getId());
-        commentResponse.setPostId(comment.getPost().getId());
-        commentResponse.setParentId(comment.getParent() != null ? comment.getParent().getId() : null);
-        commentResponse.setContent(comment.getText());
-        commentResponse.setAuthor(comment.getAuthor().getUsername());
-        commentResponse.setUpvotes(comment.getUpvoteCount());
-        commentResponse.setDownvotes(comment.getDownvoteCount());
-        commentResponse.setScore(comment.getScore());
-
-//        hardcoded - current_user
-        User user = userRepository.findByUsername("current_user").orElse(null);
-        commentResponse.setUserVote(user != null ? comment.getUserVote(user) : null);
-
-        commentResponse.setCreatedAt(comment.getCreatedAt());
-        commentResponse.setUpdatedAt(comment.getUpdatedAt());
-        
-        List<CommentResponseDto> replies = new ArrayList<>();
-        if (comment.getReplies() != null && !comment.getReplies().isEmpty()) {
-            replies = comment.getReplies().stream()
-                    .map(this::commentToCommentResponseDto)
-                    .toList();
-        }
-        commentResponse.setReplies(replies);
-
-        return commentResponse;
-    }
 }

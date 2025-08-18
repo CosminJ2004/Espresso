@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.*;
+import com.example.backend.mapper.CommentMapper;
 import com.example.backend.model.*;
 import com.example.backend.repository.CommentRepository;
 import com.example.backend.repository.FilterRepository;
@@ -22,7 +23,6 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
-    private final CommentService commentService;
     private final VoteRepository voteRepository;
     private final VoteService voteService;
     private final ProcessService processService;
@@ -30,11 +30,10 @@ public class PostService {
     private final Logger log;
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, CommentService commentService, VoteRepository voteRepository, VoteService voteService, ProcessService processService, FilterRepository filterRepository, Logger log) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, CommentRepository commentRepository, VoteRepository voteRepository, VoteService voteService, ProcessService processService, FilterRepository filterRepository, Logger log) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
-        this.commentService = commentService;
         this.voteRepository = voteRepository;
         this.voteService = voteService;
         this.processService = processService;
@@ -205,7 +204,7 @@ public class PostService {
         List<Comment> rootComments = commentRepository.findByPostIdAndParentIsNullOrderByCreatedAtAsc(postId);
         log.info("Retrieved " + rootComments.size() + " comments for post ID: " + postId);
 
-        return rootComments.stream().map(commentService::commentToCommentResponseDto).collect(Collectors.toList());
+        return rootComments.stream().map(CommentMapper::toDto).collect(Collectors.toList());
     }
 
     @Transactional
@@ -228,6 +227,6 @@ public class PostService {
         voteRepository.save(authorVote);
         comment.getVotes().add(authorVote);
 
-        return commentService.commentToCommentResponseDto(comment);
+        return CommentMapper.toDto(comment);
     }
 }
