@@ -118,7 +118,13 @@ namespace Processing.Filters
 
             //using var arcSession = new InferenceSession(modelPath);
             //var font = SystemFonts.CreateFont("Noto Sans", 16);
-            var font = SystemFonts.CreateFont(SystemFonts.Families.First().Name, 16);
+            var font = SystemFonts.CreateFont("DejaVu Sans", 16);
+
+            foreach (var fam in SystemFonts.Families)
+            {
+                Console.WriteLine($"Font: {fam.Name}");
+            }
+
 
             var faceMatches = new List<(FaceDetected Face, string Name)>();
 
