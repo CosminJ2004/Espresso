@@ -18,9 +18,15 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton(sp => new InferenceSession(Path.Combine(AppContext.BaseDirectory, "Utils", "best.onnx")));
 
 
+
 builder.Services.AddTransient<RgbImageReader>();
 builder.Services.AddTransient<RgbImageWriter>();
 builder.Services.AddSingleton<YoloDetector>();
+
+//builder.Services.AddScoped<IImageFilter, FaceDetection>();
+builder.Services.AddScoped<IImageFilter, Yolo>();
+builder.Services.AddScoped<IImageFilter, SepiaFilter>();
+builder.Services.AddScoped<IImageFilter, PixelateFilter>();
 
 builder.Services.AddSingleton<IImageFilter, GrayscaleFilter>();
 builder.Services.AddSingleton<IImageFilter, InvertFilter>();

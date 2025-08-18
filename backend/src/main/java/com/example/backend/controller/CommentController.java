@@ -22,23 +22,23 @@ public class CommentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Response<CommentResponseDto>> getCommentById(@PathVariable Long id) {
+    public ResponseEntity<Response<CommentResponseDto>> getCommentById(@PathVariable String id) {
         return Response.ok(commentService.getCommentById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Response<CommentResponseDto>> updateComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequest) {
+    public ResponseEntity<Response<CommentResponseDto>> updateComment(@PathVariable String id, @RequestBody CommentRequestDto commentRequest) {
         return Response.ok(commentService.updateComment(id, commentRequest));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Response<Void>> deleteComment(@PathVariable Long id) {
+    public ResponseEntity<Response<Void>> deleteComment(@PathVariable String id) {
         commentService.deleteComment(id);
         return Response.ok("Comment deleted successfully");
     }
 
     @PutMapping("/{id}/vote")
-    public ResponseEntity<Response<VoteResponseDto>> voteComment(@PathVariable Long id, @RequestBody VoteRequestDto voteRequest) {
+    public ResponseEntity<Response<VoteResponseDto>> voteComment(@PathVariable String id, @RequestBody VoteRequestDto voteRequest) {
         return Response.ok(commentService.voteComment(id, voteRequest));
     }
 }

@@ -4,6 +4,7 @@ import com.example.backend.dto.UserResponseDto;
 import com.example.backend.model.User;
 
 public final class UserMapper {
+
     private UserMapper() {
     }
 
@@ -14,7 +15,9 @@ public final class UserMapper {
         return new UserResponseDto(
                 user.getId(),
                 user.getUsername(),
-                user.getCreatedAt()
+                user.getCreatedAt(),
+                (long) user.getPosts().size(),
+                (long) user.getComments().size()
         );
     }
 }

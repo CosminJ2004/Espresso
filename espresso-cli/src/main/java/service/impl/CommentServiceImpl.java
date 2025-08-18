@@ -20,18 +20,18 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ApiResult<Comment> getById(Long id) {
+    public ApiResult<Comment> getById(String id) {
         try {
             String url = baseUrl + "/" + id;
             return apiClient.get(url, new TypeReference<ApiResult<Comment>>() {
             });
         } catch (Exception e) {
             return ApiResult.error("Failed to fetch comment: " + e.getMessage(), 500);
-        }
+            }
     }
 
     @Override
-    public ApiResult<Comment> update(Long id, CommentRequestDto dto) {
+    public ApiResult<Comment> update(String id, CommentRequestDto dto) {
         try {
             String url = baseUrl + "/" + id;
             return apiClient.put(url, dto, new TypeReference<ApiResult<Comment>>() {
@@ -42,7 +42,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ApiResult<Void> delete(Long id) {
+    public ApiResult<Void> delete(String id) {
         try {
             String url = baseUrl + "/" + id;
             return apiClient.delete(url, new TypeReference<ApiResult<Void>>() {
@@ -53,7 +53,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public ApiResult<Vote> voteComment(Long id, VoteRequestDto dto) {
+    public ApiResult<Vote> voteComment(String id, VoteRequestDto dto) {
         try {
             String url = baseUrl + "/" + id + "/vote";
             return apiClient.put(url, dto, new TypeReference<ApiResult<Vote>>() {

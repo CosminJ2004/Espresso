@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> findByPostIdAndParentIsNullOrderByCreatedAtAsc(Long postId);
+public interface CommentRepository extends JpaRepository<Comment, String> {
+    List<Comment> findByPostIdAndParentIsNullOrderByCreatedAtAsc(String postId);
 }

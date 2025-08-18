@@ -36,6 +36,10 @@ public final class AppState {
         return isRunning;
     }
 
+    public void setRunning(boolean isRunning) {
+        this.isRunning = isRunning;
+    }
+
     public void stop() {
         this.isRunning = false;
     }

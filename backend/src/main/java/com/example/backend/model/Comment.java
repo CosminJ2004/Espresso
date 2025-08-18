@@ -12,9 +12,10 @@ import java.util.List;
 @Entity
 @Table(name = "comments")
 public class Comment{
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     @NotBlank(message = "Comment text is required")
@@ -52,7 +53,6 @@ public class Comment{
         this.text = text;
         this.post = post;
         this.parent = null;
-        this.createdAt = LocalDateTime.now();
     }
 
     public Comment(User author, String text, Post post, Comment parent) {
@@ -60,7 +60,6 @@ public class Comment{
         this.text = text;
         this.post = post;
         this.parent = parent;
-        this.createdAt = LocalDateTime.now();
     }
 
     @PrePersist

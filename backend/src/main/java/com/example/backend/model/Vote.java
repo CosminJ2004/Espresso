@@ -13,9 +13,10 @@ import java.time.LocalDateTime;
            @UniqueConstraint(columnNames = {"user_id", "comment_id"})
        })
 public class Vote {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -47,7 +48,6 @@ public class Vote {
         this.post = post;
         this.comment = null;
         this.type = type;
-        this.createdAt = LocalDateTime.now();
     }
 
     public Vote(User user, Comment comment, VoteType type) {
@@ -55,7 +55,6 @@ public class Vote {
         this.post = null;
         this.comment = comment;
         this.type = type;
-        this.createdAt = LocalDateTime.now();
     }
 
     @PrePersist

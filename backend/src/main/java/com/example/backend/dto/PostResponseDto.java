@@ -1,11 +1,10 @@
 package com.example.backend.dto;
 
+import com.example.backend.model.Post;
 import com.example.backend.model.VoteType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
@@ -14,31 +13,37 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class PostResponseDto {
 
-    private Long id;
-
-    @NotBlank(message = "Title is required")
-    @Size(max = 300, message = "Title too long")
+    private String id;
     private String title;
-
-    @Size(max = 10000, message = "Content too long")
     private String content;
-
-    @NotBlank(message = "Author is required")
+    private String imageUrl;
+    private Long filter;
     private String author;
-
     private String subreddit;
-
     private Long upvotes;
-
     private Long downvotes;
-
     private Long score;
-
     private Long commentCount;
-
     private VoteType userVote;
-
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
+
+    public static PostResponseDto fromPost(Post post) {
+        return new PostResponseDto(
+                post.getId(),
+                post.getTitle(),
+                post.getContent(),
+                post.getImageUrl(),
+                post.getFilter() != null ? post.getFilter().getId() : null,
+                post.getAuthor().getUsername(),
+                "echipa3_general",
+                post.getUpvoteCount(),
+                post.getDownvoteCount(),
+                post.getScore(),
+                post.getCommentCount(),
+                post.getUserVote("current_user"),
+                post.getCreatedAt(),
+                post.getUpdatedAt()
+        );
+    }
 }

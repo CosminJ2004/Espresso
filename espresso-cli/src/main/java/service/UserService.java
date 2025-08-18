@@ -7,7 +7,7 @@ import infra.http.ApiResult;
 import java.util.List;
 
 public interface UserService {
-    ApiResult<User> getById(Long id);
+    ApiResult<User> getById(String id);
     ApiResult<List<User>> getAll();
     ApiResult<User> create(UserRequestDto dto);
     ApiResult<User> login(UserRequestDto dto);

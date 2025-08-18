@@ -1,17 +1,21 @@
 package objects.domain;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import objects.domain.VoteType;
 
 public record Comment(
-        Long id,
-        Long postId,
-        Long parentId,
+        String id,
+        String postId,
+        String parentId,
         String content,
         String author,
         Long upvotes,
         Long downvotes,
         Long score,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        VoteType userVote,
+        List<Comment> replies
 ) {
 }

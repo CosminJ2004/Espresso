@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CommentService {
@@ -35,14 +36,15 @@ public class CommentService {
         this.voteService = voteService;
     }
 
-    public CommentResponseDto getCommentById(Long id) {
+    public CommentResponseDto getCommentById(String id) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found with ID: " + id));
 
         return commentToCommentResponseDto(comment);
     }
 
-    public CommentResponseDto updateComment(Long id, CommentRequestDto commentRequest) {
+    @Transactional
+    public CommentResponseDto updateComment(String id, CommentRequestDto commentRequest) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found with ID: " + id));
 
@@ -52,14 +54,16 @@ public class CommentService {
         return commentToCommentResponseDto(updatedComment);
     }
 
-    public void deleteComment(Long commentId) {
+    @Transactional
+    public void deleteComment(String commentId) {
         if (!commentRepository.existsById(commentId)) {
             throw new IllegalArgumentException("Comment not found");
         }
         commentRepository.deleteById(commentId);
     }
 
-    public VoteResponseDto voteComment(Long commentId, VoteRequestDto voteRequest) {
+    @Transactional
+    public VoteResponseDto voteComment(String commentId, VoteRequestDto voteRequest) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 

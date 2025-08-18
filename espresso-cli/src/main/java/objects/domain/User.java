@@ -1,9 +1,10 @@
 package objects.domain;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record User(
-        Long id,
+        String id,
         String username,
         LocalDateTime createdAt,
         int postCount,

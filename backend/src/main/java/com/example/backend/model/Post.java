@@ -8,6 +8,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -15,8 +16,8 @@ import java.util.List;
 public class Post {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @Column(nullable = false)
     @NotBlank(message = "title is required")
@@ -31,7 +32,11 @@ public class Post {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-    private String filePath;
+    private String imageId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "filter_id")
+    private Filter filter;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -46,22 +51,20 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Vote> votes = new ArrayList<>();
 
-    public Post() {}
+    public Post() {
+    }
 
     public Post(User author, String title, String content) {
         this.author = author;
         this.title = title;
         this.content = content;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
-    public Post(User author, String title, String content, String filePath) {
+    public Post(User author, String title, String content, Filter filter) {
         this.author = author;
         this.title = title;
         this.content = content;
-        this.filePath = filePath;
-        this.createdAt = LocalDateTime.now();
+        this.filter = filter;
     }
 
     @PrePersist
@@ -69,11 +72,18 @@ public class Post {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }
+        if (filter != null && imageId == null) {
+            imageId = UUID.randomUUID().toString();
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+
+        if (filter != null && imageId == null) {
+            imageId = UUID.randomUUID().toString();
+        }
     }
 
     public long getCommentCount() {
@@ -111,12 +121,12 @@ public class Post {
         return getUpvoteCount() - getDownvoteCount();
     }
 
-    public VoteType getUserVote(User user) {
+    public VoteType getUserVote(String username) {
         if (votes == null || votes.isEmpty()) {
             return null;
         }
         return votes.stream()
-                .filter(vote -> vote.getUser().equals(user))
+                .filter(vote -> vote.getUser().getUsername().equals(username))
                 .map(Vote::getType)
                 .findFirst()
                 .orElse(null);
@@ -124,6 +134,17 @@ public class Post {
 
     public String getAuthorUsername() {
         return author != null ? author.getUsername() : "Unknown";
+    }
+
+    public String getImageUrl() {
+        if (imageId == null) {
+            return null;
+        }
+        return generateImageUrl(imageId, filter != null ? filter.getName() : "none");
+    }
+    
+    private String generateImageUrl(String imageId, String filter) {
+        return String.format("http://13.61.12.137/images/%s/%s.png", filter, imageId);
     }
 
     @Override

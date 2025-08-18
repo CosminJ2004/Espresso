@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -28,66 +27,50 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Response<PostResponseDto>> getPostById(@PathVariable Long id) {
+    public ResponseEntity<Response<PostResponseDto>> getPostById(@PathVariable String id) {
         return Response.ok(postService.getPostById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<Response<PostResponseDto>> createPost(@RequestBody PostRequestDto postRequest) {
-        return Response.ok(postService.createPost(postRequest));
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<PostResponseDto>> createPostWithoutImage(@RequestBody PostRequestDto postRequest) {
+        return Response.ok(postService.createPostWithoutImage(postRequest));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Response<PostResponseDto>> updatePost(@PathVariable Long id, @RequestBody PostRequestDto postRequest) {
-        return Response.ok(postService.updatePost(id, postRequest));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Response<PostResponseDto>> createPostWithImage(@ModelAttribute PostRequestDto postRequest) {
+        return Response.ok(postService.createPostWithImage(postRequest));
+    }
+
+    @PutMapping(value = "/{id}", consumes =  MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<PostResponseDto>> updatePostWithoutImage(@PathVariable String id, @RequestBody PostRequestDto postRequest) {
+        return Response.ok(postService.updatePostWithoutImage(id, postRequest));
+    }
+
+    @PutMapping(value = "/{id}", consumes =  MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Response<PostResponseDto>> updatePostWithImage(@PathVariable String id, @ModelAttribute PostRequestDto postRequest) {
+        return Response.ok(postService.updatePostWithImage(id, postRequest));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Response<Void>> deletePost(@PathVariable Long id) {
+    public ResponseEntity<Response<Void>> deletePost(@PathVariable String id) {
         postService.deletePost(id);
         return Response.ok("Post deleted successfully");
     }
 
     @PutMapping("/{id}/vote")
-    public ResponseEntity<Response<VoteResponseDto>> votePost(@PathVariable Long id, @RequestBody VoteRequestDto voteRequest) {
+    public ResponseEntity<Response<VoteResponseDto>> votePost(@PathVariable String id, @RequestBody VoteRequestDto voteRequest) {
         return Response.ok(postService.votePost(id, voteRequest));
     }
 
     @GetMapping("/{id}/comments")
-    public ResponseEntity<Response<List<CommentResponseDto>>> getCommentsByPostId(@PathVariable Long id) {
+    public ResponseEntity<Response<List<CommentResponseDto>>> getCommentsByPostId(@PathVariable String id) {
         return Response.ok(postService.getCommentsByPostId(id));
     }
 
     @PostMapping("/{id}/comments")
-    public ResponseEntity<Response<CommentResponseDto>> addComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequest) {
+    public ResponseEntity<Response<CommentResponseDto>> addComment(@PathVariable String id, @RequestBody CommentRequestDto commentRequest) {
         return Response.ok(postService.addComment(id, commentRequest));
     }
-
-    @PostMapping(value = "/with-image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Response<PostResponseDto>> createPostWithImage(PostRequestImageDto postRequestDto) {
-        return Response.ok(postService.createPostWithImage(postRequestDto));
-    }
-
-    @GetMapping(value = "/get-grayscale-filter")
-    public ResponseEntity<Response<PostResponseDto>> getGrayscaleFilter(PostRequestImageDto postRequestDto) {
-        return Response.ok(postService.getPostWithGrayscale(postRequestDto));
-    }
-
-    @GetMapping("/{id}/filter/{filterType}")
-    public ResponseEntity<byte[]> getPostWithFilter(
-            @PathVariable Long id,
-            @PathVariable String filterType) throws IOException {
-
-        byte[] filteredImage = postService.getPostImageWithFilter(id, filterType);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_PNG) // sau PNG dacă filtrele tale returnează PNG
-                .body(filteredImage);
-    }
-
-
-
-
 }
 
 

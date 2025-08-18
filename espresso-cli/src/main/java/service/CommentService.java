@@ -7,8 +7,8 @@ import objects.dto.VoteRequestDto;
 import infra.http.ApiResult;
 
 public interface CommentService {
-    ApiResult<Comment> getById(Long id);
-    ApiResult<Comment> update(Long id, CommentRequestDto dto);
-    ApiResult<Void> delete(Long id);
-    ApiResult<Vote> voteComment(Long id, VoteRequestDto dto);
+    ApiResult<Comment> getById(String id);
+    ApiResult<Comment> update(String id, CommentRequestDto dto);
+    ApiResult<Void> delete(String id);
+    ApiResult<Vote> voteComment(String id, VoteRequestDto dto);
 }

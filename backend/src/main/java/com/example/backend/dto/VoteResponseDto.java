@@ -11,10 +11,7 @@ import lombok.AllArgsConstructor;
 public class VoteResponseDto {
 
     private Long upvotes;
-
     private Long downvotes;
-
     private Long score;
-
     private VoteType userVote;
 }

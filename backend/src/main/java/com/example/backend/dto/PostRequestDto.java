@@ -24,6 +24,7 @@ public class PostRequestDto {
 
     private String subreddit;
 
+    private MultipartFile image;
 
-
+    private Long filter;
 }

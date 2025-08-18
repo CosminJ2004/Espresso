@@ -31,7 +31,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserResponseDto getUserById(Long id) {
+    public UserResponseDto getUserById(String id) {
         User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
         return UserMapper.toDto(user);
     }
@@ -88,11 +88,27 @@ public class UserService {
 
     public UserResponseDto updateUser(String username, UserRequestDto dto) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + username));
 
-        user.setUsername(dto.getUsername());
-        user.setPassword(dto.getPassword());
-        return UserMapper.toDto(userRepository.save(user));
+        String newUsername = dto.getUsername();
+        if (newUsername != null) {
+            newUsername = newUsername.trim();
+            if (!newUsername.isEmpty() && !newUsername.equals(user.getUsername())) {
+                if (userRepository.existsByUsername(newUsername)) {
+                    throw new IllegalArgumentException("Username already taken");
+                }
+                user.setUsername(newUsername);
+            }
+        }
+
+        String newPassword = dto.getPassword();
+        if (newPassword != null && !newPassword.isBlank()) {
+            if (!passwordEncoder.matches(newPassword, user.getPassword())) {
+                user.setPassword(passwordEncoder.encode(newPassword));
+            }
+        }
+        User saved = userRepository.save(user);
+        return UserMapper.toDto(saved);
     }
 
     public void logout() {
