@@ -5,20 +5,32 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<NoWarn>$(NoWarn);NU1605</NoWarn>
 	</PropertyGroup>
 
+	
 	<ItemGroup>
 		<PackageReference Include="Microsoft.ML" Version="4.0.2" />
-		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+		
 		<PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.22.1" />
-		<PackageReference Include="OpenCvSharp4" Version="4.11.0.20250507" />
-		<PackageReference Include="OpenCvSharp4.runtime.win" Version="4.11.0.20250507" Condition="'$(OS)' == 'Windows_NT'" />
-		<PackageReference Include="OpenCvSharp4.runtime.linux" Version="4.10.0.20250507" Condition="'$(OS)' == 'Linux'" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.0" />
+		<PackageReference Include="SixLabors.Fonts" Version="1.0.0" />
+		<PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0" />
+		<PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+
+
+
+
+
+
 	</ItemGroup>
 
 
 
 	<ItemGroup>
+		<None Update="Utils\arcface.onnx">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="Utils\best.onnx">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

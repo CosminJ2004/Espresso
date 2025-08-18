@@ -1,9 +1,12 @@
-﻿namespace Processing.Models;
+﻿using System.Drawing;
+
+namespace Processing.Models;
 public class RgbImage
 {
     public int Width { get; }
     public int Height { get; }
     public RgbPixel[,] Pixels { get; }
+
 
     public RgbImage(int width, int height)
     {

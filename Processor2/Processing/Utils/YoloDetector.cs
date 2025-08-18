@@ -1,140 +1,180 @@
-﻿//using Microsoft.ML.OnnxRuntime;
-//using Microsoft.ML.OnnxRuntime.Tensors;
+﻿using Microsoft.ML.OnnxRuntime;
+using Microsoft.ML.OnnxRuntime.Tensors;
 
-//using Processing.Models;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
+using Processing.Models;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.IO;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Text;
+using Processing.Convertors;
+using SixLabors.ImageSharp.Processing;
 
-//namespace Processing.Utils
-//{
-//    public class YoloDetector
-//    {
-//        private InferenceSession _session;
-//        private readonly string[] _labels;
-//        private readonly int _inputWidth = 320;
-//        private readonly int _inputHeight = 320;
-//        private readonly float _confThreshold = 0.4f;
-//        private readonly float _nmsThreshold = 0.45f;
+namespace Processing.Utils
+{
+    public class YoloDetector
+    {
+        private InferenceSession _session;
+        private readonly string[] _labels;
+        private readonly int _inputWidth = 320;
+        private readonly int _inputHeight = 320;
+        private readonly float _confThreshold = 0.4f;
+        private readonly float _nmsThreshold = 0.45f;
 
-//        public YoloDetector(string modelPath, string[] labels)
-//        {
-//            _session = new InferenceSession(modelPath);
-//            _labels = labels;
-//        }
 
-//        public List<Detection> Detect(Mat image)
-//        {
-//            var inputTensor = Preprocess(image);
-//            var inputs = new List<NamedOnnxValue>
-//            {
-//                NamedOnnxValue.CreateFromTensor("images", inputTensor)
-//            };
+        public YoloDetector()
+        {
+           
+        }
 
-//            using var results = _session.Run(inputs);
-//            var output = results.First().AsEnumerable<float>().ToArray();
 
-//            return Postprocess(output, image.Width, image.Height);
-//        }
 
-//        private DenseTensor<float> Preprocess(Mat image)
-//        {
-//            Mat resized = new Mat();
-//            Cv2.Resize(image, resized, new Size(_inputWidth, _inputHeight));
-//            Cv2.CvtColor(resized, resized, ColorConversionCodes.BGR2RGB);
-//            resized.ConvertTo(resized, MatType.CV_32FC3, 1.0 / 255);
+        private static readonly string modelPath = Path.Combine(AppContext.BaseDirectory, "Utils", "best.onnx");
 
-//            var chw = new float[3 * _inputWidth * _inputHeight];
-//            int index = 0;
-//            for (int c = 0; c < 3; c++)
-//            {
-//                for (int y = 0; y < _inputHeight; y++)
-//                {
-//                    for (int x = 0; x < _inputWidth; x++)
-//                    {
-//                        chw[index++] = resized.At<Vec3f>(y, x)[c];
-//                    }
-//                }
-//            }
+        private static readonly string[] labels = { "face" };
 
-//            return new DenseTensor<float>(chw, new[] { 1, 3, _inputHeight, _inputWidth });
-//        }
+   
 
-//        private List<Detection> Postprocess(float[] output, int originalWidth, int originalHeight)
-//        {
-//            var detections = new List<Detection>();
 
-//            // 6 valori pe box: x, y, w, h, obj_conf, class_prob (pentru o singură clasă)
-//            int dimensions = 6;
-//            int rows = output.Length / dimensions;
 
-//            for (int i = 0; i < rows; i++)
-//            {
-//                float objConf = output[i * dimensions + 4];
-//                float classProb = output[i * dimensions + 5];
-//                float confidence = objConf * classProb;
+        public List<FaceDetected> ApplyAndExtract(RgbImage image)
+        {
+            byte[] img = MatRgbConvertor.RgbImageToByteArray(image);
+            int origW = image.Width;
+            int origH = image.Height;
 
-//                if (confidence < _confThreshold)
-//                    continue;
+            // 1) Creare ImageSharp
+            Image<Rgb24> sharpImage = new Image<Rgb24>(origW, origH);
+            for (int y = 0; y < origH; y++)
+                for (int x = 0; x < origW; x++)
+                {
+                    var px = image.Pixels[y, x];
+                    sharpImage[x, y] = new Rgb24(px.R, px.G, px.B);
+                }
 
-//                float cx = output[i * dimensions + 0];
-//                float cy = output[i * dimensions + 1];
-//                float w = output[i * dimensions + 2];
-//                float h = output[i * dimensions + 3];
+            // 2) Resize pentru model
+            int modelWidth = 320, modelHeight = 320;
+            sharpImage.Mutate(ctx => ctx.Resize(modelWidth, modelHeight));
 
-//                float x = cx - w / 2;
-//                float y = cy - h / 2;
+            // sharpImage este deja redimensionat la modelWidth x modelHeight
+            byte[] pixelBytes = new byte[modelWidth * modelHeight * 3];
+            sharpImage.CopyPixelDataTo(pixelBytes); // pixelBytes = RGB intercalat
 
-//                // Scale la dimensiunile originale
-//                x = x / _inputWidth * originalWidth;
-//                y = y / _inputHeight * originalHeight;
-//                w = w / _inputWidth * originalWidth;
-//                h = h / _inputHeight * originalHeight;
+            // Convertim direct în float tensor [1,3,H,W]
+            var inputTensor = new DenseTensor<float>(new[] { 1, 3, modelHeight, modelWidth });
 
-//                detections.Add(new Detection
-//                {
-//                    Label = _labels[0], // o singură clasă, index 0
-//                    Box = new Rect((int)x, (int)y, (int)w, (int)h),
-//                    Confidence = confidence
-//                });
-//            }
+            int pixelIndex = 0;
+            for (int y = 0; y < modelHeight; y++)
+            {
+                for (int x = 0; x < modelWidth; x++)
+                {
+                    inputTensor[0, 0, y, x] = pixelBytes[pixelIndex++] / 255f; // R
+                    inputTensor[0, 1, y, x] = pixelBytes[pixelIndex++] / 255f; // G
+                    inputTensor[0, 2, y, x] = pixelBytes[pixelIndex++] / 255f; // B
+                }
+            }
 
-//            return ApplyNms(detections);
-//        }
+            // 4) Run ONNX
+            using var session = new InferenceSession(modelPath);
+            var inputs = new List<NamedOnnxValue>
+    {
+        NamedOnnxValue.CreateFromTensor(session.InputMetadata.Keys.First(), inputTensor)
+    };
+            using var results = session.Run(inputs);
+            var output = results.First().AsTensor<float>();
+            var dims = output.Dimensions.ToArray();
+            int anchors = dims[2];
 
-//        private List<Detection> ApplyNms(List<Detection> detections)
-//        {
-//            var result = new List<Detection>();
+            List<BoundingBox> boxes = new List<BoundingBox>();
+            List<float> scores = new List<float>();
 
-//            foreach (var group in detections.GroupBy(d => d.Label))
-//            {
-//                var boxes = group.OrderByDescending(d => d.Confidence).ToList();
+            for (int i = 0; i < anchors; i++)
+            {
+                float x = output[0, 0, i];
+                float y = output[0, 1, i];
+                float w = output[0, 2, i];
+                float h = output[0, 3, i];
+                float conf = output[0, 4, i];
 
-//                while (boxes.Count > 0)
-//                {
-//                    var best = boxes[0];
-//                    result.Add(best);
-//                    boxes.RemoveAt(0);
+                if (conf < _confThreshold) continue;
 
-//                    boxes = boxes.Where(b => IoU(best.Box, b.Box) < _nmsThreshold).ToList();
-//                }
-//            }
-//            return result;
-//        }
+                int x1 = (int)((x - w / 2) * origW / modelWidth);
+                int y1 = (int)((y - h / 2) * origH / modelHeight);
+                int width = (int)(w * origW / modelWidth);
+                int height = (int)(h * origH / modelHeight);
 
-//        private float IoU(Rect a, Rect b)
-//        {
-//            int interX = Math.Max(a.X, b.X);
-//            int interY = Math.Max(a.Y, b.Y);
-//            int interW = Math.Min(a.X + a.Width, b.X + b.Width) - interX;
-//            int interH = Math.Min(a.Y + a.Height, b.Y + b.Height) - interY;
+                boxes.Add(new BoundingBox(x1, y1, width, height));
+                scores.Add(conf);
+            }
 
-//            if (interW <= 0 || interH <= 0) return 0;
+            var indices = Nms(boxes, scores, _nmsThreshold);
 
-//            float interArea = interW * interH;
-//            float unionArea = a.Width * a.Height + b.Width * b.Height - interArea;
+            List<FaceDetected> crops = new List<FaceDetected>();
 
-//            return interArea / unionArea;
-//        }
-//    }
-//}
+            foreach (var idx in indices)
+            {
+                var box = boxes[idx];
+
+                // crop bounding box
+                RgbImage crop = new RgbImage(box.Width, box.Height);
+                for (int y = 0; y < box.Height; y++)
+                    for (int x = 0; x < box.Width; x++)
+                    {
+                        int srcX = box.X + x;
+                        int srcY = box.Y + y;
+                        if (srcX >= 0 && srcX < origW && srcY >= 0 && srcY < origH)
+                            crop.Pixels[y, x] = image.Pixels[srcY, srcX];
+                    }
+
+                crops.Add(new FaceDetected { FaceImage = crop, Box = box });
+            }
+
+            Console.WriteLine($"Detected {boxes.Count} boxes, extracted {crops.Count} crops after NMS");
+
+            return crops;
+        }
+
+
+
+        private List<int> Nms(List<BoundingBox> boxes, List<float> scores, float iouThreshold)
+        {
+            var indices = Enumerable.Range(0, boxes.Count)
+                .OrderByDescending(i => scores[i]).ToList();
+            var keep = new List<int>();
+
+            while (indices.Count > 0)
+            {
+                int current = indices[0];
+                keep.Add(current);
+                indices.RemoveAt(0);
+
+                indices = indices.Where(i => IoU(boxes[current], boxes[i]) < iouThreshold).ToList();
+            }
+
+            return keep;
+        }
+
+        // Functie IoU pentru BoundingBox
+        private float IoU(BoundingBox a, BoundingBox b)
+        {
+            int x1 = Math.Max(a.X, b.X);
+            int y1 = Math.Max(a.Y, b.Y);
+            int x2 = Math.Min(a.X + a.Width, b.X + b.Width);
+            int y2 = Math.Min(a.Y + a.Height, b.Y + b.Height);
+
+            int intersectionWidth = Math.Max(0, x2 - x1);
+            int intersectionHeight = Math.Max(0, y2 - y1);
+            int intersectionArea = intersectionWidth * intersectionHeight;
+
+            int unionArea = a.Width * a.Height + b.Width * b.Height - intersectionArea;
+
+            return (float)intersectionArea / unionArea;
+        }
+
+
+    }
+}
