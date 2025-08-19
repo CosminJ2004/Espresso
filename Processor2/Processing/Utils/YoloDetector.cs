@@ -22,7 +22,7 @@ namespace Processing.Utils
         private readonly string[] _labels;
         private readonly int _inputWidth = 320;
         private readonly int _inputHeight = 320;
-        private readonly float _confThreshold = 0.4f;
+        private readonly float _confThreshold = 0.7f;
         private readonly float _nmsThreshold = 0.45f;
 
 
