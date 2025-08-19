@@ -28,7 +28,7 @@ namespace Processing.Utils
 
         public YoloDetector(InferenceSession session)
         {
-            _session = session; // folosim sesiunea singleton
+            _session = session; // session singleton
         }
 
 
@@ -47,7 +47,7 @@ namespace Processing.Utils
             int origW = image.Width;
             int origH = image.Height;
 
-            // 1) Creare ImageSharp
+            // 1) creating image with ImageSharp
             Image<Rgb24> sharpImage = new Image<Rgb24>(origW, origH);
             for (int y = 0; y < origH; y++)
                 for (int x = 0; x < origW; x++)
@@ -56,15 +56,15 @@ namespace Processing.Utils
                     sharpImage[x, y] = new Rgb24(px.R, px.G, px.B);
                 }
 
-            // 2) Resize pentru model
+            // 2) Resize  for  yolo model 
             int modelWidth = 320, modelHeight = 320;
             sharpImage.Mutate(ctx => ctx.Resize(modelWidth, modelHeight));
 
-            // sharpImage este deja redimensionat la modelWidth x modelHeight
+            
             byte[] pixelBytes = new byte[modelWidth * modelHeight * 3];
-            sharpImage.CopyPixelDataTo(pixelBytes); // pixelBytes = RGB intercalat
+            sharpImage.CopyPixelDataTo(pixelBytes); // pixelBytes = RGB 
 
-            // Convertim direct în float tensor [1,3,H,W]
+            // converting into tensor [1,3,H,W]
             var inputTensor = new DenseTensor<float>(new[] { 1, 3, modelHeight, modelWidth });
 
             int pixelIndex = 0;
@@ -158,7 +158,7 @@ namespace Processing.Utils
             return keep;
         }
 
-        // Functie IoU pentru BoundingBox
+        // Function IoU for BoundingBox
         private float IoU(BoundingBox a, BoundingBox b)
         {
             int x1 = Math.Max(a.X, b.X);
