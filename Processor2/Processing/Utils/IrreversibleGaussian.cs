@@ -64,5 +64,20 @@ namespace Processing.Utils
         }
 
         private static byte ClampByte(int value) => (byte)Math.Clamp(value, 0, 255);
+        public static Rectangle ClampRectangle(BoundingBox rect, int imageWidth, int imageHeight)
+        {
+            int x = Math.Max(0, rect.X);
+            int y = Math.Max(0, rect.Y);
+            int w = Math.Min(rect.Width, imageWidth - x);
+            int h = Math.Min(rect.Height, imageHeight - y);
+
+            if (w <= 0 || h <= 0)
+                return Rectangle.Empty; // nimic valid
+
+            return new Rectangle(x, y, w, h);
+        }
+
+
+
     }
 }

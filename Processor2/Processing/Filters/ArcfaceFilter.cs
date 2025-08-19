@@ -25,7 +25,7 @@ namespace Processing.Filters
     {
         public string Name => "arcface";
         private readonly string modelPath = Path.Combine(AppContext.BaseDirectory, "Utils", "arcface.onnx");
-        private readonly string facesDbPath = Path.Combine(AppContext.BaseDirectory, "Utils", "faces_db4.json");
+        private readonly string facesDbPath = Path.Combine(AppContext.BaseDirectory, "Utils", "faces_db.json");
 
         private readonly YoloDetector yolo;
 
@@ -159,14 +159,35 @@ namespace Processing.Filters
                     }
                 }
                 faceMatches.Add((face, matchedName));
+
                 if (matchedName == "Unknown")
                 {
                     var box = face.Box;
-                    imgSharp.Mutate(ctx =>
+
+                    int x = Math.Max(0, box.X);
+                    int y = Math.Max(0, box.Y);
+                    int w = Math.Min(box.Width, imgSharp.Width - x);
+                    int h = Math.Min(box.Height, imgSharp.Height - y);
+
+                    if (w > 0 && h > 0)
                     {
-                        ctx.GaussianBlur(15, new Rectangle(box.X, box.Y, box.Width, box.Height));
-                    });
+                        var rect = new Rectangle(x, y, w, h);
+
+                        // aplicăm blur + noise pe acea zonă
+                        var blurred = IrreversibleGaussian.BlurArea(
+                            image,
+                            new Point(rect.X, rect.Y),
+                            new Point(rect.Right, rect.Bottom),
+                            radius: 9,
+                            noiseStrength:0.1f
+                           
+                        );
+
+                        // suprascriem imgSharp cu imaginea procesată
+                        imgSharp = ConvertToImageSharp(blurred);
+                    }
                 }
+
 
                 Console.WriteLine($"Face at ({faceBox.X},{faceBox.Y}) matched with {matchedName} ({maxSim})");
             }
