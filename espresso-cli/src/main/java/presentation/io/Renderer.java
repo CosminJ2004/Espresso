@@ -463,4 +463,22 @@ public class Renderer {
             displayReplies(comment.replies(), 0, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")); // 0 pt comentariu singur
         }
     }
+
+    public void displayFilters(List<objects.domain.Filter> filters) {
+        if (filters == null || filters.isEmpty()) {
+            displayInfo("No filters available.");
+            return;
+        }
+
+        List<String> filterOptions = new ArrayList<>();
+        for (objects.domain.Filter filter : filters) {
+            filterOptions.add(filter.getId() + ". " + filter.getLabel());
+        }
+
+        List<String> lines = box.buildBox("OPTIONS", filterOptions);
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toCyan(line)));
+        }
+        System.out.println();
+    }
 }
