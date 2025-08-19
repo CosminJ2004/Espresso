@@ -37,31 +37,20 @@ namespace Processing.Filters
 
             
             if (!File.Exists(modelPath) || !File.Exists(facesDbPath))
-                throw new FileNotFoundException("Modelul ArcFace sau baza de date nu au fost găsite.");
+                throw new FileNotFoundException("Arcface model or faces db were not found");
 
             arcSession = new InferenceSession(modelPath);
             knownFaces = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, List<float[]>>>(File.ReadAllText(facesDbPath));
             this.yolo = yolo;
         }
 
-        //private static float CosineSimilarity(float[] a, float[] b)
-        //{
-        //    float dot = 0f, magA = 0f, magB = 0f;
-        //    for (int i = 0; i < a.Length; i++)
-        //    {
-        //        dot += a[i] * b[i];
-        //        magA += a[i] * a[i];
-        //        magB += b[i] * b[i];
-        //    }
-        //    return dot / (float)(Math.Sqrt(magA) * Math.Sqrt(magB));
-        //}
-
+   
 
         float CosineSimilarity(float[] a, float[] b)
         {
             float sim = 0;
             for (int i = 0; i < a.Length; i++)
-                sim += a[i] * b[i];  // nu mai trebuie divizare, sunt normalizate
+                sim += a[i] * b[i];  // no need for divide. they are both normalized vectors
             return sim;
         }
 
@@ -102,30 +91,23 @@ namespace Processing.Filters
 
         public RgbImage Apply(RgbImage image)
         {
-            if (!File.Exists(modelPath) || !File.Exists(facesDbPath))
-            {
-                Console.WriteLine("Modelul ArcFace sau baza de date nu au fost găsite.");
-                return image;
-            }
 
-            //var knownFaces = JsonConvert.DeserializeObject<Dictionary<string, float[]>>(File.ReadAllText(facesDbPath));
-            //var knownFaces = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, List<float[]>>>(File.ReadAllText(facesDbPath));
 
             var imgSharp = ConvertToImageSharp(image);
 
-           
+           //extracting the faces in the photo
             List<FaceDetected> facesDetected = yolo.ApplyAndExtract(image);
 
-            //using var arcSession = new InferenceSession(modelPath);
-            //var font = SystemFonts.CreateFont("Noto Sans", 16);
+
+            //for both linux and windows
             Font font;
             try
             {
-                font = SystemFonts.CreateFont("DejaVu Sans", 16);
+                font = SystemFonts.CreateFont("DejaVu Sans", 18);
             }
             catch
             {
-                font = SystemFonts.CreateFont("Arial", 16);
+                font = SystemFonts.CreateFont("Arial", 18);
             }
 
         
@@ -135,10 +117,15 @@ namespace Processing.Filters
 
             foreach (var face in facesDetected)
             {
+                //extracting the bounding box
                 var faceBox = face.Box;
+                //extracting a new image from that box 
                 var faceImgSharp = imgSharp.Clone(ctx => ctx.Crop(new Rectangle(faceBox.X, faceBox.Y, faceBox.Width, faceBox.Height)));
+
                 var tensorData = PreprocessFace(faceImgSharp);
+
                 var flattened = tensorData.Cast<float>().ToArray();
+
                 var tensor = new DenseTensor<float>(flattened, new int[] { 1, 112, 112, 3 });
 
                 var inputs = new List<NamedOnnxValue>
@@ -160,7 +147,7 @@ namespace Processing.Filters
                     {
                         float sim = CosineSimilarity(embedding, emb);
 
-                        // Debug: vezi toate similaritățile
+                        // Debug: allowing to see the similarity scores
                         Console.WriteLine($"Comparing with {kv.Key} => similarity = {sim}");
 
                         if (sim > 0.55f && sim > maxSim)
@@ -172,17 +159,25 @@ namespace Processing.Filters
                     }
                 }
                 faceMatches.Add((face, matchedName));
+                if (matchedName == "Unknown")
+                {
+                    var box = face.Box;
+                    imgSharp.Mutate(ctx =>
+                    {
+                        ctx.GaussianBlur(15, new Rectangle(box.X, box.Y, box.Width, box.Height));
+                    });
+                }
 
                 Console.WriteLine($"Face at ({faceBox.X},{faceBox.Y}) matched with {matchedName} ({maxSim})");
             }
 
-            // Desenăm toate fețele cu numele lor
+            // showing the results on the image
             imgSharp.Mutate(ctx =>
             {
                 foreach (var (face, name) in faceMatches)
                 {
                     var box = face.Box;
-                    ctx.Draw(Color.Red, 2, new RectangularPolygon(box.X, box.Y, box.Width, box.Height));
+                    ctx.Draw(Color.Red, 3, new RectangularPolygon(box.X, box.Y, box.Width, box.Height));
                     ctx.DrawText(name, font, Color.Yellow, new PointF(box.X, Math.Max(box.Y - 20, 0)));
                 }
             });

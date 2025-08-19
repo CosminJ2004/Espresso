@@ -26,14 +26,11 @@ namespace Processing.Filters
 
 
         public string Name => "yolo";
-        //private static readonly string modelPath = "C:\\Users\\Cosmin\\IdeaProjects\\Espresso\\Processor2\\Processing\\Utils\\best.onnx";
-        //private static readonly string modelPath = Path.Combine(AppContext.BaseDirectory, "Utils", "best.onnx");
-        //private static readonly string projectRoot = Path.Combine(AppContext.BaseDirectory, "..", "..", "..");
-        //private static readonly string modelPath = Path.Combine(projectRoot, "Processing", "Utils", "best.onnx");
+      
         private static readonly string modelPath = Path.Combine(AppContext.BaseDirectory, "Utils", "best.onnx");
 
         private static readonly string[] labels = { "face" };
-        //private readonly YoloDetector _detector = new YoloDetector(modelPath, labels);
+
 
         public Yolo() { }
 
@@ -135,14 +132,14 @@ namespace Processing.Filters
             // 6) apply NMS
             var indices = Nms(boxes, scores, iouThreshold);
 
-            // img: byte[] în format RGB
+            // img: byte[] in format RGB
             // width, height: dimensiunile originale
             for (int idx2 = 0; idx2 < indices.Count; idx2++)
             {
                 int i = indices[idx2];
                 var box = boxes[i];
 
-                // desenăm marginile dreptunghiului
+                
                 for (int x = box.X; x < box.X + box.Width && x < origW; x++)
                 {
                     if (box.Y >= 0 && box.Y < origH)
@@ -184,7 +181,7 @@ namespace Processing.Filters
             Console.WriteLine($"Detected {boxes.Count} boxes, kept {indices.Count} after NMS");
 
 
-            // img rămâne tot un byte[] în format RGB
+            // img stays a byte[] in format RGB
             return MatRgbConvertor.ByteArrayToRgbImage(img,origW,origH);
 
 
@@ -208,7 +205,7 @@ namespace Processing.Filters
             return keep;
         }
 
-        // Functie IoU pentru BoundingBox
+        // function IoU for BoundingBox
         private float IoU(BoundingBox a, BoundingBox b)
         {
             int x1 = Math.Max(a.X, b.X);
