@@ -128,10 +128,7 @@ namespace Processing.Filters
                 font = SystemFonts.CreateFont("Arial", 16);
             }
 
-            foreach (var fam in SystemFonts.Families)
-            {
-                Console.WriteLine($"Font: {fam.Name}");
-            }
+        
 
 
             var faceMatches = new List<(FaceDetected Face, string Name)>();
@@ -162,16 +159,21 @@ namespace Processing.Filters
                     foreach (var emb in kv.Value)
                     {
                         float sim = CosineSimilarity(embedding, emb);
+
+                        // Debug: vezi toate similaritățile
+                        Console.WriteLine($"Comparing with {kv.Key} => similarity = {sim}");
+
                         if (sim > 0.55f && sim > maxSim)
                         {
                             maxSim = sim;
                             matchedName = kv.Key;
+                           
                         }
                     }
                 }
-
                 faceMatches.Add((face, matchedName));
-                //Console.WriteLine($"Face at ({faceBox.X},{faceBox.Y}) matched with {matchedName} ({maxSim})");
+
+                Console.WriteLine($"Face at ({faceBox.X},{faceBox.Y}) matched with {matchedName} ({maxSim})");
             }
 
             // Desenăm toate fețele cu numele lor
