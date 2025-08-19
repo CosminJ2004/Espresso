@@ -22,14 +22,14 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Response<UserResponseDto>> getUserById(@PathVariable String id) {
-        return Response.ok(userService.getUserById(id));
-    }
-
     @GetMapping
     public ResponseEntity<Response<List<UserResponseDto>>> getAllUsers() {
         return Response.ok(userService.getAllUsers());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Response<UserResponseDto>> getUserById(@PathVariable String id) {
+        return Response.ok(userService.getUserById(id));
     }
 
     @PostMapping
@@ -48,9 +48,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{username}")
-    public ResponseEntity<Response<Void>> deleteUser(@PathVariable String username) {
-        userService.deleteUser(username);
-        return Response.ok("User deleted successfully");
+    public ResponseEntity<Response<String>> deleteUser(@PathVariable String username) {
+        return Response.ok(userService.deleteUser(username));
     }
 
     @PutMapping("/{username}")

@@ -32,9 +32,8 @@ public class CommentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Response<Void>> deleteComment(@PathVariable String id) {
-        commentService.deleteComment(id);
-        return Response.ok("Comment deleted successfully");
+    public ResponseEntity<Response<String>> deleteComment(@PathVariable String id) {
+        return Response.ok(commentService.deleteComment(id));
     }
 
     @PutMapping("/{id}/vote")

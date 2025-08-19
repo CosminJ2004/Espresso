@@ -42,8 +42,4 @@ public abstract class BaseLogger implements Logger, LogWriter {
     // Abstract method for subclasses to implement
     @Override
     public abstract void writeLog(LogEntry entry);
-
-    public int getQueueSize() {
-        return logProcessor.getQueueSize();
-    }
 }

@@ -61,7 +61,7 @@ public class CommentService {
     }
 
     @Transactional
-    public void deleteComment(String commentId) {
+    public String deleteComment(String commentId) {
         log.info("Deleting comment with ID: " + commentId);
         if (!commentRepository.existsById(commentId)) {
             log.error("Comment not found for deletion, ID: " + commentId);
@@ -69,6 +69,7 @@ public class CommentService {
         }
         commentRepository.deleteById(commentId);
         log.info("Comment deleted successfully, ID: " + commentId);
+        return "Comment deleted successfully";
     }
 
     @Transactional

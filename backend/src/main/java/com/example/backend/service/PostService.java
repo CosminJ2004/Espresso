@@ -164,7 +164,7 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(String id) {
+    public String deletePost(String id) {
         log.info("Deleting post with ID: " + id);
         if (!postRepository.existsById(id)) {
             log.error("Post not found for deletion, ID: " + id);
@@ -172,6 +172,7 @@ public class PostService {
         }
         postRepository.deleteById(id);
         log.info("Post deleted successfully, ID: " + id);
+        return "Post deleted successfully";
     }
 
     @Transactional

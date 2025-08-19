@@ -21,11 +21,11 @@ public class StorageRepository {
     private final S3Client client;
     private final String bucket;
 
-    public StorageRepository(@Value("${storage.s3.url}") String url,
-                           @Value("${storage.s3.bucket}") String bucket,
-                           @Value("${storage.s3.username}") String username,
-                           @Value("${storage.s3.password}") String password,
-                           @Value("${storage.s3.region}") String region) {
+    public StorageRepository(@Value("${storage.url}") String url,
+                           @Value("${storage.bucket}") String bucket,
+                           @Value("${storage.username}") String username,
+                           @Value("${storage.password}") String password,
+                           @Value("${storage.region}") String region) {
         this.bucket = bucket;
         this.client = S3Client.builder()
                 .endpointOverride(URI.create(url))

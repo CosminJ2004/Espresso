@@ -29,6 +29,15 @@ public class UserService {
         this.log = log;
     }
 
+    public List<UserResponseDto> getAllUsers() {
+        log.info("Fetching all users");
+        List<User> users = userRepository.findAll();
+        log.info("Retrieved " + users.size() + " users");
+        return users.stream()
+                .map(UserMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
     public UserResponseDto getUserById(String id) {
         log.info("Fetching user by ID: " + id);
         User user = userRepository.findById(id).orElseThrow(() -> {
@@ -37,15 +46,6 @@ public class UserService {
         });
         log.info("User found: " + user.getUsername());
         return UserMapper.toDto(user);
-    }
-
-    public List<UserResponseDto> getAllUsers() {
-        log.info("Fetching all users");
-        List<User> users = userRepository.findAll();
-        log.info("Retrieved " + users.size() + " users");
-        return users.stream()
-                .map(UserMapper::toDto)
-                .collect(Collectors.toList());
     }
 
     public UserResponseDto createUser(UserRequestDto userRequest) {
@@ -97,7 +97,7 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(String username) {
+    public String deleteUser(String username) {
         log.info("Deleting user: " + username);
         if (!userRepository.existsByUsername(username)) {
             log.error("User not found for deletion: " + username);
@@ -106,6 +106,7 @@ public class UserService {
 
         userRepository.deleteByUsername(username);
         log.info("User deleted successfully: " + username);
+        return "User deleted successfully";
     }
 
     public UserResponseDto updateUser(String username, UserRequestDto dto) {
