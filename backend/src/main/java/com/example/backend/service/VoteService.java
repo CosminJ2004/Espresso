@@ -41,9 +41,14 @@ public class VoteService {
         } else {
             if (existingVote.isPresent()) {
                 Vote vote = existingVote.get();
-                log.info("Updating existing vote for " + targetType + " ID: " + targetId + " to " + voteType);
-                vote.setType(voteType);
-                voteRepository.save(vote);
+                if (vote.getType() == voteType) {
+                    log.info("Removing existing vote for " + targetType + " ID: " + targetId + " (same vote type submitted)");
+                    voteRepository.delete(vote);
+                } else {
+                    log.info("Updating existing vote for " + targetType + " ID: " + targetId + " to " + voteType);
+                    vote.setType(voteType);
+                    voteRepository.save(vote);
+                }
             } else {
                 log.info("Creating new vote for " + targetType + " ID: " + targetId + " with type " + voteType);
                 Vote newVote;
