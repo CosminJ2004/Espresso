@@ -172,14 +172,19 @@ namespace Processing.Filters
                     if (w > 0 && h > 0)
                     {
                         var rect = new Rectangle(x, y, w, h);
+                        Console.WriteLine($"Applying blur + noise to unknown face at ({rect.X},{rect.Y}) with size {rect.Width}x{rect.Height}");
+                        Console.WriteLine($"Image size: {imgSharp.Width}x{imgSharp.Height}");
+                        Console.WriteLine($"Rectangle: {rect}");
+                        Console.WriteLine($"Rectangle valid: {rect.X >= 0 && rect.Y >= 0 && rect.Right <= imgSharp.Width && rect.Bottom <= imgSharp.Height}");
+
 
                         // aplicăm blur + noise pe acea zonă
                         var blurred = IrreversibleGaussian.BlurArea(
                             image,
                             new Point(rect.X, rect.Y),
                             new Point(rect.Right, rect.Bottom),
-                            radius: 9,
-                            noiseStrength:0.1f
+                            radius: 7,
+                            noiseStrength:7f
                            
                         );
 
