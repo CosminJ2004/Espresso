@@ -21,4 +21,8 @@ public final class Endpoints {
     public static String getSubredditsEndpoint() {
         return API_BASE_URL + "/subreddits";
     }
+
+    public static String getFiltersEndpoint() {
+        return API_BASE_URL + "/filters";
+    }
 }

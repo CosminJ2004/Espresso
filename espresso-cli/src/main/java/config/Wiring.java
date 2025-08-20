@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import infra.http.ApiClient;
 import service.CommentService;
+import service.FilterService;
 import service.PostService;
 import service.UserService;
 import service.impl.CommentServiceImpl;
+import service.impl.FilterServiceImpl;
 import service.impl.PostServiceImpl;
 import service.impl.UserServiceImpl;
 
@@ -22,6 +24,7 @@ public final class Wiring {
     private final UserService userService;
     private final CommentService commentService;
     private final PostService postService;
+    private final FilterService filterService;
     //constructor wiring
     public Wiring(){
         this.objectMapper = new ObjectMapper();
@@ -30,6 +33,7 @@ public final class Wiring {
         this.userService = new UserServiceImpl(apiClient);
         this.commentService = new CommentServiceImpl(apiClient);
         this.postService = new PostServiceImpl(apiClient);
+        this.filterService = new FilterServiceImpl(apiClient);
     }
 
     public ObjectMapper getObjectMapper() {
@@ -50,5 +54,9 @@ public final class Wiring {
 
     public PostService getPostService() {
         return postService;
+    }
+
+    public FilterService getFilterService() {
+        return filterService;
     }
 }

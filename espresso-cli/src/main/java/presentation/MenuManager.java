@@ -9,6 +9,7 @@ import presentation.menus.UserMenu;
 import presentation.io.ConsoleIO;
 import presentation.io.Renderer;
 import service.CommentService;
+import service.FilterService;
 import service.PostService;
 import service.UserService;
 
@@ -16,6 +17,7 @@ public final class MenuManager {
     private final UserService userService;
     private final PostService postService;
     private final CommentService commentService;
+    private final FilterService filterService;
     private final ConsoleIO io;
     private final Renderer ui;
     private final AppState appState;
@@ -30,17 +32,18 @@ public final class MenuManager {
     private final LoginMenu loginMenu;
     private final MainMenu mainMenu;
 
-    public MenuManager(UserService userService, PostService postService, CommentService commentService, ConsoleIO io, Renderer ui) {
+    public MenuManager(UserService userService, PostService postService, CommentService commentService, FilterService filterService, ConsoleIO io, Renderer ui) {
         this.userService = userService;
         this.postService = postService;
         this.commentService = commentService;
+        this.filterService = filterService;
         this.io = io;
         this.ui = ui;
         this.appState = AppState.getInstance();
 
         this.authHandler = new AuthHandler(userService, io, ui);
         this.userHandler = new UserHandler(userService, io, ui);
-        this.postHandler = new PostHandler(postService, io, ui);
+        this.postHandler = new PostHandler(postService, filterService, io, ui);
         this.commentHandler = new CommentHandler(postService, commentService, io, ui);
         this.undoRedoHandler = new UndoRedoHandler(io, ui);
 

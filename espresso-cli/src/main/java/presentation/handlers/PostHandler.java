@@ -2,6 +2,7 @@ package presentation.handlers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import infra.http.ApiResult;
+import objects.domain.Filter;
 import objects.domain.Post;
 import objects.domain.Vote;
 import objects.domain.VoteType;
@@ -11,6 +12,7 @@ import objects.dto.VoteRequestDto;
 import presentation.AppState;
 import presentation.io.ConsoleIO;
 import presentation.io.Renderer;
+import service.FilterService;
 import service.PostService;
 import undo.UndoRedoManager;
 import undo.action.Action;
@@ -23,14 +25,16 @@ import java.util.UUID;
 public class PostHandler {
     private static final String DEFAULT_SUBREDDIT = "echipa3_general";
     private final PostService postService;
+    private final FilterService filterService;
     private final ConsoleIO io;
     private final Renderer ui;
     private final AppState appState = AppState.getInstance();
     private final UndoRedoManager undoRedoManager;
     private final ObjectMapper objectMapper;
 
-    public PostHandler(PostService postService, ConsoleIO io, Renderer ui) {
+    public PostHandler(PostService postService, FilterService filterService, ConsoleIO io, Renderer ui) {
         this.postService = postService;
+        this.filterService = filterService;
         this.io = io;
         this.ui = ui;
         this.undoRedoManager = UndoRedoManager.getInstance();
@@ -75,14 +79,30 @@ public class PostHandler {
             ui.displayError("Image path cannot be empty.");
             return;
         }
-        //filtru optional
+
+        ApiResult<List<Filter>> filtersResult = filterService.getAll();
+        if (filtersResult.isSuccess() && filtersResult.getData() != null) {
+            ui.displayFilters(filtersResult.getData());
+        } else {
+            ui.displayError("Failed to load filters. Using default no filter.");
+        }
+
         String filterInput = io.readLine("Enter filter ID (or press Enter to skip): ");
         Long filterId = 1L; // do nothing filter is at one
         if(filterInput.isEmpty() || filterInput == null) {
             ui.displayInfo("No filter ID provided, using default no filter."); // ID 1 : none
         } else {
             try {
-                filterId = Long.parseLong(filterInput.trim());
+                Long parsedId = Long.parseLong(filterInput.trim());
+                if (filtersResult.isSuccess() && filtersResult.getData() != null) {
+                    boolean validFilter = filtersResult.getData().stream()
+                            .anyMatch(f -> f.getId().equals(parsedId));
+                    if (validFilter) {
+                        filterId = parsedId;
+                    } else {
+                        ui.displayError("Invalid filter ID. Using default no filter.");
+                    }
+                }
             } catch (NumberFormatException e) {
                 ui.displayError("Invalid filter ID. Creating post without filter.");
                 filterId = 1L;

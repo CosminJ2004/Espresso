@@ -29,6 +29,7 @@ public class Main {
                     wiring.getPostService(),
                     wiring.getUserService(),
                     wiring.getCommentService(),
+                    wiring.getFilterService(),
                     io,
                     ui
             );
