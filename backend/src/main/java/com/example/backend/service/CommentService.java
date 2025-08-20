@@ -84,6 +84,7 @@ public class CommentService {
 
         voteService.vote(user, null, comment, voteRequest.getVoteType());
 
+        commentRepository.flush();
         comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException(commentId));
 

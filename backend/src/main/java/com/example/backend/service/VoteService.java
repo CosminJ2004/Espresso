@@ -5,6 +5,7 @@ import com.example.backend.repository.*;
 import com.example.backend.util.logger.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -20,6 +21,7 @@ public class VoteService {
         this.log = log;
     }
 
+    @Transactional
     public void vote(User user, Post post, Comment comment, VoteType voteType) {
         String targetType = post != null ? "post" : "comment";
         String targetId = post != null ? post.getId() : comment.getId();
@@ -37,17 +39,20 @@ public class VoteService {
             if (existingVote.isPresent()) {
                 log.info("Removing existing vote for " + targetType + " ID: " + targetId);
                 voteRepository.delete(existingVote.get());
+                voteRepository.flush();
             }
         } else {
             if (existingVote.isPresent()) {
                 Vote vote = existingVote.get();
-                if (vote.getType() == voteType) {
+                if (vote.getType().equals(voteType)) {
                     log.info("Removing existing vote for " + targetType + " ID: " + targetId + " (same vote type submitted)");
                     voteRepository.delete(vote);
+                    voteRepository.flush();
                 } else {
                     log.info("Updating existing vote for " + targetType + " ID: " + targetId + " to " + voteType);
                     vote.setType(voteType);
                     voteRepository.save(vote);
+                    voteRepository.flush();
                 }
             } else {
                 log.info("Creating new vote for " + targetType + " ID: " + targetId + " with type " + voteType);

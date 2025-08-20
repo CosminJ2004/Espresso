@@ -184,6 +184,7 @@ public class PostService {
 
         voteService.vote(user, post, null, voteRequest.getVoteType());
 
+        postRepository.flush();
         post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException(postId));
 
         return VoteMapper.toDto(post, user.getUsername());
