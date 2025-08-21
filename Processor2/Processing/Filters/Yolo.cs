@@ -139,42 +139,39 @@ namespace Processing.Filters
                 int i = indices[idx2];
                 var box = boxes[i];
 
-                
-                for (int x = box.X; x < box.X + box.Width && x < origW; x++)
+                int thickness = 3;
+
+                for (int t = 0; t < thickness; t++)
                 {
-                    if (box.Y >= 0 && box.Y < origH)
+                    for (int x = box.X; x < box.X + box.Width && x < origW; x++)
                     {
-                        int topIdx = (box.Y * origW + x) * 3;
-                        img[topIdx] = 255;     // R
-                        img[topIdx + 1] = 0;   // G
-                        img[topIdx + 2] = 0;   // B
+                        if (box.Y + t >= 0 && box.Y + t < origH)
+                        {
+                            int topIdx = ((box.Y + t) * origW + x) * 3;
+                            img[topIdx] = 255; img[topIdx + 1] = 0; img[topIdx + 2] = 0;
+                        }
+                        if (box.Y + box.Height - 1 - t >= 0 && box.Y + box.Height - 1 - t < origH)
+                        {
+                            int bottomIdx = ((box.Y + box.Height - 1 - t) * origW + x) * 3;
+                            img[bottomIdx] = 255; img[bottomIdx + 1] = 0; img[bottomIdx + 2] = 0;
+                        }
                     }
-                    if (box.Y + box.Height >= 0 && box.Y + box.Height < origH)
+
+                    for (int y = box.Y; y < box.Y + box.Height && y < origH; y++)
                     {
-                        int bottomIdx = ((box.Y + box.Height) * origW + x) * 3;
-                        img[bottomIdx] = 255;
-                        img[bottomIdx + 1] = 0;
-                        img[bottomIdx + 2] = 0;
+                        if (box.X + t >= 0 && box.X + t < origW)
+                        {
+                            int leftIdx = (y * origW + box.X + t) * 3;
+                            img[leftIdx] = 255; img[leftIdx + 1] = 0; img[leftIdx + 2] = 0;
+                        }
+                        if (box.X + box.Width - 1 - t >= 0 && box.X + box.Width - 1 - t < origW)
+                        {
+                            int rightIdx = (y * origW + box.X + box.Width - 1 - t) * 3;
+                            img[rightIdx] = 255; img[rightIdx + 1] = 0; img[rightIdx + 2] = 0;
+                        }
                     }
                 }
 
-                for (int y = box.Y; y < box.Y + box.Height && y < origH; y++)
-                {
-                    if (box.X >= 0 && box.X < origW)
-                    {
-                        int leftIdx = (y * origW + box.X) * 3;
-                        img[leftIdx] = 255;
-                        img[leftIdx + 1] = 0;
-                        img[leftIdx + 2] = 0;
-                    }
-                    if (box.X + box.Width >= 0 && box.X + box.Width < origW)
-                    {
-                        int rightIdx = (y * origW + box.X + box.Width) * 3;
-                        img[rightIdx] = 255;
-                        img[rightIdx + 1] = 0;
-                        img[rightIdx + 2] = 0;
-                    }
-                }
             }
 
 
