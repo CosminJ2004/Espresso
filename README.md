@@ -9,3 +9,6 @@ User Interactions:
 
 Image Flow:
 ![Image Flow](personal/images/image_flow.png)
+
+Face Recognition Flow:
+![Face Flow](personal/images/Face_recognition_workflow.png)
