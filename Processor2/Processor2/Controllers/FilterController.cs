@@ -47,7 +47,7 @@ namespace Processor2.Controllers;
             ms.Position = 0;
             _logger.LogInformation("CopyTo MemoryStream took {ms} ms", sw.ElapsedMilliseconds);
 
-            // 🚀 Procesare imagine pe thread separat
+            //  Procesare imagine pe thread separat
             sw.Restart();
             var outStream = await Task.Run(() =>
             {

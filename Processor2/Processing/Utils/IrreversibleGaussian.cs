@@ -27,6 +27,8 @@ namespace Processing.Utils
                     sharpImg[x, y] = new Rgb24(image.Pixels[y, x].R, image.Pixels[y, x].G, image.Pixels[y, x].B);
 
             var rect = new Rectangle(leftCorner.X, leftCorner.Y, regionWidth, regionHeight);
+            
+            if (radius < 1) radius = 1;
 
             // Aplicăm Gaussian blur
             sharpImg.Mutate(ctx =>
