@@ -365,13 +365,84 @@ public class Renderer {
                         "2. Delete Comment",
                         "3. Vote Comment",
                         "4. Reply to Comment",
-                        "5. Back to comment selection"
+                        "5. Interact with Replies",
+                        "6. Back to comment selection"
                 )
         );
         for (String line : lines) {
             System.out.println(Colors.toBold(Colors.toYellow(line)));
         }
         System.out.println();
+    }
+
+    public void displayNestedReplySelectionMenu(Comment parentComment, String currentPath) {
+        String preview = preview(nvl(parentComment.content()), 40);
+        List<String> lines = box.buildBox(
+                "REPLY SELECTION - Level " + currentPath + " - " + preview,
+                List.of(
+                        "Please select an option:",
+                        "1. Select a reply to interact with",
+                        "2. Back to parent actions"
+                )
+        );
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toYellow(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayNestedReplyActionMenu(Comment reply, String currentPath) {
+        String preview = preview(nvl(reply.content()), 40);
+        List<String> lines = box.buildBox(
+                "REPLY ACTIONS - Level " + currentPath + " - " + preview,
+                List.of(
+                        "Please select an option:",
+                        "1. Edit Reply",
+                        "2. Delete Reply",
+                        "3. Vote Reply",
+                        "4. Reply to Reply",
+                        "5. Interact with Nested Replies",
+                        "6. Back to parent reply selection"
+                )
+        );
+        for (String line : lines) {
+            System.out.println(Colors.toBold(Colors.toYellow(line)));
+        }
+        System.out.println();
+    }
+
+    public void displayNestedReplyList(List<Comment> replies, String currentPath) {
+        if (replies == null || replies.isEmpty()) {
+            displayInfo("No replies available at this level.");
+            return;
+        }
+
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        displayInfo("Available replies at level " + currentPath + ":");
+        
+        for (int i = 0; i < replies.size(); i++) {
+            Comment reply = replies.get(i);
+            String created = (reply.createdAt() == null) ? "-" : reply.createdAt().format(fmt);
+            String preview = preview(nvl(reply.content()), 50);
+            String nestedPath = currentPath + "." + (i + 1);
+
+            List<String> body = new ArrayList<>();
+            body.add("- Reply #" + nestedPath + " by: " + nvl(reply.author()));
+            body.add("Score: " + nvl(reply.score()) + " | Upvotes: " + nvl(reply.upvotes()) + " | Downvotes: " + nvl(reply.downvotes()));
+            body.add("Created: " + created);
+            if (!preview.equals("-")) {
+                body.add("Content: " + preview);
+            }
+            if (reply.replies() != null && !reply.replies().isEmpty()) {
+                body.add("Has " + reply.replies().size() + " nested replies");
+            }
+
+            List<String> lines = box.buildBox("REPLY #" + nestedPath, body);
+            for (String line : lines) {
+                System.out.println(Colors.toBold(Colors.toBlue(line)));
+            }
+            System.out.println();
+        }
     }
 
     public void displayComments(List<Comment> comments) {
@@ -396,21 +467,49 @@ public class Renderer {
             String preview = preview(nvl(reply.content()), 50);
 
             List<String> body = new ArrayList<>();
-            body.add("↳ Reply by: " + nvl(reply.author()));
+            body.add("- Reply by: " + nvl(reply.author()));
             body.add("Score: " + nvl(reply.score()) + " | Upvotes: " + nvl(reply.upvotes()) + " | Downvotes: " + nvl(reply.downvotes()));
             body.add("Created: " + created);
             if (!preview.equals("-")) {
                 body.add("Content: " + preview);
             }
 
-            List<String> lines = box.buildBox("REPLY #" + (parentCommentNumber > 0 ? parentCommentNumber + "." : "") + (i + 1), body);
+            String replyNumber = parentCommentNumber > 0 ? parentCommentNumber + "." + (i + 1) : String.valueOf(i + 1);
+            List<String> lines = box.buildBox("REPLY #" + replyNumber, body);
             for (String line : lines) {
                 System.out.println(Colors.toBold(Colors.toBlue(line)));
             }
             System.out.println();
 
             if (reply.replies() != null && !reply.replies().isEmpty()) {
-                displayReplies(reply.replies(), parentCommentNumber, fmt);
+                displayRepliesNested(reply.replies(), replyNumber, fmt);
+            }
+        }
+    }
+
+    private void displayRepliesNested(List<Comment> replies, String parentReplyNumber, DateTimeFormatter fmt) {
+        for (int i = 0; i < replies.size(); i++) {
+            Comment reply = replies.get(i);
+            String created = (reply.createdAt() == null) ? "-" : reply.createdAt().format(fmt);
+            String preview = preview(nvl(reply.content()), 50);
+
+            List<String> body = new ArrayList<>();
+            body.add("- Reply by: " + nvl(reply.author()));
+            body.add("Score: " + nvl(reply.score()) + " | Upvotes: " + nvl(reply.upvotes()) + " | Downvotes: " + nvl(reply.downvotes()));
+            body.add("Created: " + created);
+            if (!preview.equals("-")) {
+                body.add("Content: " + preview);
+            }
+
+            String nestedReplyNumber = parentReplyNumber + "." + (i + 1);
+            List<String> lines = box.buildBox("REPLY #" + nestedReplyNumber, body);
+            for (String line : lines) {
+                System.out.println(Colors.toBold(Colors.toCyan(line)));
+            }
+            System.out.println();
+
+            if (reply.replies() != null && !reply.replies().isEmpty()) {
+                displayRepliesNested(reply.replies(), nestedReplyNumber, fmt);
             }
         }
     }
